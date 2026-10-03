@@ -9,14 +9,23 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun ShoppingListScreen(
     onNavigateToDetail: (String) -> Unit,
+    onNavigateToContacts: () -> Unit,
+    onNavigateToProfile: () -> Unit,
     viewModel: ShoppingListViewModel = koinViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     ObserveAsEvents(viewModel.uiEvent) { event ->
         when (event) {
             is ShoppingListUiEvent.NavigateToDetail -> onNavigateToDetail(event.id)
+            ShoppingListUiEvent.NavigateToContacts -> onNavigateToContacts()
+            ShoppingListUiEvent.NavigateToProfile -> onNavigateToProfile()
             is ShoppingListUiEvent.ShowError -> Unit
         }
     }
-    ShoppingListContent(uiState, viewModel::onAction)
+    ShoppingListContent(
+        uiState = uiState,
+        onAction = viewModel::onAction,
+        onNavigateToContacts = { viewModel.onAction(ShoppingListUiAction.OpenContacts) },
+        onNavigateToProfile = { viewModel.onAction(ShoppingListUiAction.OpenProfile) },
+    )
 }

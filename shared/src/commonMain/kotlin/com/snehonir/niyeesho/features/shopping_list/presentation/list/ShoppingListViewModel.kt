@@ -38,6 +38,8 @@ class ShoppingListViewModel(
             is ShoppingListUiAction.ListClicked -> viewModelScope.launch { _uiEvent.send(ShoppingListUiEvent.NavigateToDetail(action.id)) }
             is ShoppingListUiAction.DeleteClicked -> mutate { deleteList(action.id) }
             is ShoppingListUiAction.ArchiveClicked -> mutate { archiveList(action.id) }
+            ShoppingListUiAction.OpenContacts -> viewModelScope.launch { _uiEvent.send(ShoppingListUiEvent.NavigateToContacts) }
+            ShoppingListUiAction.OpenProfile -> viewModelScope.launch { _uiEvent.send(ShoppingListUiEvent.NavigateToProfile) }
             ShoppingListUiAction.ErrorDismissed -> _uiState.update { it.copy(error = null) }
         }
     }

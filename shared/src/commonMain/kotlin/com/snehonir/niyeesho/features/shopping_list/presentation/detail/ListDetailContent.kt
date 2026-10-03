@@ -12,6 +12,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.snehonir.niyeesho.core.designsystem.component.AppButton
+import com.snehonir.niyeesho.core.designsystem.component.AppTopBar
 import com.snehonir.niyeesho.core.designsystem.component.ErrorView
 import com.snehonir.niyeesho.core.designsystem.theme.Spacing
 import com.snehonir.niyeesho.core.utils.UiText
@@ -21,6 +22,7 @@ import com.snehonir.niyeesho.features.shopping_list.presentation.detail.componen
 fun ListDetailContent(
     uiState: ListDetailUiState,
     onAction: (ListDetailUiAction) -> Unit,
+    onBack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     LazyColumn(

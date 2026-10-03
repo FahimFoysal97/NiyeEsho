@@ -17,7 +17,7 @@ import com.snehonir.niyeesho.core.designsystem.theme.Spacing
 @Composable
 fun ShoppingListCard(list: ShoppingListUiModel, onClick: () -> Unit, modifier: Modifier = Modifier) {
     Card(
-        modifier = modifier.fillMaxWidth().clickable(onClick = onClick),
+        modifier = modifier.fillMaxWidth().clickable(onClick = onClick).padding(bottom = Spacing.sm),
         shape = androidx.compose.material3.MaterialTheme.shapes.large,
         colors = CardDefaults.cardColors(
             containerColor = androidx.compose.material3.MaterialTheme.colorScheme.surface,

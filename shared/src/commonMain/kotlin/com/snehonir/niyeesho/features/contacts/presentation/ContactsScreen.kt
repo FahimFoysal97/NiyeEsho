@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.snehonir.niyeesho.core.utils.ObserveAsEvents
+import com.snehonir.niyeesho.features.contacts.presentation.component.InviteBottomSheet
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -21,4 +22,11 @@ fun ContactsScreen(
         }
     }
     ContactsContent(uiState = uiState, onAction = viewModel::onAction)
+    uiState.inviteLink?.let { link ->
+        InviteBottomSheet(
+            inviteLink = link,
+            onShare = { onShareInvite(link) },
+            onDismiss = { viewModel.onAction(ContactsUiAction.DismissInvite) },
+        )
+    }
 }

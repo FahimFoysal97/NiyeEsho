@@ -7,5 +7,7 @@ sealed interface ShoppingListUiAction {
     data class ListClicked(val id: String) : ShoppingListUiAction
     data class DeleteClicked(val id: String) : ShoppingListUiAction
     data class ArchiveClicked(val id: String) : ShoppingListUiAction
+    data object OpenContacts : ShoppingListUiAction
+    data object OpenProfile : ShoppingListUiAction
     data object ErrorDismissed : ShoppingListUiAction
 }

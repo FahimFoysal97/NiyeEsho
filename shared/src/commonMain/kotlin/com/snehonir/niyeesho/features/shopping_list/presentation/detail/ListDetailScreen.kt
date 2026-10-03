@@ -12,6 +12,7 @@ import org.koin.compose.viewmodel.koinViewModel
 fun ListDetailScreen(
     listId: String,
     onInviteMember: () -> Unit = {},
+    onBack: () -> Unit = {},
     onShareInvite: (String) -> Unit = {},
     viewModel: ListDetailViewModel = koinViewModel(),
 ) {
@@ -23,7 +24,7 @@ fun ListDetailScreen(
             is ListDetailUiEvent.ShowError -> Unit
         }
     }
-    ListDetailContent(uiState, viewModel::onAction)
+    ListDetailContent(uiState, viewModel::onAction, onBack)
     uiState.inviteLink?.let { inviteLink ->
         InviteMemberSheet(
             inviteLink = inviteLink,

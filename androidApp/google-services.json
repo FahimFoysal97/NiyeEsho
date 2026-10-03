@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "684879377586",
+    "project_id": "niye-esho",
+    "storage_bucket": "niye-esho.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:684879377586:android:42eed894d0141c808445ab",
+        "android_client_info": {
+          "package_name": "com.snehonir.niyeesho"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDjFe1iErg8FTY-SCAD1SIZywINaIKPZxU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

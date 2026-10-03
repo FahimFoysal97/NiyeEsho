@@ -1,0 +1,14 @@
+package com.snehonir.niyeesho.features.contacts.domain.repository
+
+import com.snehonir.niyeesho.features.contacts.domain.entity.Contact
+import kotlinx.coroutines.flow.Flow
+
+/** Owns the local contacts cache and its Drive/token synchronization. */
+interface ContactsRepository {
+    fun watchContacts(): Flow<Result<List<Contact>>>
+    suspend fun addContact(contact: Contact): Result<Unit>
+    suspend fun removeContact(uid: String): Result<Unit>
+    suspend fun searchContacts(query: String): Result<List<Contact>>
+    suspend fun refreshContactToken(uid: String): Result<Contact>
+    suspend fun syncWithDrive(accessToken: String): Result<Unit>
+}

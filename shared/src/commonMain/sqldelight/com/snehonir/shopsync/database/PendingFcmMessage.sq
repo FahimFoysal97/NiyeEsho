@@ -1,0 +1,9 @@
+CREATE TABLE PendingFcmMessageEntity (
+    id             TEXT    NOT NULL PRIMARY KEY,
+    recipient_uid  TEXT    NOT NULL,
+    message_type   TEXT    NOT NULL,
+    payload_json   TEXT    NOT NULL,
+    created_at     INTEGER NOT NULL,
+    retry_count    INTEGER NOT NULL DEFAULT 0,
+    last_retry     INTEGER
+);

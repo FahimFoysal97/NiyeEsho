@@ -1,0 +1,20 @@
+package com.snehonir.niyeesho.features.messaging.domain.entity
+
+enum class FcmMessageType {
+    CONTACT_ACCEPTED,
+    CONTACT_REMOVED,
+    TOKEN_UPDATE,
+    LIST_SHARED,
+    LIST_UPDATED,
+    LIST_DELETED,
+    LIST_ARCHIVED,
+    MEMBER_ADDED,
+    MEMBER_REMOVED,
+    ITEM_ADDED,
+    ITEM_UPDATED,
+    ITEM_TOGGLED,
+    ITEM_DELETED,
+    ITEMS_REORDERED,
+    SYNC_REQUEST,
+    SYNC_RESPONSE,
+}

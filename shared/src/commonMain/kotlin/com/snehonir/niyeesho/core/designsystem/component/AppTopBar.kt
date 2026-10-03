@@ -1,11 +1,8 @@
 package com.snehonir.niyeesho.core.designsystem.component
 
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.*
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -21,7 +18,7 @@ fun AppTopBar(
     contentColor: androidx.compose.ui.graphics.Color = MaterialTheme.colorScheme.onSurface,
     actions: @Composable () -> Unit = {},
 ) {
-    TopAppBar(
+    CenterAlignedTopAppBar(
         title = {
             Text(
                 text = title.resolve(),
@@ -32,13 +29,17 @@ fun AppTopBar(
         navigationIcon = {
             onBackClick?.let { onBack ->
                 IconButton(onClick = onBack) {
-                    Text("â€¹", style = MaterialTheme.typography.headlineMedium)
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = "Back",
+                        tint = contentColor,
+                    )
                 }
             }
         },
         actions = { actions() },
         windowInsets = WindowInsets(0, 0, 0, 0),
-        colors = TopAppBarDefaults.topAppBarColors(
+        colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
             containerColor = containerColor,
             titleContentColor = contentColor,
             navigationIconContentColor = contentColor,

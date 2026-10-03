@@ -11,6 +11,7 @@ import org.koin.compose.viewmodel.koinViewModel
 fun ContactsScreen(
     onOpenContact: (String) -> Unit,
     onShareInvite: (String) -> Unit,
+    onBack: () -> Unit,
     viewModel: ContactsViewModel = koinViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -21,7 +22,7 @@ fun ContactsScreen(
             is ContactsUiEvent.ShowError -> Unit
         }
     }
-    ContactsContent(uiState = uiState, onAction = viewModel::onAction)
+    ContactsContent(uiState = uiState, onAction = viewModel::onAction, onBack = onBack)
     uiState.inviteLink?.let { link ->
         InviteBottomSheet(
             inviteLink = link,

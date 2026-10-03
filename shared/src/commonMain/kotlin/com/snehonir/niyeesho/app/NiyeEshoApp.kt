@@ -22,6 +22,7 @@ import com.snehonir.niyeesho.features.auth.domain.usecase.IsSignedInUseCase
 import com.snehonir.niyeesho.features.auth.presentation.profile.ProfileScreen
 import com.snehonir.niyeesho.features.auth.presentation.signin.SignInScreen
 import com.snehonir.niyeesho.features.contacts.presentation.ContactsScreen
+import com.snehonir.niyeesho.features.dashboard.presentation.DashboardScreen
 import com.snehonir.niyeesho.features.shopping_list.presentation.detail.ListDetailScreen
 import com.snehonir.niyeesho.features.shopping_list.presentation.list.ShoppingListScreen
 import org.koin.compose.koinInject
@@ -65,12 +66,9 @@ fun NiyeEshoApp(
                         )
                     },
                     shoppingLists = {
-                        ShoppingListScreen(
+                        DashboardScreen(
                             onNavigateToDetail = { id ->
                                 navController.navigate(NavRoute.ListDetail(id).route)
-                            },
-                            onNavigateToContacts = {
-                                navController.navigate(NavRoute.Contacts.route)
                             },
                             onNavigateToProfile = {
                                 navController.navigate(NavRoute.Profile.route)
@@ -87,6 +85,7 @@ fun NiyeEshoApp(
                         ContactsScreen(
                             onOpenContact = { },
                             onShareInvite = onShareInvite,
+                            onBack = { navController.popBackStack() },
                         )
                     },
                     profile = {
@@ -96,6 +95,7 @@ fun NiyeEshoApp(
                                     popUpTo(0)
                                 }
                             },
+                            onBack = { navController.popBackStack() },
                         )
                     },
                     inviteAccept = { },

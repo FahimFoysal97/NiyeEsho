@@ -9,6 +9,7 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun ProfileScreen(
     onNavigateToSignIn: () -> Unit,
+    onBack: () -> Unit,
     viewModel: ProfileViewModel = koinViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -18,5 +19,5 @@ fun ProfileScreen(
             is ProfileUiEvent.ShowError -> Unit
         }
     }
-    ProfileContent(uiState = uiState, onAction = viewModel::onAction)
+    ProfileContent(uiState = uiState, onAction = viewModel::onAction, onBack = onBack)
 }

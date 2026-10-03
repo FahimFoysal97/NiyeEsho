@@ -67,7 +67,9 @@ actual fun GoogleSignInButton(
                     ),
                 )
             } else {
-                launcher.launch(signInClient.signInIntent)
+                signInClient.signOut().addOnCompleteListener {
+                    launcher.launch(signInClient.signInIntent)
+                }
             }
         },
         enabled = enabled,

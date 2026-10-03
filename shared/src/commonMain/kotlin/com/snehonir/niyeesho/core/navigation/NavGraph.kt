@@ -1,6 +1,7 @@
 package com.snehonir.niyeesho.core.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -20,7 +21,7 @@ data class NavGraphDestinations(
 @Composable
 fun NiyeEshoNavGraph(
     destinations: NavGraphDestinations,
-    modifier: androidx.compose.ui.Modifier = androidx.compose.ui.Modifier,
+    modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController(),
     startDestination: String = NavRoute.SignIn.route,
 ) {

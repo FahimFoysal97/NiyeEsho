@@ -2,12 +2,22 @@ package com.snehonir.niyeesho.features.shopping_list.presentation.detail
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.snehonir.niyeesho.features.messaging.domain.entity.InviteData
+import com.snehonir.niyeesho.features.messaging.domain.usecase.GenerateInviteLinkUseCase
 import com.snehonir.niyeesho.features.shopping_list.domain.entity.ListItem
-import com.snehonir.niyeesho.features.shopping_list.domain.usecase.*
+import com.snehonir.niyeesho.features.shopping_list.domain.usecase.AddListItemUseCase
+import com.snehonir.niyeesho.features.shopping_list.domain.usecase.DeleteListItemUseCase
+import com.snehonir.niyeesho.features.shopping_list.domain.usecase.GetShoppingListUseCase
+import com.snehonir.niyeesho.features.shopping_list.domain.usecase.ToggleListItemUseCase
+import com.snehonir.niyeesho.features.shopping_list.domain.usecase.WatchListItemsUseCase
 import com.snehonir.niyeesho.features.shopping_list.presentation.detail.model.ListItemUiModel
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 
@@ -17,6 +27,7 @@ class ListDetailViewModel(
     private val addItem: AddListItemUseCase,
     private val toggleItem: ToggleListItemUseCase,
     private val deleteItem: DeleteListItemUseCase,
+    private val generateInviteLink: GenerateInviteLinkUseCase,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(ListDetailUiState())
     val uiState = _uiState.asStateFlow()
@@ -28,14 +39,17 @@ class ListDetailViewModel(
         if (currentListId == listId && !_uiState.value.isLoading) return
         currentListId = listId
         viewModelScope.launch {
-            getList(listId).onSuccess { list -> _uiState.update { it.copy(list = list, isLoading = false) } }
-                .onFailure { fail(it) }
+            getList(listId).onSuccess { list ->
+                _uiState.update { it.copy(list = list, isLoading = false) }
+            }.onFailure { fail(it) }
             watchItems(listId).collect { result ->
                 result.onSuccess { items ->
                     _uiState.update {
                         it.copy(
-                            activeItems = items.filterNot { item -> item.isChecked }.map(ListItemUiModel::fromDomain).toImmutableList(),
-                            checkedItems = items.filter { item -> item.isChecked }.map(ListItemUiModel::fromDomain).toImmutableList(),
+                            activeItems = items.filterNot { item -> item.isChecked }
+                                .map(ListItemUiModel::fromDomain).toImmutableList(),
+                            checkedItems = items.filter { item -> item.isChecked }
+                                .map(ListItemUiModel::fromDomain).toImmutableList(),
                         )
                     }
                 }.onFailure { fail(it) }
@@ -48,8 +62,24 @@ class ListDetailViewModel(
             is ListDetailUiAction.ToggleItem -> mutate { toggleItem(action.id, action.checked, null) }
             is ListDetailUiAction.DeleteItem -> mutate { deleteItem(action.id) }
             is ListDetailUiAction.AddItem -> add(action)
-            ListDetailUiAction.InviteMember -> viewModelScope.launch { _uiEvent.send(ListDetailUiEvent.OpenInvite) }
+            ListDetailUiAction.InviteMember -> generateInvite()
+            ListDetailUiAction.DismissInvite -> _uiState.update { it.copy(inviteLink = null) }
             ListDetailUiAction.ErrorDismissed -> _uiState.update { it.copy(error = null) }
+        }
+    }
+
+    private fun generateInvite() {
+        viewModelScope.launch {
+            val list = _uiState.value.list ?: run {
+                fail(IllegalStateException("List is not loaded yet."))
+                return@launch
+            }
+            generateInviteLink(
+                InviteData.preview().copy(listId = list.id, listTitle = list.title),
+            ).onSuccess { link ->
+                _uiState.update { it.copy(inviteLink = link) }
+                _uiEvent.send(ListDetailUiEvent.OpenInvite)
+            }.onFailure { fail(it) }
         }
     }
 
@@ -74,9 +104,11 @@ class ListDetailViewModel(
             ).onFailure { fail(it) }
         }
     }
+
     private fun mutate(operation: suspend () -> Result<Unit>) = viewModelScope.launch {
         operation().onFailure { fail(it) }
     }
+
     private fun fail(error: Throwable) {
         val message = error.message ?: "Unable to update this list."
         _uiState.update { it.copy(isLoading = false, error = message) }

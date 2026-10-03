@@ -1,5 +1,6 @@
 package com.snehonir.niyeesho
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -12,7 +13,19 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
-            NiyeEshoApp()
+            NiyeEshoApp(
+                onShareInvite = { inviteLink ->
+                    startActivity(
+                        Intent.createChooser(
+                            Intent(Intent.ACTION_SEND).apply {
+                                type = "text/plain"
+                                putExtra(Intent.EXTRA_TEXT, inviteLink)
+                            },
+                            "Share invite link",
+                        ),
+                    )
+                },
+            )
         }
     }
 }

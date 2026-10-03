@@ -11,6 +11,7 @@ data class ListDetailUiState(
     val checkedItems: ImmutableList<ListItemUiModel> = persistentListOf(),
     val isLoading: Boolean = true,
     val error: String? = null,
+    val inviteLink: String? = null,
 ) {
     companion object {
         fun preview() = ListDetailUiState(

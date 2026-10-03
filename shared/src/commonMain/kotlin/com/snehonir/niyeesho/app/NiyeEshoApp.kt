@@ -14,7 +14,10 @@ import com.snehonir.niyeesho.features.shopping_list.presentation.detail.ListDeta
 import com.snehonir.niyeesho.features.shopping_list.presentation.list.ShoppingListScreen
 
 @Composable
-fun NiyeEshoApp(modifier: Modifier = Modifier) {
+fun NiyeEshoApp(
+    modifier: Modifier = Modifier,
+    onShareInvite: (String) -> Unit = {},
+) {
     val navController = rememberNavController()
     NiyeEshoTheme {
         NiyeEshoNavGraph(
@@ -41,13 +44,13 @@ fun NiyeEshoApp(modifier: Modifier = Modifier) {
                 listDetail = { id ->
                     ListDetailScreen(
                         listId = id,
-                        onInviteMember = { },
+                        onShareInvite = onShareInvite,
                     )
                 },
                 contacts = {
                     ContactsScreen(
                         onOpenContact = { },
-                        onShareInvite = { },
+                        onShareInvite = onShareInvite,
                     )
                 },
                 profile = {

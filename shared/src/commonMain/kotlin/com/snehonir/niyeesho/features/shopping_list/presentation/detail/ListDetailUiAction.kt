@@ -5,5 +5,6 @@ sealed interface ListDetailUiAction {
     data class DeleteItem(val id: String) : ListDetailUiAction
     data class AddItem(val name: String, val quantity: String?, val unit: String?) : ListDetailUiAction
     data object InviteMember : ListDetailUiAction
+    data object DismissInvite : ListDetailUiAction
     data object ErrorDismissed : ListDetailUiAction
 }

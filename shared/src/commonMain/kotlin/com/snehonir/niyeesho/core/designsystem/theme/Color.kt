@@ -10,3 +10,8 @@ val NiyeEshoOnPrimary = Color.White
 val NiyeEshoBackground = Color(0xFFF6F8F7)
 val NiyeEshoOnSurface = Color(0xFF17211D)
 val NiyeEshoTertiary = Color(0xFF6750A4)
+
+// Brand gradient tokens used by hero surfaces (sign-in, headers).
+val NiyeEshoGradientTop = Color(0xFF1FA67F)
+val NiyeEshoGradientBottom = Color(0xFF115C47)
+val NiyeEshoAccentSoft = Color(0xFFFCEFD6)

@@ -2,6 +2,7 @@ package com.snehonir.niyeesho.core.designsystem.component
 
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -28,5 +29,12 @@ fun AppTextField(
         isError = isError,
         singleLine = singleLine,
         keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
+        shape = androidx.compose.material3.MaterialTheme.shapes.medium,
+        colors = OutlinedTextFieldDefaults.colors(
+            unfocusedContainerColor = androidx.compose.material3.MaterialTheme.colorScheme.surface,
+            focusedContainerColor = androidx.compose.material3.MaterialTheme.colorScheme.surface,
+            unfocusedBorderColor = androidx.compose.material3.MaterialTheme.colorScheme.outlineVariant,
+            focusedBorderColor = androidx.compose.material3.MaterialTheme.colorScheme.primary,
+        ),
     )
 }

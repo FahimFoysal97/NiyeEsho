@@ -1,20 +1,31 @@
 package com.snehonir.niyeesho.features.auth.presentation.signin
 
-import android.content.Intent
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import com.snehonir.niyeesho.BuildKonfig
+import com.snehonir.niyeesho.core.designsystem.theme.Spacing
 
 @Composable
 actual fun GoogleSignInButton(
@@ -60,9 +71,51 @@ actual fun GoogleSignInButton(
             }
         },
         enabled = enabled,
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier.height(Spacing.xxl + Spacing.xs),
+        shape = CircleShape,
+        colors = ButtonDefaults.buttonColors(
+            containerColor = Color.White,
+            contentColor = Color(0xFF1F1F1F),
+            disabledContainerColor = Color.White.copy(alpha = 0.6f),
+        ),
+        elevation = ButtonDefaults.buttonElevation(
+            defaultElevation = Spacing.xs / 2,
+            pressedElevation = Spacing.xs,
+        ),
     ) {
-        if (!enabled) CircularProgressIndicator()
-        else Text("Continue with Google")
+        if (!enabled) {
+            CircularProgressIndicator(
+                modifier = Modifier.size(Spacing.lg),
+                strokeWidth = Spacing.xs / 2,
+                color = MaterialTheme.colorScheme.primary,
+            )
+        } else {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(Spacing.sm),
+            ) {
+                GoogleGlyph()
+                Text(
+                    text = "Continue with Google",
+                    style = MaterialTheme.typography.labelLarge,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun GoogleGlyph(modifier: Modifier = Modifier) {
+    Box(
+        modifier = modifier
+            .size(Spacing.lg)
+            .clip(CircleShape),
+        contentAlignment = Alignment.Center,
+    ) {
+        Text(
+            text = "G",
+            style = MaterialTheme.typography.titleMedium,
+            color = Color(0xFF4285F4),
+        )
     }
 }

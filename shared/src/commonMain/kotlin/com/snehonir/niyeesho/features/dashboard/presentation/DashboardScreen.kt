@@ -11,6 +11,7 @@ import org.koin.compose.viewmodel.koinViewModel
 fun DashboardScreen(
     onNavigateToDetail: (String) -> Unit,
     onNavigateToProfile: () -> Unit,
+    onShareInvite: (String) -> Unit = {},
     modifier: Modifier = Modifier,
     viewModel: DashboardViewModel = koinViewModel(),
 ) {
@@ -19,10 +20,8 @@ fun DashboardScreen(
     ObserveAsEvents(viewModel.uiEvent) { event ->
         when (event) {
             is DashboardUiEvent.NavigateToDetail -> onNavigateToDetail(event.listId)
-            /*is DashboardUiEvent.NavigateToContactList -> {
-                // Handle contact tap if needed
-            }*/
             DashboardUiEvent.NavigateToProfile -> onNavigateToProfile()
+            is DashboardUiEvent.ShareInvite -> onShareInvite(event.link)
             is DashboardUiEvent.ShowError -> Unit
         }
     }
@@ -32,6 +31,7 @@ fun DashboardScreen(
         onAction = viewModel::onAction,
         onNavigateToDetail = onNavigateToDetail,
         onNavigateToProfile = onNavigateToProfile,
+        onShareInvite = onShareInvite,
         modifier = modifier,
     )
 }

@@ -13,6 +13,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.snehonir.niyeesho.core.designsystem.theme.Spacing
+import com.snehonir.niyeesho.features.contacts.presentation.component.QrCodeDisplay
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -29,8 +30,12 @@ fun InviteMemberSheet(
         ) {
             Text("Invite someone", style = MaterialTheme.typography.headlineSmall)
             Text(
-                "Share this link with a family member or friend so they can join this list.",
+                "Share this link or scan the QR code with a family member or friend so they can join this list.",
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            QrCodeDisplay(
+                value = inviteLink,
+                modifier = Modifier.fillMaxWidth(),
             )
             Text(
                 inviteLink,

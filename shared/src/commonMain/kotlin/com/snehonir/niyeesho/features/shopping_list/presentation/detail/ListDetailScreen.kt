@@ -14,6 +14,7 @@ fun ListDetailScreen(
     onInviteMember: () -> Unit = {},
     onBack: () -> Unit = {},
     onShareInvite: (String) -> Unit = {},
+    onNavigateToDetail: (String) -> Unit = {},
     viewModel: ListDetailViewModel = koinViewModel(),
 ) {
     LaunchedEffect(listId) { viewModel.load(listId) }
@@ -21,6 +22,7 @@ fun ListDetailScreen(
     ObserveAsEvents(viewModel.uiEvent) { event ->
         when (event) {
             ListDetailUiEvent.OpenInvite -> onInviteMember()
+            is ListDetailUiEvent.NavigateToDetail -> onNavigateToDetail(event.listId)
             is ListDetailUiEvent.ShowError -> Unit
         }
     }

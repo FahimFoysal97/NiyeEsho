@@ -9,6 +9,8 @@ data class ContactsUiState(
     val query: String = "",
     val isLoading: Boolean = true,
     val isRefreshing: Boolean = false,
+    val isCreateGroupDialogVisible: Boolean = false,
+    val selectedContactForGroup: Contact? = null,
     val error: String? = null,
     val inviteLink: String? = null,
 ) {

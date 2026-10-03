@@ -7,7 +7,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -17,7 +16,8 @@ import com.snehonir.niyeesho.core.designsystem.component.AppTopBar
 import com.snehonir.niyeesho.core.designsystem.component.ErrorView
 import com.snehonir.niyeesho.core.designsystem.theme.Spacing
 import com.snehonir.niyeesho.core.utils.UiText
-import com.snehonir.niyeesho.features.shopping_list.presentation.list.component.CreateListDialog
+import com.snehonir.niyeesho.features.shopping_list.presentation.detail.component.InviteMemberSheet
+import com.snehonir.niyeesho.features.shopping_list.presentation.list.component.CreateGroupDialog
 
 @Composable
 fun DashboardContent(
@@ -25,6 +25,7 @@ fun DashboardContent(
     onAction: (DashboardUiAction) -> Unit,
     onNavigateToDetail: (String) -> Unit,
     onNavigateToProfile: () -> Unit,
+    onShareInvite: (String) -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
@@ -75,6 +76,27 @@ fun DashboardContent(
                     }
                 }
 
+                // 2 Action Buttons in a Row (Invite / Share & Create Group)
+                item {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(Spacing.sm),
+                    ) {
+                        Button(
+                            onClick = { onAction(DashboardUiAction.InviteShareClicked) },
+                            modifier = Modifier.weight(1f),
+                        ) {
+                            Text("🔗 Invite / Share")
+                        }
+                        Button(
+                            onClick = { onAction(DashboardUiAction.AddGroupClicked) },
+                            modifier = Modifier.weight(1f),
+                        ) {
+                            Text("👥 Create Group")
+                        }
+                    }
+                }
+
                 uiState.error?.let { error ->
                     item { ErrorView(UiText.Plain(error), modifier = Modifier.fillMaxWidth()) }
                 }
@@ -91,66 +113,21 @@ fun DashboardContent(
                             contentAlignment = Alignment.Center,
                         ) {
                             Text(
-                                text = "No shopping lists or requests yet. Tap '+' to start!",
+                                text = "No shopping lists or requests yet. Tap 'Create Group' to start!",
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
                         }
                     }
                 }
             }
-
-            FloatingActionButton(
-                onClick = { onAction(DashboardUiAction.FabClicked) },
-                modifier = Modifier.align(Alignment.BottomEnd).padding(Spacing.lg),
-                containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = MaterialTheme.colorScheme.onPrimary,
-            ) {
-                Icon(Icons.Default.Add, contentDescription = "Options")
-            }
         }
     }
 
-    if (uiState.isFabMenuVisible) {
-        AlertDialog(
-            onDismissRequest = { onAction(DashboardUiAction.FabMenuDismissed) },
-            title = { Text("Choose Action") },
-            text = {
-                Column(verticalArrangement = Arrangement.spacedBy(Spacing.sm)) {
-                    TextButton(
-                        onClick = { onAction(DashboardUiAction.AddGroupClicked) },
-                        modifier = Modifier.fillMaxWidth(),
-                    ) {
-                        Text("👥 Add Group", style = MaterialTheme.typography.titleMedium)
-                    }
-                    TextButton(
-                        onClick = { onAction(DashboardUiAction.InviteShareClicked) },
-                        modifier = Modifier.fillMaxWidth(),
-                    ) {
-                        Text("🔗 Invite / Share", style = MaterialTheme.typography.titleMedium)
-                    }
-                }
-            },
-            confirmButton = {},
-            dismissButton = {
-                TextButton(onClick = { onAction(DashboardUiAction.FabMenuDismissed) }) {
-                    Text("Cancel")
-                }
-            },
-        )
-    }
-
-    if (uiState.isInviteDialogVisible) {
-        AlertDialog(
-            onDismissRequest = { onAction(DashboardUiAction.InviteDismissed) },
-            title = { Text("Invite & Share") },
-            text = {
-                Text("Share your invite link with family and friends to shop together instantly.")
-            },
-            confirmButton = {
-                TextButton(onClick = { onAction(DashboardUiAction.InviteDismissed) }) {
-                    Text("OK")
-                }
-            },
+    if (uiState.isInviteDialogVisible && uiState.inviteLink != null) {
+        InviteMemberSheet(
+            inviteLink = uiState.inviteLink,
+            onShare = { onShareInvite(uiState.inviteLink) },
+            onDismiss = { onAction(DashboardUiAction.InviteDismissed) },
         )
     }
 
@@ -160,8 +137,11 @@ fun DashboardContent(
 @Composable
 private fun ItemCreateDialog(uiState: DashboardUiState, onAction: (DashboardUiAction) -> Unit) {
     if (uiState.isCreateDialogVisible) {
-        CreateListDialog(
-            onConfirm = { title -> onAction(DashboardUiAction.CreateConfirmed(title, "user_demo")) },
+        CreateGroupDialog(
+            availableContacts = uiState.availableContacts,
+            onConfirm = { title, members ->
+                onAction(DashboardUiAction.CreateConfirmed(title, "user_demo", members))
+            },
             onDismiss = { onAction(DashboardUiAction.CreateDismissed) },
         )
     }

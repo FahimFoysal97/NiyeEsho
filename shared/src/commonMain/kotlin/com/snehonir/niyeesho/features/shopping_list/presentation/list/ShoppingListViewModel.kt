@@ -24,7 +24,14 @@ class ShoppingListViewModel(
         viewModelScope.launch {
             watchLists().collect { result ->
                 result.onSuccess { lists ->
-                    _uiState.update { it.copy(lists = lists.map(ShoppingListUiModel::fromDomain).toImmutableList(), isLoading = false) }
+                    _uiState.update {
+                        it.copy(
+                            lists = lists.map(ShoppingListUiModel::fromDomain)
+                                .distinctBy { list -> list.id }
+                                .toImmutableList(),
+                            isLoading = false,
+                        )
+                    }
                 }.onFailure { fail(it) }
             }
         }

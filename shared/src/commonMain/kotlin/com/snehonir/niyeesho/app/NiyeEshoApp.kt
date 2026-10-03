@@ -73,17 +73,24 @@ fun NiyeEshoApp(
                             onNavigateToProfile = {
                                 navController.navigate(NavRoute.Profile.route)
                             },
+                            onShareInvite = onShareInvite,
                         )
                     },
                     listDetail = { id ->
                         ListDetailScreen(
                             listId = id,
+                            onBack = { navController.popBackStack() },
                             onShareInvite = onShareInvite,
+                            onNavigateToDetail = { listId ->
+                                navController.navigate(NavRoute.ListDetail(listId).route)
+                            },
                         )
                     },
                     contacts = {
                         ContactsScreen(
-                            onOpenContact = { },
+                            onOpenContact = { listId ->
+                                navController.navigate(NavRoute.ListDetail(listId).route)
+                            },
                             onShareInvite = onShareInvite,
                             onBack = { navController.popBackStack() },
                         )

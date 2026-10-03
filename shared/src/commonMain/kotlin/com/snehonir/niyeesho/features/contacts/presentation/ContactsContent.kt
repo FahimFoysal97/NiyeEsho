@@ -17,6 +17,7 @@ import com.snehonir.niyeesho.core.designsystem.component.ErrorView
 import com.snehonir.niyeesho.core.designsystem.theme.Spacing
 import com.snehonir.niyeesho.core.utils.UiText
 import com.snehonir.niyeesho.features.contacts.presentation.component.ContactListItem
+import com.snehonir.niyeesho.features.shopping_list.presentation.list.component.CreateGroupDialog
 
 @Composable
 fun ContactsContent(
@@ -47,8 +48,8 @@ fun ContactsContent(
                 modifier = Modifier.fillMaxWidth(),
             )
             AppButton(
-                text = UiText.Plain("Invite a friend"),
-                onClick = { onAction(ContactsUiAction.InviteClicked) },
+                text = UiText.Plain("👥 Create Group List"),
+                onClick = { onAction(ContactsUiAction.CreateGroupClicked) },
                 modifier = Modifier.fillMaxWidth(),
             )
             uiState.error?.let { ErrorView(UiText.Plain(it), modifier = Modifier.fillMaxWidth()) }
@@ -57,7 +58,7 @@ fun ContactsContent(
                     modifier = Modifier.fillMaxWidth().weight(1f),
                     contentAlignment = Alignment.Center,
                 ) {
-                    Text("No contacts yet. Invite someone to start sharing!", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text("No contacts yet. Tap 'Create Group List' to start!", color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             } else {
                 LazyColumn(
@@ -65,12 +66,25 @@ fun ContactsContent(
                     verticalArrangement = Arrangement.spacedBy(Spacing.sm),
                 ) {
                     items(uiState.contacts, key = { it.uid }) { contact ->
-                        ContactListItem(contact = contact, onClick = {
-                            onAction(ContactsUiAction.ContactSelected(contact))
-                        })
+                        ContactListItem(
+                            contact = contact,
+                            onClick = {
+                                onAction(ContactsUiAction.ContactSelected(contact))
+                            },
+                        )
                     }
                 }
             }
         }
+    }
+
+    if (uiState.isCreateGroupDialogVisible) {
+        CreateGroupDialog(
+            availableContacts = uiState.contacts,
+            onConfirm = { title, members ->
+                onAction(ContactsUiAction.CreateGroupConfirmed(title, members))
+            },
+            onDismiss = { onAction(ContactsUiAction.DismissCreateGroup) },
+        )
     }
 }

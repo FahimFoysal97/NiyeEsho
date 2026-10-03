@@ -20,14 +20,23 @@ class ShoppingListRepositoryImpl(
         local.get(id)?.let { Result.success(it) }
             ?: Result.failure(NoSuchElementException("Shopping list not found."))
 
-    override suspend fun createShoppingList(title: String, ownerId: String): Result<ShoppingList> = runCatching {
+    override suspend fun createShoppingList(
+        title: String,
+        ownerId: String,
+        members: List<ListMember>,
+        id: String?,
+    ): Result<ShoppingList> = runCatching {
         val now = Clock.System.now()
+        val ownerMember = ListMember(ownerId, "Sneho Nir", null)
+        val allMembers = (listOf(ownerMember) + members).distinctBy { it.uid }
+        val allMemberIds = allMembers.map { it.uid }
+        val listId = id ?: "list_${now.toEpochMilliseconds()}"
         val list = ShoppingList(
-            id = "list_${now.toEpochMilliseconds()}",
+            id = listId,
             title = title,
             ownerId = ownerId,
-            memberIds = listOf(ownerId),
-            members = listOf(ListMember(ownerId, ownerId, null)),
+            memberIds = allMemberIds,
+            members = allMembers,
             createdAt = now,
             updatedAt = now,
             lastSyncedAt = null,
@@ -48,6 +57,13 @@ class ShoppingListRepositoryImpl(
             if (memberId !in list.memberIds) {
                 local.upsert(list.copy(memberIds = list.memberIds + memberId))
             }
+        }
+    }
+    override suspend fun addMembers(listId: String, members: List<ListMember>): Result<Unit> = runCatching {
+        local.get(listId)?.let { list ->
+            val updatedMembers = (list.members + members).distinctBy { it.uid }
+            val updatedMemberIds = updatedMembers.map { it.uid }
+            local.upsert(list.copy(members = updatedMembers, memberIds = updatedMemberIds, updatedAt = Clock.System.now()))
         }
     }
     override suspend fun removeMember(listId: String, memberId: String): Result<Unit> = runCatching {

@@ -28,6 +28,7 @@ val shoppingListModule = module {
     singleOf(::DeleteShoppingListUseCase)
     singleOf(::ArchiveShoppingListUseCase)
     singleOf(::InviteMemberUseCase)
+    singleOf(::AddMembersToListUseCase)
     singleOf(::RemoveMemberUseCase)
     singleOf(::WatchListItemsUseCase)
     singleOf(::AddListItemUseCase)

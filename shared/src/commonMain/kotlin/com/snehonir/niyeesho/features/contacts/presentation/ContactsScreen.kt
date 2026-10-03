@@ -18,6 +18,7 @@ fun ContactsScreen(
     ObserveAsEvents(viewModel.uiEvent) { event ->
         when (event) {
             is ContactsUiEvent.OpenContact -> onOpenContact(event.uid)
+            is ContactsUiEvent.GroupCreated -> onOpenContact(event.listId)
             is ContactsUiEvent.ShareInvite -> onShareInvite(event.link)
             is ContactsUiEvent.ShowError -> Unit
         }

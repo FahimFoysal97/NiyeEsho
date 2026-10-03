@@ -2,12 +2,15 @@ package com.snehonir.niyeesho.features.contacts.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.snehonir.niyeesho.features.contacts.domain.entity.Contact
 import com.snehonir.niyeesho.features.contacts.domain.usecase.RefreshContactTokenUseCase
 import com.snehonir.niyeesho.features.contacts.domain.usecase.RemoveContactUseCase
 import com.snehonir.niyeesho.features.contacts.domain.usecase.SearchContactsUseCase
 import com.snehonir.niyeesho.features.contacts.domain.usecase.WatchContactsUseCase
-import com.snehonir.niyeesho.features.messaging.domain.usecase.GenerateInviteLinkUseCase
 import com.snehonir.niyeesho.features.messaging.domain.entity.InviteData
+import com.snehonir.niyeesho.features.messaging.domain.usecase.GenerateInviteLinkUseCase
+import com.snehonir.niyeesho.features.shopping_list.domain.entity.ListMember
+import com.snehonir.niyeesho.features.shopping_list.domain.usecase.CreateShoppingListUseCase
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -23,6 +26,7 @@ class ContactsViewModel(
     private val searchContacts: SearchContactsUseCase,
     private val refreshToken: RefreshContactTokenUseCase,
     private val generateInviteLink: GenerateInviteLinkUseCase,
+    private val createList: CreateShoppingListUseCase,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(ContactsUiState())
     val uiState = _uiState.asStateFlow()
@@ -33,7 +37,7 @@ class ContactsViewModel(
         viewModelScope.launch {
             watchContacts().collect { result ->
                 result.onSuccess { contacts ->
-                    _uiState.update { it.copy(contacts = contacts.toImmutableList(), isLoading = false) }
+                    _uiState.update { it.copy(contacts = contacts.distinctBy { contact -> contact.uid }.toImmutableList(), isLoading = false) }
                 }.onFailure { fail(it) }
             }
         }
@@ -43,6 +47,10 @@ class ContactsViewModel(
         when (action) {
             is ContactsUiAction.QueryChanged -> queryChanged(action.query)
             is ContactsUiAction.ContactSelected -> openContact(action.contact.uid)
+            ContactsUiAction.CreateGroupClicked -> _uiState.update { it.copy(isCreateGroupDialogVisible = true) }
+            is ContactsUiAction.InviteContactClicked -> startGroupCreationForContact(action.contact)
+            is ContactsUiAction.CreateGroupConfirmed -> createGroupList(action.title, action.members)
+            ContactsUiAction.DismissCreateGroup -> _uiState.update { it.copy(isCreateGroupDialogVisible = false, selectedContactForGroup = null) }
             is ContactsUiAction.RemoveContact -> remove(action.uid)
             is ContactsUiAction.RefreshToken -> refresh(action.uid)
             ContactsUiAction.InviteClicked -> generateInvite()
@@ -53,11 +61,29 @@ class ContactsViewModel(
         }
     }
 
+    private fun startGroupCreationForContact(contact: Contact) {
+        val member = ListMember(contact.uid, contact.displayName, contact.avatarUrl)
+        createGroupList("Group with ${contact.displayName}", listOf(member))
+    }
+
+    private fun createGroupList(title: String, members: List<ListMember>) {
+        viewModelScope.launch {
+            createList(
+                title = title,
+                ownerId = "user_demo",
+                members = members,
+            ).onSuccess { list ->
+                _uiState.update { it.copy(isCreateGroupDialogVisible = false, selectedContactForGroup = null) }
+                _uiEvent.send(ContactsUiEvent.GroupCreated(list.id))
+            }.onFailure { fail(it) }
+        }
+    }
+
     private fun queryChanged(query: String) {
         _uiState.update { it.copy(query = query) }
         viewModelScope.launch {
             searchContacts(query).onSuccess { contacts ->
-                _uiState.update { it.copy(contacts = contacts.toImmutableList()) }
+                _uiState.update { it.copy(contacts = contacts.distinctBy { contact -> contact.uid }.toImmutableList()) }
             }.onFailure { fail(it) }
         }
     }
@@ -69,9 +95,9 @@ class ContactsViewModel(
     }
 
     private fun refresh(uid: String) {
-    viewModelScope.launch {
-        refreshToken(uid).onFailure { fail(it) }
-    }
+        viewModelScope.launch {
+            refreshToken(uid).onFailure { fail(it) }
+        }
     }
 
     private fun generateInvite() {

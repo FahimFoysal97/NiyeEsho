@@ -52,6 +52,11 @@ class DashboardViewModel(
 
     fun onAction(action: DashboardUiAction) {
         when (action) {
+            DashboardUiAction.FabClicked -> _uiState.update { it.copy(isFabMenuVisible = true) }
+            DashboardUiAction.FabMenuDismissed -> _uiState.update { it.copy(isFabMenuVisible = false) }
+            DashboardUiAction.AddGroupClicked -> _uiState.update { it.copy(isFabMenuVisible = false, isCreateDialogVisible = true) }
+            DashboardUiAction.InviteShareClicked -> _uiState.update { it.copy(isFabMenuVisible = false, isInviteDialogVisible = true) }
+            DashboardUiAction.InviteDismissed -> _uiState.update { it.copy(isInviteDialogVisible = false) }
             DashboardUiAction.CreateClicked -> _uiState.update { it.copy(isCreateDialogVisible = true) }
             DashboardUiAction.CreateDismissed -> _uiState.update { it.copy(isCreateDialogVisible = false) }
             is DashboardUiAction.CreateConfirmed -> create(action.title, action.ownerId)

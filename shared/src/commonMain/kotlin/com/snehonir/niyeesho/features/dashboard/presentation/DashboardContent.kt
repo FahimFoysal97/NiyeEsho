@@ -91,7 +91,7 @@ fun DashboardContent(
                             contentAlignment = Alignment.Center,
                         ) {
                             Text(
-                                text = "No shopping lists or requests yet. Tap '+ New List' to start!",
+                                text = "No shopping lists or requests yet. Tap '+' to start!",
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
                         }
@@ -100,14 +100,58 @@ fun DashboardContent(
             }
 
             FloatingActionButton(
-                onClick = { onAction(DashboardUiAction.CreateClicked) },
+                onClick = { onAction(DashboardUiAction.FabClicked) },
                 modifier = Modifier.align(Alignment.BottomEnd).padding(Spacing.lg),
                 containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = MaterialTheme.colorScheme.onPrimary,
             ) {
-                Icon(Icons.Default.Add, contentDescription = "Create new list")
+                Icon(Icons.Default.Add, contentDescription = "Options")
             }
         }
+    }
+
+    if (uiState.isFabMenuVisible) {
+        AlertDialog(
+            onDismissRequest = { onAction(DashboardUiAction.FabMenuDismissed) },
+            title = { Text("Choose Action") },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(Spacing.sm)) {
+                    TextButton(
+                        onClick = { onAction(DashboardUiAction.AddGroupClicked) },
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
+                        Text("👥 Add Group", style = MaterialTheme.typography.titleMedium)
+                    }
+                    TextButton(
+                        onClick = { onAction(DashboardUiAction.InviteShareClicked) },
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
+                        Text("🔗 Invite / Share", style = MaterialTheme.typography.titleMedium)
+                    }
+                }
+            },
+            confirmButton = {},
+            dismissButton = {
+                TextButton(onClick = { onAction(DashboardUiAction.FabMenuDismissed) }) {
+                    Text("Cancel")
+                }
+            },
+        )
+    }
+
+    if (uiState.isInviteDialogVisible) {
+        AlertDialog(
+            onDismissRequest = { onAction(DashboardUiAction.InviteDismissed) },
+            title = { Text("Invite & Share") },
+            text = {
+                Text("Share your invite link with family and friends to shop together instantly.")
+            },
+            confirmButton = {
+                TextButton(onClick = { onAction(DashboardUiAction.InviteDismissed) }) {
+                    Text("OK")
+                }
+            },
+        )
     }
 
     ItemCreateDialog(uiState, onAction)

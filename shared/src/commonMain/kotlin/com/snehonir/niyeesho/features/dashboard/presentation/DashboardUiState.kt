@@ -7,6 +7,8 @@ data class DashboardUiState(
     val lists: ImmutableList<DashboardUiModel> = persistentListOf(),
     val isLoading: Boolean = true,
     val isCreateDialogVisible: Boolean = false,
+    val isFabMenuVisible: Boolean = false,
+    val isInviteDialogVisible: Boolean = false,
     val error: String? = null,
     val userName: String = "Sneho Nir",
     val userEmail: String = "sneho@example.com",

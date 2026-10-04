@@ -1,5 +1,6 @@
 package com.snehonir.niyeesho.features.shopping_list.data.repository
 
+import com.snehonir.niyeesho.core.utils.TokenManager
 import com.snehonir.niyeesho.core.utils.logD
 import com.snehonir.niyeesho.features.drive.domain.entity.DriveListItem
 import com.snehonir.niyeesho.features.drive.domain.entity.DriveListMember
@@ -23,6 +24,7 @@ class ListItemRepositoryImpl(
     private val driveRepository: DriveRepository,
     private val messagingRepository: MessagingRepository,
     private val shoppingListRepository: ShoppingListRepository,
+    private val tokenManager: TokenManager,
 ) : ListItemRepository {
     override fun watchListItems(listId: String): Flow<Result<List<ListItem>>> =
         local.watchForList(listId).map { Result.success(it) }.catch { emit(Result.failure(it)) }
@@ -87,6 +89,11 @@ class ListItemRepositoryImpl(
 
     private suspend fun syncToRemote(listId: String) {
         runCatching {
+            val token = tokenManager.getToken()
+            if (token.isNullOrBlank()) {
+                logD("ListItemRepo", "syncToRemote() -> skipped: No access token found.")
+                return
+            }
             logD("ListItemRepo", "syncToRemote() -> backing up listId: $listId to Google Drive")
             val listResult = shoppingListRepository.getShoppingList(listId)
             if (listResult.isSuccess) {
@@ -118,7 +125,7 @@ class ListItemRepositoryImpl(
                     },
                     isArchived = list.isArchived,
                 )
-                driveRepository.saveList("demo_access_token", driveList)
+                driveRepository.saveList(token, driveList)
                 logD("ListItemRepo", "syncToRemote() -> Google Drive backup success for listId: $listId")
             }
         }.onFailure {

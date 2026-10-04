@@ -2,6 +2,8 @@ package com.snehonir.niyeesho.features.auth.presentation.profile
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.russhwolf.settings.Settings
+import com.snehonir.niyeesho.core.utils.TokenManager
 import com.snehonir.niyeesho.features.auth.domain.usecase.GetCurrentUserUseCase
 import com.snehonir.niyeesho.features.auth.domain.usecase.SignOutUseCase
 import com.snehonir.niyeesho.features.drive.domain.entity.DriveListItem
@@ -21,6 +23,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
+import kotlinx.datetime.Instant
 
 class ProfileViewModel(
     private val getCurrentUser: GetCurrentUserUseCase,
@@ -29,6 +32,8 @@ class ProfileViewModel(
     private val shoppingListLocal: ShoppingListLocalDataSource,
     private val listItemLocal: ListItemLocalDataSource,
     private val driveRepository: DriveRepository,
+    private val tokenManager: TokenManager,
+    private val settings: Settings,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(ProfileUiState())
     val uiState = _uiState.asStateFlow()
@@ -51,17 +56,25 @@ class ProfileViewModel(
 
     private fun load() {
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true) }
+            _uiState.update { it.copy(isLoading = true, error = null) }
+            val storedSyncEpoch = settings.getLong("last_synced_at", 0L)
+            val lastSyncedInstant = if (storedSyncEpoch > 0L) Instant.fromEpochMilliseconds(storedSyncEpoch) else null
             getCurrentUser()
-                .onSuccess { user -> _uiState.update { it.copy(user = user, isLoading = false, lastSyncedAt = Clock.System.now()) } }
+                .onSuccess { user ->
+                    _uiState.update { it.copy(user = user, isLoading = false, lastSyncedAt = lastSyncedInstant ?: user?.updatedAt, error = null) }
+                }
                 .onFailure { throwable -> fail(throwable) }
         }
     }
 
     private fun manualSync() {
         viewModelScope.launch {
-            _uiState.update { it.copy(isSyncing = true) }
+            _uiState.update { it.copy(isSyncing = true, error = null) }
             runCatching {
+                val token = tokenManager.getToken()
+                if (token.isNullOrBlank()) {
+                    error("Google access token not found. Please sign in with Google to sync.")
+                }
                 // 1. Upload unuploaded local data to cloud first
                 val localLists = shoppingListLocal.watchAll().first()
                 for (list in localLists) {
@@ -92,13 +105,18 @@ class ProfileViewModel(
                         },
                         isArchived = list.isArchived,
                     )
-                    driveRepository.saveList("demo_access_token", driveList).getOrThrow()
+                    driveRepository.saveList(token, driveList).getOrThrow()
                 }
 
                 // 2. Sync from cloud
-                syncFromDrive("demo_access_token").getOrThrow()
-            }.onSuccess {
-                _uiState.update { it.copy(isSyncing = false, isSyncedSuccessfully = true, lastSyncedAt = Clock.System.now()) }
+                syncFromDrive(token).getOrThrow()
+
+                // 3. Set real completion timestamp
+                val completionTime = Clock.System.now()
+                settings.putLong("last_synced_at", completionTime.toEpochMilliseconds())
+                completionTime
+            }.onSuccess { realServerTime ->
+                _uiState.update { it.copy(isSyncing = false, isSyncedSuccessfully = true, lastSyncedAt = realServerTime, error = null) }
                 delay(1000)
                 _uiState.update { it.copy(isSyncedSuccessfully = false) }
             }.onFailure { throwable ->
@@ -119,7 +137,7 @@ class ProfileViewModel(
     }
 
     private suspend fun fail(throwable: Throwable) {
-        val message = throwable.message ?: "Unable to load profile."
+        val message = throwable.message ?: "Unable to complete sync operation."
         _uiState.update { it.copy(isLoading = false, error = message) }
         _uiEvent.send(ProfileUiEvent.ShowError(message))
     }

@@ -2,10 +2,19 @@ package com.snehonir.niyeesho.features.dashboard.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.russhwolf.settings.Settings
+import com.snehonir.niyeesho.core.utils.TokenManager
 import com.snehonir.niyeesho.core.utils.logD
 import com.snehonir.niyeesho.features.contacts.domain.usecase.WatchContactsUseCase
+import com.snehonir.niyeesho.features.drive.domain.entity.DriveListItem
+import com.snehonir.niyeesho.features.drive.domain.entity.DriveListMember
+import com.snehonir.niyeesho.features.drive.domain.entity.DriveShoppingList
+import com.snehonir.niyeesho.features.drive.domain.repository.DriveRepository
+import com.snehonir.niyeesho.features.drive.domain.usecase.SyncFromDriveUseCase
 import com.snehonir.niyeesho.features.messaging.domain.entity.InviteData
 import com.snehonir.niyeesho.features.messaging.domain.usecase.GenerateInviteLinkUseCase
+import com.snehonir.niyeesho.features.shopping_list.data.local.ListItemLocalDataSource
+import com.snehonir.niyeesho.features.shopping_list.data.local.ShoppingListLocalDataSource
 import com.snehonir.niyeesho.features.shopping_list.domain.entity.ListMember
 import com.snehonir.niyeesho.features.shopping_list.domain.usecase.CreateShoppingListUseCase
 import com.snehonir.niyeesho.features.shopping_list.domain.usecase.GetShoppingListUseCase
@@ -14,6 +23,12 @@ import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import kotlinx.datetime.Clock
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.LocalTime
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toInstant
+import kotlinx.datetime.toLocalDateTime
 
 class DashboardViewModel(
     private val watchLists: WatchShoppingListsUseCase,
@@ -21,6 +36,12 @@ class DashboardViewModel(
     private val getShoppingList: GetShoppingListUseCase,
     private val createList: CreateShoppingListUseCase,
     private val generateInviteLink: GenerateInviteLinkUseCase,
+    private val syncFromDrive: SyncFromDriveUseCase,
+    private val settings: Settings,
+    private val shoppingListLocal: ShoppingListLocalDataSource,
+    private val listItemLocal: ListItemLocalDataSource,
+    private val driveRepository: DriveRepository,
+    private val tokenManager: TokenManager,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(DashboardUiState())
     val uiState = _uiState.asStateFlow()
@@ -29,7 +50,10 @@ class DashboardViewModel(
     val uiEvent: Flow<DashboardUiEvent> = _uiEvent.receiveAsFlow()
 
     init {
-        logD("DashboardViewModel", "DashboardViewModel initialized, starting watchLists and watchContacts collection")
+        logD("DashboardViewModel", "DashboardViewModel initialized, checking 24h / daily 1:00 AM sync rule")
+        viewModelScope.launch {
+            checkAndPerformScheduledOr24HourSync()
+        }
         viewModelScope.launch {
             combine(
                 watchLists(),
@@ -58,6 +82,70 @@ class DashboardViewModel(
                     )
                 }
             }.collect {}
+        }
+    }
+
+    private suspend fun checkAndPerformScheduledOr24HourSync() {
+        runCatching {
+            val lastSyncedEpoch = settings.getLong("last_synced_at", 0L)
+            val nowInstant = Clock.System.now()
+            val nowEpoch = nowInstant.toEpochMilliseconds()
+            val twentyFourHours = 24 * 3600 * 1000L
+
+            val timeZone = TimeZone.currentSystemDefault()
+            val localNow = nowInstant.toLocalDateTime(timeZone)
+
+            // Today at 01:00 AM
+            val today1Am = LocalDateTime(localNow.date, LocalTime(1, 0))
+            val today1AmEpoch = today1Am.toInstant(timeZone).toEpochMilliseconds()
+
+            val isPast1AmToday = nowEpoch >= today1AmEpoch
+            val syncedBeforeToday1Am = lastSyncedEpoch < today1AmEpoch
+
+            val isScheduled1AmDue = isPast1AmToday && syncedBeforeToday1Am
+            val needs24HourSync = lastSyncedEpoch == 0L || (nowEpoch - lastSyncedEpoch > twentyFourHours)
+
+            if (needs24HourSync || isScheduled1AmDue) {
+                logD("DashboardViewModel", "Sync required (Daily 1:00 AM schedule or 24h rule). Performing sync...")
+                val localLists = shoppingListLocal.watchAll().first()
+                val token = tokenManager.getToken() ?: "demo_access_token"
+                for (list in localLists) {
+                    val items = listItemLocal.watchForList(list.id).first()
+                    val driveList = DriveShoppingList(
+                        id = list.id,
+                        title = list.title,
+                        ownerId = list.ownerId,
+                        memberIds = list.memberIds,
+                        members = list.members.map { DriveListMember(it.uid, it.displayName, it.avatarUrl) },
+                        createdAt = list.createdAt,
+                        updatedAt = list.updatedAt,
+                        lastSyncedAt = list.lastSyncedAt,
+                        items = items.map { item ->
+                            DriveListItem(
+                                id = item.id,
+                                name = item.name,
+                                quantity = item.quantity,
+                                unit = item.unit,
+                                isChecked = item.isChecked,
+                                addedBy = item.addedBy,
+                                addedByName = item.addedByName,
+                                checkedBy = item.checkedBy,
+                                position = item.position,
+                                createdAt = item.createdAt,
+                                updatedAt = item.updatedAt,
+                            )
+                        },
+                        isArchived = list.isArchived,
+                    )
+                    driveRepository.saveList(token, driveList).getOrThrow()
+                }
+                syncFromDrive(token).getOrThrow()
+                val syncTime = Clock.System.now().toEpochMilliseconds()
+                settings.putLong("last_synced_at", syncTime)
+                logD("DashboardViewModel", "Daily 1:00 AM / 24h sync completed successfully at $syncTime")
+            }
+        }.onFailure {
+            logD("DashboardViewModel", "Scheduled daily sync failed: ${it.message}")
         }
     }
 

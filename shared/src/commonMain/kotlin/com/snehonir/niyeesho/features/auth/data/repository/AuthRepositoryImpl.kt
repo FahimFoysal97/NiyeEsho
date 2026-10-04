@@ -1,5 +1,6 @@
 package com.snehonir.niyeesho.features.auth.data.repository
 
+import com.snehonir.niyeesho.core.utils.TokenManager
 import com.snehonir.niyeesho.features.auth.data.local.AuthLocalDataSource
 import com.snehonir.niyeesho.features.auth.data.mapper.toAuthState
 import com.snehonir.niyeesho.features.auth.data.remote.AuthRemoteDataSource
@@ -16,6 +17,7 @@ class AuthRepositoryImpl(
     private val local: AuthLocalDataSource,
     private val remote: AuthRemoteDataSource,
     private val importDriveData: ImportUserDataFromDriveUseCase,
+    private val tokenManager: TokenManager,
 ) : AuthRepository {
     override fun observeAuthState(): Flow<Result<AuthState>> =
         local.observeUser()
@@ -30,11 +32,15 @@ class AuthRepositoryImpl(
     override suspend fun signInWithGoogle(idToken: String): Result<User> =
         remote.signInWithGoogle(idToken).onSuccess { user ->
             local.saveUser(user)
+            tokenManager.saveToken(idToken)
             importDriveData(idToken)
         }
 
     override suspend fun signOut(): Result<Unit> =
-        remote.signOut().onSuccess { local.clearUser() }
+        remote.signOut().onSuccess {
+            local.clearUser()
+            tokenManager.clearToken()
+        }
 
     override suspend fun getCurrentUser(): Result<User?> =
         local.getUser()?.let { Result.success(it) }

@@ -1,5 +1,6 @@
 package com.snehonir.niyeesho.features.shopping_list.presentation.detail.model
 
+import com.snehonir.niyeesho.core.utils.SyncStatus
 import com.snehonir.niyeesho.core.utils.toDisplayDate
 import com.snehonir.niyeesho.features.shopping_list.domain.entity.ListItem
 import kotlinx.datetime.TimeZone
@@ -12,6 +13,7 @@ data class ListItemUiModel(
     val addedByName: String,
     val createdAtFormatted: String,
     val checked: Boolean,
+    val syncStatus: SyncStatus,
 ) {
     companion object {
         fun fromDomain(item: ListItem): ListItemUiModel {
@@ -25,6 +27,7 @@ data class ListItemUiModel(
                 addedByName = item.addedByName,
                 createdAtFormatted = "$dateStr at $timeStr",
                 checked = item.isChecked,
+                syncStatus = item.syncStatus,
             )
         }
     }

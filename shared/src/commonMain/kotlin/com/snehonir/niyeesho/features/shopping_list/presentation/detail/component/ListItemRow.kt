@@ -9,6 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.snehonir.niyeesho.core.designsystem.theme.Spacing
 import com.snehonir.niyeesho.features.shopping_list.presentation.detail.model.ListItemUiModel
+import com.snehonir.niyeesho.features.shopping_list.presentation.list.component.SyncStatusIndicator
 
 @Composable
 fun ListItemRow(item: ListItemUiModel, onToggle: () -> Unit, modifier: Modifier = Modifier) {
@@ -53,11 +54,18 @@ fun ListItemRow(item: ListItemUiModel, onToggle: () -> Unit, modifier: Modifier 
                         }
                     }
                 }
-                Text(
-                    text = "Added by ${item.addedByName} • ${item.createdAtFormatted}",
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f),
-                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(
+                        text = "Added by ${item.addedByName} • ${item.createdAtFormatted}",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f),
+                    )
+                    SyncStatusIndicator(item.syncStatus)
+                }
             }
         }
     }

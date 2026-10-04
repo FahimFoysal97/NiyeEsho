@@ -16,28 +16,28 @@ class TokenManagerImpl(
 ) : TokenManager {
     override fun getToken(): String? {
         val token = settings.getStringOrNull(KEY_TOKEN)
-        logD("TokenManager", "getToken() -> retrieved token present: ${!token.isNullOrBlank()}")
+        logD("TokenManagerImpl", "getToken() -> retrieved token present: ${!token.isNullOrBlank()}")
         return token
     }
 
     override fun saveToken(token: String) {
-        logD("TokenManager", "saveToken() -> saving access token")
+        logD("TokenManagerImpl", "saveToken() -> saving access token")
         settings.putString(KEY_TOKEN, token)
     }
 
     override fun clearToken() {
-        logD("TokenManager", "clearToken() -> clearing access token")
+        logD("TokenManagerImpl", "clearToken() -> clearing access token")
         settings.remove(KEY_TOKEN)
     }
 
     override fun getFcmToken(): String? {
         val token = settings.getStringOrNull(KEY_FCM_TOKEN)
-        logD("TokenManager", "getFcmToken() -> retrieved FCM token present: ${!token.isNullOrBlank()}")
+        logD("TokenManagerImpl", "getFcmToken() -> retrieved FCM token present: ${!token.isNullOrBlank()}")
         return token
     }
 
     override fun saveFcmToken(token: String) {
-        logD("TokenManager", "saveFcmToken() -> saving FCM token")
+        logD("TokenManagerImpl", "saveFcmToken() -> saving FCM token")
         settings.putString(KEY_FCM_TOKEN, token)
     }
 

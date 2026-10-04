@@ -2,6 +2,8 @@ package com.snehonir.niyeesho.features.contacts.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.snehonir.niyeesho.core.utils.TokenManager
+import com.snehonir.niyeesho.features.auth.domain.usecase.GetCurrentUserUseCase
 import com.snehonir.niyeesho.features.contacts.domain.entity.Contact
 import com.snehonir.niyeesho.features.contacts.domain.usecase.RefreshContactTokenUseCase
 import com.snehonir.niyeesho.features.contacts.domain.usecase.RemoveContactUseCase
@@ -27,6 +29,8 @@ class ContactsViewModel(
     private val refreshToken: RefreshContactTokenUseCase,
     private val generateInviteLink: GenerateInviteLinkUseCase,
     private val createList: CreateShoppingListUseCase,
+    private val getCurrentUser: GetCurrentUserUseCase,
+    private val tokenManager: TokenManager,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(ContactsUiState())
     val uiState = _uiState.asStateFlow()
@@ -102,7 +106,14 @@ class ContactsViewModel(
 
     private fun generateInvite() {
         viewModelScope.launch {
-            generateInviteLink(InviteData.preview())
+            val user = getCurrentUser().getOrNull()
+            val inviteData = InviteData(
+                uid = user?.uid ?: "user_demo",
+                name = user?.displayName ?: "User",
+                token = tokenManager.getFcmToken() ?: "fcm_token_placeholder",
+                driveUrl = user?.avatarUrl ?: "",
+            )
+            generateInviteLink(inviteData)
                 .onSuccess { link ->
                     _uiState.update { it.copy(inviteLink = link) }
                     _uiEvent.send(ContactsUiEvent.ShareInvite(link))

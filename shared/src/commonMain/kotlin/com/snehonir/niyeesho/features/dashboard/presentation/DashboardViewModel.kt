@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.russhwolf.settings.Settings
 import com.snehonir.niyeesho.core.utils.TokenManager
 import com.snehonir.niyeesho.core.utils.logD
+import com.snehonir.niyeesho.features.auth.domain.usecase.GetCurrentUserUseCase
 import com.snehonir.niyeesho.features.contacts.domain.usecase.RemoveContactUseCase
 import com.snehonir.niyeesho.features.contacts.domain.usecase.WatchContactsUseCase
 import com.snehonir.niyeesho.features.drive.domain.entity.DriveListItem
@@ -46,6 +47,7 @@ class DashboardViewModel(
     private val tokenManager: TokenManager,
     private val deleteShoppingList: DeleteShoppingListUseCase,
     private val removeContactUseCase: RemoveContactUseCase,
+    private val getCurrentUser: GetCurrentUserUseCase,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(DashboardUiState())
     val uiState = _uiState.asStateFlow()
@@ -194,7 +196,14 @@ class DashboardViewModel(
         logD("DashboardViewModel", "generateInvite() started")
         viewModelScope.launch {
             _uiState.update { it.copy(isFabMenuVisible = false) }
-            generateInviteLink(InviteData.preview())
+            val user = getCurrentUser().getOrNull()
+            val inviteData = InviteData(
+                uid = user?.uid ?: "user_demo",
+                name = user?.displayName ?: "User",
+                token = tokenManager.getFcmToken() ?: "fcm_token_placeholder",
+                driveUrl = user?.avatarUrl ?: "",
+            )
+            generateInviteLink(inviteData)
                 .onSuccess { link ->
                     logD("DashboardViewModel", "generateInviteLink succeeded with link length: ${link.length}")
                     _uiState.update { it.copy(inviteLink = link, isInviteDialogVisible = true) }

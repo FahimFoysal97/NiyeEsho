@@ -67,6 +67,7 @@ kotlin {
             implementation(libs.androidx.core.ktx)
             implementation(libs.androidx.splashscreen)
             implementation(platform("com.google.firebase:firebase-bom:${libs.versions.firebaseBom.get()}"))
+            implementation(libs.firebase.messaging)
             implementation("com.google.zxing:core:3.5.3")
         }
         iosMain.dependencies {

@@ -1,5 +1,6 @@
 package com.snehonir.niyeesho.features.shopping_list.presentation.detail.component
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -13,12 +14,12 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
@@ -39,7 +40,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoCheckboxBorder
 import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoDarkBg
@@ -78,8 +81,9 @@ fun GroupSettingsDialog(
     if (showDeleteConfirm) {
         AlertDialog(
             onDismissRequest = { showDeleteConfirm = false },
+            shape = RoundedCornerShape(20.dp),
             containerColor = NiyeEshoDarkSurface,
-            title = { Text("Delete Shopping List?", color = Color.White) },
+            title = { Text("Delete Shopping List?", color = Color.White, style = MaterialTheme.typography.titleMedium) },
             text = { Text("Are you sure you want to delete this list? This action cannot be undone.", color = NiyeEshoGreenMuted) },
             confirmButton = {
                 TextButton(
@@ -88,7 +92,7 @@ fun GroupSettingsDialog(
                         onDeleteList()
                     },
                     colors = ButtonDefaults.textButtonColors(contentColor = Color(0xFFE05252)),
-                ) { Text("Delete") }
+                ) { Text("Delete", fontWeight = FontWeight.Bold) }
             },
             dismissButton = {
                 TextButton(
@@ -102,11 +106,21 @@ fun GroupSettingsDialog(
     AlertDialog(
         onDismissRequest = onDismiss,
         modifier = modifier,
+        shape = RoundedCornerShape(20.dp),
         containerColor = NiyeEshoDarkSurface,
-        title = { Text("Group Settings & Details", color = Color.White, style = MaterialTheme.typography.titleMedium) },
+        title = {
+            Text(
+                "Group Settings & Details",
+                color = Color.White,
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold,
+            )
+        },
         text = {
             Column(
-                modifier = Modifier.fillMaxWidth().heightIn(max = Spacing.xxl * 6),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(max = Spacing.xxl * 6),
                 verticalArrangement = Arrangement.spacedBy(Spacing.md),
             ) {
                 // Edit Title Section
@@ -114,6 +128,7 @@ fun GroupSettingsDialog(
                     text = "List Title",
                     style = MaterialTheme.typography.labelMedium,
                     color = NiyeEshoGreenPrimary,
+                    fontWeight = FontWeight.Bold,
                 )
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -125,22 +140,28 @@ fun GroupSettingsDialog(
                         onValueChange = { titleInput = it },
                         modifier = Modifier.weight(1f),
                         singleLine = true,
-                        shape = RoundedCornerShape(10.dp),
+                        shape = RoundedCornerShape(12.dp),
                         colors = OutlinedTextFieldDefaults.colors(
                             unfocusedContainerColor = NiyeEshoDarkBg,
                             focusedContainerColor = NiyeEshoDarkBg,
                             unfocusedBorderColor = Color.Transparent,
                             focusedBorderColor = NiyeEshoGreenPrimary,
+                            focusedTextColor = Color.White,
+                            unfocusedTextColor = Color.White,
                         ),
                     )
                     IconButton(
                         onClick = { if (titleInput.isNotBlank()) onUpdateTitle(titleInput) },
                         enabled = titleInput.isNotBlank() && titleInput != listTitle,
+                        modifier = Modifier
+                            .size(44.dp)
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(if (titleInput.isNotBlank() && titleInput != listTitle) NiyeEshoGreenPrimary else NiyeEshoDarkBg),
                     ) {
                         Icon(
                             imageVector = Icons.Default.Edit,
                             contentDescription = "Update title",
-                            tint = NiyeEshoGreenPrimary,
+                            tint = if (titleInput.isNotBlank() && titleInput != listTitle) Color.White else NiyeEshoGreenDarkMuted,
                         )
                     }
                 }
@@ -152,15 +173,21 @@ fun GroupSettingsDialog(
                     text = "Current Members (${members.size})",
                     style = MaterialTheme.typography.labelMedium,
                     color = NiyeEshoGreenPrimary,
+                    fontWeight = FontWeight.Bold,
                 )
                 LazyColumn(
-                    modifier = Modifier.fillMaxWidth().heightIn(max = Spacing.xxl * 2),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .heightIn(max = Spacing.xxl * 2),
                     verticalArrangement = Arrangement.spacedBy(Spacing.xs),
                 ) {
-                    items(members, key = { it.uid }) { member ->
+                    items(members, key = { item -> item.uid }) { member ->
                         val isInContacts = member.uid in contactUids || member.uid == "user_demo"
+                        val initial = member.displayName.trim().firstOrNull()?.uppercaseChar()?.toString() ?: "U"
                         Row(
-                            modifier = Modifier.fillMaxWidth().padding(vertical = Spacing.xs),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = Spacing.xs),
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.SpaceBetween,
                         ) {
@@ -170,21 +197,21 @@ fun GroupSettingsDialog(
                                 horizontalArrangement = Arrangement.spacedBy(Spacing.sm),
                             ) {
                                 Surface(
-                                    shape = RoundedCornerShape(8.dp),
+                                    shape = CircleShape,
                                     color = NiyeEshoGreenPrimary,
-                                    modifier = Modifier.size(Spacing.lg),
+                                    modifier = Modifier.size(36.dp),
                                 ) {
                                     Box(contentAlignment = Alignment.Center) {
-                                        Icon(
-                                            imageVector = Icons.Default.Person,
-                                            contentDescription = null,
-                                            tint = Color.White,
-                                            modifier = Modifier.size(Spacing.md),
+                                        Text(
+                                            text = initial,
+                                            style = MaterialTheme.typography.titleMedium,
+                                            fontWeight = FontWeight.Bold,
+                                            color = Color.White,
                                         )
                                     }
                                 }
                                 Column(modifier = Modifier.weight(1f)) {
-                                    Text(member.displayName, style = MaterialTheme.typography.bodyMedium, color = Color.White)
+                                    Text(member.displayName, style = MaterialTheme.typography.bodyMedium, color = Color.White, fontWeight = FontWeight.SemiBold)
                                     Text(
                                         text = if (isInContacts) member.uid else "${member.uid} (Not in contacts)",
                                         style = MaterialTheme.typography.bodySmall,
@@ -228,12 +255,15 @@ fun GroupSettingsDialog(
                         text = "Add from Contacts",
                         style = MaterialTheme.typography.labelMedium,
                         color = NiyeEshoGreenPrimary,
+                        fontWeight = FontWeight.Bold,
                     )
                     LazyColumn(
-                        modifier = Modifier.fillMaxWidth().heightIn(max = Spacing.xxl * 2),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .heightIn(max = Spacing.xxl * 2),
                         verticalArrangement = Arrangement.spacedBy(Spacing.xs),
                     ) {
-                        items(contactsNotAlreadyInGroup, key = { it.uid }) { contact ->
+                        items(contactsNotAlreadyInGroup, key = { contact -> contact.uid }) { contact ->
                             val isSelected = selectedContactUids.contains(contact.uid)
                             Row(
                                 modifier = Modifier
@@ -250,7 +280,7 @@ fun GroupSettingsDialog(
                                 horizontalArrangement = Arrangement.SpaceBetween,
                             ) {
                                 Column(modifier = Modifier.weight(1f)) {
-                                    Text(contact.displayName, style = MaterialTheme.typography.bodyMedium, color = Color.White)
+                                    Text(contact.displayName, style = MaterialTheme.typography.bodyMedium, color = Color.White, fontWeight = FontWeight.SemiBold)
                                     Text(contact.email, style = MaterialTheme.typography.bodySmall, color = NiyeEshoGreenDarkMuted)
                                 }
                                 Checkbox(
@@ -287,7 +317,7 @@ fun GroupSettingsDialog(
                         modifier = Modifier.size(Spacing.md),
                     )
                     Spacer(Modifier.width(Spacing.xs))
-                    Text("Delete Shopping List")
+                    Text("Delete Shopping List", fontWeight = FontWeight.Bold)
                 }
             }
         },
@@ -305,7 +335,7 @@ fun GroupSettingsDialog(
                     },
                     enabled = selectedContactUids.isNotEmpty(),
                     colors = ButtonDefaults.textButtonColors(contentColor = NiyeEshoGreenPrimary),
-                ) { Text("Add Selected Contacts") }
+                ) { Text("Add Selected Contacts", fontWeight = FontWeight.Bold) }
             }
         },
         dismissButton = {

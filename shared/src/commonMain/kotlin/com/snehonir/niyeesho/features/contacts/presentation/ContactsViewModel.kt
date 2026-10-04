@@ -23,7 +23,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class ContactsViewModel(
-    private val watchContacts: WatchContactsUseCase,
+    private val watchLists: WatchContactsUseCase, // or watchContacts
     private val removeContact: RemoveContactUseCase,
     private val searchContacts: SearchContactsUseCase,
     private val refreshToken: RefreshContactTokenUseCase,
@@ -39,7 +39,7 @@ class ContactsViewModel(
 
     init {
         viewModelScope.launch {
-            watchContacts().collect { result ->
+            watchLists().collect { result ->
                 result.onSuccess { contacts ->
                     _uiState.update { it.copy(contacts = contacts.distinctBy { contact -> contact.uid }.toImmutableList(), isLoading = false) }
                 }.onFailure { fail(it) }
@@ -50,8 +50,15 @@ class ContactsViewModel(
     fun onAction(action: ContactsUiAction) {
         when (action) {
             is ContactsUiAction.QueryChanged -> queryChanged(action.query)
-            is ContactsUiAction.ContactSelected -> openContact(action.contact.uid)
-            ContactsUiAction.CreateGroupClicked -> _uiState.update { it.copy(isCreateGroupDialogVisible = true) }
+            is ContactsUiAction.ContactSelected -> {
+                _uiState.update {
+                    it.copy(
+                        isCreateGroupDialogVisible = true,
+                        selectedContactForGroup = action.contact,
+                    )
+                }
+            }
+            ContactsUiAction.CreateGroupClicked -> _uiState.update { it.copy(isCreateGroupDialogVisible = true, selectedContactForGroup = null) }
             is ContactsUiAction.InviteContactClicked -> startGroupCreationForContact(action.contact)
             is ContactsUiAction.CreateGroupConfirmed -> createGroupList(action.title, action.members)
             ContactsUiAction.DismissCreateGroup -> _uiState.update { it.copy(isCreateGroupDialogVisible = false, selectedContactForGroup = null) }
@@ -66,8 +73,12 @@ class ContactsViewModel(
     }
 
     private fun startGroupCreationForContact(contact: Contact) {
-        val member = ListMember(contact.uid, contact.displayName, contact.avatarUrl)
-        createGroupList("Group with ${contact.displayName}", listOf(member))
+        _uiState.update {
+            it.copy(
+                isCreateGroupDialogVisible = true,
+                selectedContactForGroup = contact,
+            )
+        }
     }
 
     private fun createGroupList(title: String, members: List<ListMember>) {
@@ -120,10 +131,6 @@ class ContactsViewModel(
                 }
                 .onFailure { fail(it) }
         }
-    }
-
-    private fun openContact(uid: String) {
-        viewModelScope.launch { _uiEvent.send(ContactsUiEvent.OpenContact(uid)) }
     }
 
     private fun fail(throwable: Throwable) {

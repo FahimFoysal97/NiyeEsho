@@ -90,7 +90,7 @@ fun DashboardContent(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        Column(verticalArrangement = Arrangement.spacedBy(Spacing.xs)) {
+                        Column(verticalArrangement = Arrangement.spacedBy(Spacing.xs / 2)) {
                             Text(
                                 text = "Good morning",
                                 style = MaterialTheme.typography.bodySmall,
@@ -106,34 +106,34 @@ fun DashboardContent(
                         IconButton(
                             onClick = { onAction(DashboardUiAction.AddGroupClicked) },
                             modifier = Modifier
-                                .size(Spacing.xxl)
-                                .clip(RoundedCornerShape(Spacing.sm))
+                                .size(40.dp)
+                                .clip(RoundedCornerShape(12.dp))
                                 .background(NiyeEshoGreenPrimary),
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Add,
                                 contentDescription = "Create Group",
                                 tint = Color.White,
-                                modifier = Modifier.size(Spacing.lg),
+                                modifier = Modifier.size(22.dp),
                             )
                         }
                     }
                 }
 
-                // Most Active Hero Card
+                // Most Active Hero Card (Last Active List)
                 mostActiveList?.let { mostActive ->
                     item {
-                        val activeMembersStr = if (mostActive.members.isNotEmpty()) {
-                            mostActive.members.joinToString(", ") { it.displayName }
+                        val displayMembers = if (mostActive.members.isNotEmpty()) {
+                            mostActive.members
                         } else {
-                            uiState.userName.ifBlank { "Sneho" }
+                            listOf(ListMember("user_demo", uiState.userName.ifBlank { "User" }, null))
                         }
 
                         Card(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .clickable { onNavigateToDetail(mostActive.id) },
-                            shape = RoundedCornerShape(Spacing.md),
+                            shape = RoundedCornerShape(14.dp),
                             colors = CardDefaults.cardColors(containerColor = NiyeEshoDarkSurface),
                             elevation = CardDefaults.cardElevation(defaultElevation = Spacing.xs),
                         ) {
@@ -141,8 +141,8 @@ fun DashboardContent(
                                 // Left accent border
                                 Box(
                                     modifier = Modifier
-                                        .width(Spacing.xs)
-                                        .height(110.dp)
+                                        .width(4.dp)
+                                        .height(116.dp)
                                         .background(NiyeEshoGreenPrimary),
                                 )
                                 Column(
@@ -157,7 +157,7 @@ fun DashboardContent(
                                         verticalAlignment = Alignment.CenterVertically,
                                     ) {
                                         Text(
-                                            text = "MOST ACTIVE LIST",
+                                            text = "LAST ACTIVE LIST",
                                             style = MaterialTheme.typography.labelSmall,
                                             fontWeight = FontWeight.Bold,
                                             color = NiyeEshoGreenPrimary,
@@ -183,27 +183,50 @@ fun DashboardContent(
                                         fontWeight = FontWeight.Bold,
                                         color = Color.White,
                                     )
-                                    Text(
-                                        text = "${mostActive.lastActivityText} · $activeMembersStr",
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = NiyeEshoGreenMuted,
-                                    )
-                                    Spacer(Modifier.height(Spacing.xs))
+                                    // Member circular letters row + member count & last activity
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.spacedBy(Spacing.sm),
+                                    ) {
+                                        Row(
+                                            horizontalArrangement = Arrangement.spacedBy((-4).dp),
+                                            verticalAlignment = Alignment.CenterVertically,
+                                        ) {
+                                            displayMembers.take(3).forEachIndexed { idx, member ->
+                                                val bg = accentColors[idx % accentColors.size]
+                                                val initial = member.displayName.trim().firstOrNull()?.uppercaseChar()?.toString() ?: "U"
+                                                Surface(
+                                                    modifier = Modifier.size(20.dp),
+                                                    shape = CircleShape,
+                                                    color = bg,
+                                                ) {
+                                                    Box(contentAlignment = Alignment.Center) {
+                                                        Text(
+                                                            text = initial,
+                                                            style = MaterialTheme.typography.labelSmall,
+                                                            fontWeight = FontWeight.Bold,
+                                                            color = Color.White,
+                                                        )
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        Text(
+                                            text = "${mostActive.memberCount} members · ${mostActive.lastActivityText}",
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = NiyeEshoGreenMuted,
+                                        )
+                                    }
+                                    Spacer(Modifier.height(Spacing.xs / 2))
                                     LinearProgressIndicator(
                                         progress = { mostActive.progress },
                                         modifier = Modifier
                                             .fillMaxWidth()
-                                            .height(Spacing.xs)
+                                            .height(4.dp)
                                             .clip(RoundedCornerShape(Spacing.xs)),
                                         color = if (mostActive.isDone) NiyeEshoGoldSecondary else NiyeEshoGreenPrimary,
                                         trackColor = NiyeEshoDarkBg,
                                     )
-                                    Spacer(Modifier.height(Spacing.xs / 2))
-                                    /*Text(
-                                        text = mostActive.progressDetailLabel,
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = NiyeEshoGreenMuted,
-                                    )*/
                                 }
                             }
                         }
@@ -294,7 +317,9 @@ private fun DashboardListRowCard(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val displayMembers = list.members.ifEmpty {
+    val displayMembers = if (list.members.isNotEmpty()) {
+        list.members
+    } else {
         listOf(ListMember("user_demo", userName.ifBlank { "User" }, null))
     }
 
@@ -302,7 +327,7 @@ private fun DashboardListRowCard(
         modifier = modifier
             .fillMaxWidth()
             .clickable(onClick = onClick),
-        shape = RoundedCornerShape(Spacing.md),
+        shape = RoundedCornerShape(14.dp),
         colors = CardDefaults.cardColors(containerColor = NiyeEshoDarkSurface),
         elevation = CardDefaults.cardElevation(defaultElevation = Spacing.xs),
     ) {
@@ -310,8 +335,8 @@ private fun DashboardListRowCard(
             // Left Accent Border
             Box(
                 modifier = Modifier
-                    .width(Spacing.xs)
-                    .height(Spacing.xxxl)
+                    .width(4.dp)
+                    .height(76.dp)
                     .background(accentColor),
             )
             Column(
@@ -340,7 +365,7 @@ private fun DashboardListRowCard(
                                 val bg = avatarColors[idx % avatarColors.size]
                                 val initial = member.displayName.trim().firstOrNull()?.uppercaseChar()?.toString() ?: "U"
                                 Surface(
-                                    modifier = Modifier.size(Spacing.md + Spacing.xs),
+                                    modifier = Modifier.size(20.dp),
                                     shape = CircleShape,
                                     color = bg,
                                 ) {
@@ -378,7 +403,7 @@ private fun DashboardListRowCard(
                     progress = { list.progress },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(Spacing.xs)
+                        .height(4.dp)
                         .clip(RoundedCornerShape(Spacing.xs)),
                     color = if (list.isDone) NiyeEshoGoldSecondary else accentColor,
                     trackColor = NiyeEshoDarkBg,

@@ -9,11 +9,14 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Shapes
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -25,6 +28,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 import com.snehonir.niyeesho.core.designsystem.component.AppTextField
 import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoCheckboxBorder
 import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoDarkSurface
@@ -32,6 +36,7 @@ import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoGreenDarkMuted
 import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoGreenLight
 import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoGreenPrimary
 import com.snehonir.niyeesho.core.designsystem.theme.Spacing
+import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoShapes
 import com.snehonir.niyeesho.core.utils.UiText
 import com.snehonir.niyeesho.features.contacts.domain.entity.Contact
 import com.snehonir.niyeesho.features.shopping_list.domain.entity.ListMember
@@ -52,6 +57,7 @@ fun CreateGroupDialog(
     AlertDialog(
         onDismissRequest = onDismiss,
         modifier = modifier,
+        shape = RoundedCornerShape(20.dp),
         containerColor = NiyeEshoDarkSurface,
         title = {
             Text(
@@ -145,7 +151,7 @@ fun CreateGroupDialog(
             }
         },
         confirmButton = {
-            TextButton(
+            Button(
                 onClick = {
                     if (title.isNotBlank()) {
                         val selectedMembers = uniqueContacts
@@ -155,9 +161,12 @@ fun CreateGroupDialog(
                     }
                 },
                 enabled = title.isNotBlank(),
-                colors = ButtonDefaults.textButtonColors(
-                    contentColor = NiyeEshoGreenPrimary,
-                    disabledContentColor = NiyeEshoGreenDarkMuted,
+                shape = NiyeEshoShapes.small,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = NiyeEshoGreenPrimary,
+                    contentColor = Color.White,
+                    disabledContainerColor = NiyeEshoGreenDarkMuted,
+                    disabledContentColor = Color.White.copy(alpha = 0.5f),
                 ),
             ) {
                 Text(

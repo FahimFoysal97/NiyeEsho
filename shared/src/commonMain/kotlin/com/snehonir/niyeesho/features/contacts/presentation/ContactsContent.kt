@@ -262,6 +262,8 @@ fun ContactsContent(
     if (uiState.isCreateGroupDialogVisible) {
         CreateGroupDialog(
             availableContacts = uiState.contacts,
+            initialTitle = uiState.selectedContactForGroup?.let { "Group with ${it.displayName}" } ?: "",
+            initialSelectedContactUids = uiState.selectedContactForGroup?.let { listOf(it.uid) } ?: emptyList(),
             onConfirm = { title, members ->
                 onAction(ContactsUiAction.CreateGroupConfirmed(title, members))
             },

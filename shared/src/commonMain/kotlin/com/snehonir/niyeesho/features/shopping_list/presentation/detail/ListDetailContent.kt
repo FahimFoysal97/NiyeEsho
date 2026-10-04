@@ -10,23 +10,21 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -36,23 +34,23 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.snehonir.niyeesho.core.designsystem.component.ErrorView
 import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoDarkBg
 import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoDarkSurface
 import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoGoldSecondary
-import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoGreenDarkMuted
 import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoGreenMuted
 import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoGreenPrimary
+import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoIndigoTertiary
 import com.snehonir.niyeesho.core.designsystem.theme.Spacing
-import com.snehonir.niyeesho.core.utils.UiText
-import com.snehonir.niyeesho.features.shopping_list.presentation.detail.component.AddItemDialog
+import com.snehonir.niyeesho.features.shopping_list.domain.entity.ListMember
+import com.snehonir.niyeesho.features.shopping_list.presentation.detail.component.AddItemBottomSheet
 import com.snehonir.niyeesho.features.shopping_list.presentation.detail.component.ContactSettingsDialog
 import com.snehonir.niyeesho.features.shopping_list.presentation.detail.component.GroupSettingsDialog
+import com.snehonir.niyeesho.features.shopping_list.presentation.detail.component.InviteMemberSheet
 import com.snehonir.niyeesho.features.shopping_list.presentation.detail.component.ListItemRow
-import com.snehonir.niyeesho.features.shopping_list.presentation.list.component.CreateGroupDialog
 
 @Composable
 fun ListDetailContent(
@@ -61,22 +59,29 @@ fun ListDetailContent(
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    var isAddDialogVisible by remember { mutableStateOf(false) }
+    var isAddItemSheetOpen by remember { mutableStateOf(false) }
+    val accentColors = listOf(NiyeEshoGreenPrimary, NiyeEshoGoldSecondary, NiyeEshoIndigoTertiary)
 
     Column(
         modifier = modifier
             .fillMaxSize()
             .background(NiyeEshoDarkBg),
     ) {
-        // Top Bar
+        // Top Header Bar
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = Spacing.md, vertical = Spacing.md),
+                .padding(horizontal = Spacing.lg, vertical = Spacing.md),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
-            IconButton(onClick = onBack, modifier = Modifier.size(32.dp)) {
+            IconButton(
+                onClick = onBack,
+                modifier = Modifier
+                    .size(36.dp)
+                    .clip(RoundedCornerShape(10.dp))
+                    .background(NiyeEshoDarkSurface),
+            ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = "Back",
@@ -85,11 +90,13 @@ fun ListDetailContent(
                 )
             }
             Text(
-                text = uiState.list?.title ?: "Weekly groceries",
+                text = uiState.list?.title ?: "Shopping list",
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
                 color = Color.White,
-                modifier = Modifier.weight(1f).padding(horizontal = Spacing.sm),
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(horizontal = Spacing.sm),
             )
             IconButton(
                 onClick = {
@@ -99,7 +106,7 @@ fun ListDetailContent(
                         onAction(ListDetailUiAction.OpenGroupSettings)
                     }
                 },
-                modifier = Modifier.size(32.dp),
+                modifier = Modifier.size(36.dp),
             ) {
                 Icon(
                     imageVector = Icons.Default.Settings,
@@ -121,43 +128,37 @@ fun ListDetailContent(
                 ),
                 verticalArrangement = Arrangement.spacedBy(Spacing.md),
             ) {
-                // Active Members & Synced Tag
+                // Active Members Chips Section (Member names as chips with accent colors, no letter badges)
                 item {
+                    val members = uiState.list?.members.takeIf { !it.isNullOrEmpty() }
+                        ?: listOf(ListMember("user_demo", "Sneho Nir", null))
+
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceBetween,
                     ) {
                         Row(
-                            verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(Spacing.xs),
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.weight(1f),
                         ) {
-                            Surface(
-                                modifier = Modifier.size(24.dp),
-                                shape = CircleShape,
-                                color = NiyeEshoGreenPrimary,
-                            ) {
-                                Box(contentAlignment = Alignment.Center) {
-                                    Text("S", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold, color = Color.White)
-                                }
-                            }
-                            if ((uiState.list?.members?.size ?: 0) > 1) {
+                            members.forEachIndexed { idx, member ->
+                                val chipColor = accentColors[idx % accentColors.size]
                                 Surface(
-                                    modifier = Modifier.size(24.dp),
-                                    shape = CircleShape,
-                                    color = NiyeEshoGoldSecondary,
+                                    shape = RoundedCornerShape(16.dp),
+                                    color = chipColor.copy(alpha = 0.2f),
+                                    border = BorderStroke(1.dp, chipColor.copy(alpha = 0.5f)),
                                 ) {
-                                    Box(contentAlignment = Alignment.Center) {
-                                        Text("R", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold, color = Color.White)
-                                    }
+                                    Text(
+                                        text = member.displayName,
+                                        style = MaterialTheme.typography.labelMedium,
+                                        color = chipColor,
+                                        fontWeight = FontWeight.SemiBold,
+                                        modifier = Modifier.padding(horizontal = Spacing.sm, vertical = Spacing.xs),
+                                    )
                                 }
                             }
-                            val memberNames = uiState.list?.members?.joinToString(", ") { it.displayName } ?: "Sneho, Rahim"
-                            Text(
-                                text = memberNames,
-                                style = MaterialTheme.typography.bodySmall,
-                                color = NiyeEshoGreenMuted,
-                            )
                         }
 
                         // Synced Tag
@@ -167,44 +168,27 @@ fun ListDetailContent(
                         ) {
                             Text(
                                 text = "Synced",
-                                modifier = Modifier.padding(horizontal = Spacing.md, vertical = 2.dp),
-                                style = MaterialTheme.typography.labelMedium,
-                                fontWeight = FontWeight.SemiBold,
+                                modifier = Modifier.padding(horizontal = Spacing.md, vertical = Spacing.xs),
+                                style = MaterialTheme.typography.bodySmall,
+                                fontWeight = FontWeight.Medium,
                                 color = NiyeEshoGreenPrimary,
                             )
                         }
                     }
                 }
 
-                uiState.error?.let { message -> item { ErrorView(UiText.Plain(message)) } }
-
-                // TO GET Section Header
-                item {
-                    Text(
-                        text = "TO GET",
-                        style = MaterialTheme.typography.labelMedium,
-                        fontWeight = FontWeight.Bold,
-                        color = NiyeEshoGreenDarkMuted,
-                    )
-                }
-
-                if (uiState.activeItems.isEmpty()) {
+                // Active Items Section
+                if (uiState.activeItems.isNotEmpty()) {
                     item {
-                        Card(
-                            modifier = Modifier.fillMaxWidth(),
-                            shape = RoundedCornerShape(12.dp),
-                            colors = CardDefaults.cardColors(containerColor = NiyeEshoDarkSurface),
-                        ) {
-                            Text(
-                                text = "No items left to get. Tap 'Add item' below!",
-                                modifier = Modifier.padding(Spacing.md),
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = NiyeEshoGreenDarkMuted,
-                            )
-                        }
+                        Text(
+                            text = "Items",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White,
+                        )
                     }
-                } else {
-                    items(uiState.activeItems, key = { it.id }) { item ->
+
+                    itemsIndexed(uiState.activeItems, key = { _, item -> item.id }) { _, item ->
                         ListItemRow(
                             item = item,
                             onToggle = { onAction(ListDetailUiAction.ToggleItem(item.id, !item.checked)) },
@@ -213,84 +197,68 @@ fun ListDetailContent(
                     }
                 }
 
-                // DONE Section Header
+                // Checked / Completed Items Section
                 if (uiState.checkedItems.isNotEmpty()) {
                     item {
-                        Spacer(Modifier.padding(top = Spacing.xs))
+                        Spacer(Modifier.height(Spacing.xs))
                         Text(
-                            text = "DONE",
-                            style = MaterialTheme.typography.labelMedium,
+                            text = "Completed (${uiState.checkedItems.size})",
+                            style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
-                            color = NiyeEshoGreenDarkMuted,
+                            color = NiyeEshoGreenMuted,
                         )
                     }
-                    items(uiState.checkedItems, key = { it.id }) { item ->
+
+                    itemsIndexed(uiState.checkedItems, key = { _, item -> item.id }) { _, item ->
                         ListItemRow(
                             item = item,
-                            onToggle = { onAction(ListDetailUiAction.ToggleItem(item.id, false)) },
+                            onToggle = { onAction(ListDetailUiAction.ToggleItem(item.id, !item.checked)) },
                             onDelete = { onAction(ListDetailUiAction.DeleteItem(item.id)) },
                         )
                     }
                 }
+
+                if (uiState.activeItems.isEmpty() && uiState.checkedItems.isEmpty()) {
+                    item {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(Spacing.xxl),
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            Text(
+                                text = "No items in this list yet. Tap '+' to add one!",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = NiyeEshoGreenMuted,
+                                textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                            )
+                        }
+                    }
+                }
             }
 
-            // Bottom Add Item Button
-            OutlinedButton(
-                onClick = { isAddDialogVisible = true },
+            // Floating Action Button to Add Item
+            FloatingActionButton(
+                onClick = { isAddItemSheetOpen = true },
+                containerColor = NiyeEshoGreenPrimary,
+                contentColor = Color.White,
+                shape = CircleShape,
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .align(Alignment.BottomCenter)
+                    .align(Alignment.BottomEnd)
                     .padding(Spacing.lg),
-                shape = RoundedCornerShape(12.dp),
-                border = BorderStroke(1.5.dp, NiyeEshoGreenPrimary),
             ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center,
-                    modifier = Modifier.padding(vertical = Spacing.xs),
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Add,
-                        contentDescription = "Add item",
-                        tint = NiyeEshoGreenPrimary,
-                        modifier = Modifier.size(18.dp),
-                    )
-                    Spacer(Modifier.width(Spacing.xs))
-                    Text(
-                        text = "Add item",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.SemiBold,
-                        color = NiyeEshoGreenPrimary,
-                    )
-                }
+                Icon(imageVector = Icons.Default.Add, contentDescription = "Add Item")
             }
         }
     }
 
-    if (isAddDialogVisible) {
-        AddItemDialog(
-            onConfirm = { name, qty ->
-                onAction(ListDetailUiAction.AddItem(name, qty, null))
-                isAddDialogVisible = false
+    if (isAddItemSheetOpen) {
+        AddItemBottomSheet(
+            onAdd = { name, quantity, unit ->
+                onAction(ListDetailUiAction.AddItem(name, quantity, unit))
+                isAddItemSheetOpen = false
             },
-            onDismiss = { isAddDialogVisible = false },
-        )
-    }
-
-    if (uiState.isCreateGroupDialogVisible) {
-        val contactUid = uiState.list?.id?.removePrefix("contact_list_").orEmpty()
-        val initialSelectedUids = if (contactUid.isNotBlank()) listOf(contactUid) else emptyList()
-        val contactName = uiState.list?.title ?: ""
-        val initialTitle = if (contactName.isNotBlank()) "Group with $contactName" else ""
-
-        CreateGroupDialog(
-            availableContacts = uiState.availableContacts,
-            initialTitle = initialTitle,
-            initialSelectedContactUids = initialSelectedUids,
-            onConfirm = { title, members ->
-                onAction(ListDetailUiAction.CreateGroupConfirmed(title, members))
-            },
-            onDismiss = { onAction(ListDetailUiAction.DismissCreateGroup) },
+            onDismiss = { isAddItemSheetOpen = false },
         )
     }
 
@@ -302,26 +270,25 @@ fun ListDetailContent(
             onUpdateTitle = { title -> onAction(ListDetailUiAction.UpdateList(title)) },
             onDeleteList = { onAction(ListDetailUiAction.DeleteList) },
             onRemoveMember = { memberId -> onAction(ListDetailUiAction.RemoveMember(memberId)) },
-            onAddMembers = { members ->
-                onAction(ListDetailUiAction.AddMembersConfirmed(members))
-            },
-            onAddContact = { member ->
-                onAction(ListDetailUiAction.AddContactFromMember(member))
-            },
+            onAddMembers = { members -> onAction(ListDetailUiAction.AddMembersConfirmed(members)) },
+            onAddContact = { member -> onAction(ListDetailUiAction.AddContactFromMember(member)) },
             onDismiss = { onAction(ListDetailUiAction.DismissGroupSettings) },
         )
     }
 
     if (uiState.isContactSettingsVisible) {
-        val contactUid = uiState.list?.id?.removePrefix("contact_list_").orEmpty()
-        val contact = uiState.availableContacts.firstOrNull { it.uid == contactUid }
         ContactSettingsDialog(
-            contact = contact,
-            onCreateGroupClicked = {
-                onAction(ListDetailUiAction.DismissContactSettings)
-                onAction(ListDetailUiAction.CreateGroupClicked)
-            },
+            contact = null,
+            onCreateGroupClicked = { },
             onDismiss = { onAction(ListDetailUiAction.DismissContactSettings) },
+        )
+    }
+
+    uiState.inviteLink?.let { link ->
+        InviteMemberSheet(
+            inviteLink = link,
+            onShare = {},
+            onDismiss = { onAction(ListDetailUiAction.DismissInvite) },
         )
     }
 }

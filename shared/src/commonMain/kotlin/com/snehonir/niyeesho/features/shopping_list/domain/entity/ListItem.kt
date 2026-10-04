@@ -2,7 +2,9 @@ package com.snehonir.niyeesho.features.shopping_list.domain.entity
 
 import com.snehonir.niyeesho.core.utils.SyncStatus
 import kotlinx.datetime.Instant
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class ListItem(
     val id: String,
     val listId: String,

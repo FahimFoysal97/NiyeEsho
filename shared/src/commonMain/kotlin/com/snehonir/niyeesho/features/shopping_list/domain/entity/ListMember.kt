@@ -1,5 +1,8 @@
 package com.snehonir.niyeesho.features.shopping_list.domain.entity
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class ListMember(
     val uid: String,
     val displayName: String,

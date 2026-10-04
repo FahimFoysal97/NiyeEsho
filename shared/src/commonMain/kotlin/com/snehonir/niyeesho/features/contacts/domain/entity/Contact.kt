@@ -1,7 +1,9 @@
 package com.snehonir.niyeesho.features.contacts.domain.entity
 
 import kotlinx.datetime.Instant
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class Contact(
     val uid: String,
     val displayName: String,

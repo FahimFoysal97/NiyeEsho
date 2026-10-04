@@ -8,6 +8,7 @@ import com.snehonir.niyeesho.features.drive.data.repository.DriveRepositoryImpl
 import com.snehonir.niyeesho.features.drive.domain.repository.DriveRepository
 import com.snehonir.niyeesho.features.drive.domain.usecase.DeleteListFromDriveUseCase
 import com.snehonir.niyeesho.features.drive.domain.usecase.GetProfileFromDriveUrlUseCase
+import com.snehonir.niyeesho.features.drive.domain.usecase.ImportUserDataFromDriveUseCase
 import com.snehonir.niyeesho.features.drive.domain.usecase.InitializeDriveFolderUseCase
 import com.snehonir.niyeesho.features.drive.domain.usecase.ReadContactsFromDriveUseCase
 import com.snehonir.niyeesho.features.drive.domain.usecase.SaveContactsToDriveUseCase
@@ -31,4 +32,5 @@ val driveModule = module {
     singleOf(::SaveContactsToDriveUseCase)
     singleOf(::ReadContactsFromDriveUseCase)
     singleOf(::GetProfileFromDriveUrlUseCase)
+    singleOf(::ImportUserDataFromDriveUseCase)
 }

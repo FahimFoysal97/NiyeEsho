@@ -1,5 +1,7 @@
 package com.snehonir.niyeesho.features.drive.data.mapper
 
+import com.snehonir.niyeesho.core.utils.SyncStatus
+import com.snehonir.niyeesho.features.contacts.domain.entity.Contact
 import com.snehonir.niyeesho.features.drive.data.remote.dto.DriveContactDto
 import com.snehonir.niyeesho.features.drive.data.remote.dto.DriveListItemDto
 import com.snehonir.niyeesho.features.drive.data.remote.dto.DriveListMemberDto
@@ -12,6 +14,9 @@ import com.snehonir.niyeesho.features.drive.domain.entity.DriveListMember
 import com.snehonir.niyeesho.features.drive.domain.entity.DriveMetadata
 import com.snehonir.niyeesho.features.drive.domain.entity.DriveProfile
 import com.snehonir.niyeesho.features.drive.domain.entity.DriveShoppingList
+import com.snehonir.niyeesho.features.shopping_list.domain.entity.ListItem
+import com.snehonir.niyeesho.features.shopping_list.domain.entity.ListMember
+import com.snehonir.niyeesho.features.shopping_list.domain.entity.ShoppingList
 import kotlinx.datetime.Instant
 
 fun DriveProfileDto.toDomain() = DriveProfile(
@@ -57,4 +62,45 @@ fun DriveContactDto.toDomain() = DriveContact(
 fun DriveContact.toDto() = DriveContactDto(
     uid, displayName, email, avatarUrl, profileDriveUrl, cachedFcmToken,
     tokenCachedAt.toString(), connectedAt.toString(),
+)
+
+fun DriveShoppingList.toShoppingList() = ShoppingList(
+    id = id,
+    title = title,
+    ownerId = ownerId,
+    memberIds = memberIds,
+    members = members.map { ListMember(it.uid, it.displayName, it.avatarUrl) },
+    createdAt = createdAt,
+    updatedAt = updatedAt,
+    lastSyncedAt = lastSyncedAt,
+    isArchived = isArchived,
+    syncStatus = SyncStatus.Synced,
+)
+
+fun DriveListItem.toListItem(listId: String) = ListItem(
+    id = id,
+    listId = listId,
+    name = name,
+    quantity = quantity,
+    unit = unit,
+    isChecked = isChecked,
+    addedBy = addedBy,
+    addedByName = addedByName,
+    checkedBy = checkedBy,
+    position = position,
+    createdAt = createdAt,
+    updatedAt = updatedAt,
+    syncStatus = SyncStatus.Synced,
+)
+
+fun DriveContact.toContact() = Contact(
+    uid = uid,
+    displayName = displayName,
+    email = email,
+    avatarUrl = avatarUrl,
+    profileDriveUrl = profileDriveUrl,
+    cachedFcmToken = cachedFcmToken,
+    tokenCachedAt = tokenCachedAt,
+    connectedAt = connectedAt,
+    isBlocked = false,
 )

@@ -1,7 +1,9 @@
 package com.snehonir.niyeesho.features.auth.domain.entity
 
 import kotlinx.datetime.Instant
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class User(
     val uid: String,
     val displayName: String,

@@ -2,10 +2,9 @@ package com.snehonir.niyeesho.features.dashboard.presentation
 
 import com.snehonir.niyeesho.core.utils.SyncStatus
 import com.snehonir.niyeesho.core.utils.toDisplayDate
+import com.snehonir.niyeesho.core.utils.toDisplayTime
 import com.snehonir.niyeesho.features.contacts.domain.entity.Contact
 import com.snehonir.niyeesho.features.shopping_list.domain.entity.ShoppingList
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
 
 data class DashboardUiModel(
     val id: String,
@@ -19,8 +18,7 @@ data class DashboardUiModel(
 ) {
     companion object {
         fun fromDomain(list: ShoppingList): DashboardUiModel {
-            val localUpdated = list.updatedAt.toLocalDateTime(TimeZone.currentSystemDefault())
-            val timeStr = "${localUpdated.hour.toString().padStart(2, '0')}:${localUpdated.minute.toString().padStart(2, '0')}"
+            val timeStr = list.updatedAt.toDisplayTime()
             val dateStr = list.updatedAt.toDisplayDate()
             return DashboardUiModel(
                 id = list.id,
@@ -35,8 +33,7 @@ data class DashboardUiModel(
         }
 
         fun fromContact(contact: Contact): DashboardUiModel {
-            val localUpdated = contact.connectedAt.toLocalDateTime(TimeZone.currentSystemDefault())
-            val timeStr = "${localUpdated.hour.toString().padStart(2, '0')}:${localUpdated.minute.toString().padStart(2, '0')}"
+            val timeStr = contact.connectedAt.toDisplayTime()
             val dateStr = contact.connectedAt.toDisplayDate()
             return DashboardUiModel(
                 id = "contact_list_${contact.uid}",

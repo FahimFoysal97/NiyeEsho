@@ -4,7 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Email
@@ -23,8 +22,7 @@ import com.snehonir.niyeesho.core.designsystem.component.ErrorView
 import com.snehonir.niyeesho.core.designsystem.theme.Spacing
 import com.snehonir.niyeesho.core.utils.UiText
 import com.snehonir.niyeesho.core.utils.toDisplayDate
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
+import com.snehonir.niyeesho.core.utils.toDisplayTime
 
 @Composable
 fun ProfileContent(
@@ -142,8 +140,7 @@ fun ProfileContent(
                                         color = MaterialTheme.colorScheme.onSurface,
                                     )
                                     val syncedText = uiState.lastSyncedAt?.let {
-                                        val local = it.toLocalDateTime(TimeZone.currentSystemDefault())
-                                        "Last synced: ${local.hour.toString().padStart(2, '0')}:${local.minute.toString().padStart(2, '0')} (${it.toDisplayDate()})"
+                                        "Last synced: ${it.toDisplayTime()} (${it.toDisplayDate()})"
                                     } ?: "Not synced yet"
                                     Text(
                                         text = syncedText,
@@ -184,50 +181,6 @@ fun ProfileContent(
                                         Text("Sync Now")
                                     }
                                 }
-                            }
-                        }
-                    }
-
-                    // User Details Information Card (Gmail / Auth actual data)
-                    item {
-                        Card(
-                            modifier = Modifier.fillMaxWidth(),
-                            shape = MaterialTheme.shapes.medium,
-                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                            elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
-                        ) {
-                            Column(
-                                modifier = Modifier.padding(Spacing.lg),
-                                verticalArrangement = Arrangement.spacedBy(Spacing.md),
-                            ) {
-                                Text(
-                                    text = "Google Account Details",
-                                    style = MaterialTheme.typography.titleMedium,
-                                    fontWeight = FontWeight.SemiBold,
-                                    color = MaterialTheme.colorScheme.primary,
-                                )
-
-                                ProfileDetailRow(
-                                    icon = Icons.Default.Person,
-                                    label = "Display Name",
-                                    value = user.displayName.ifBlank { "Not provided" },
-                                )
-
-                                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
-
-                                ProfileDetailRow(
-                                    icon = Icons.Default.Email,
-                                    label = "Gmail Address",
-                                    value = user.email.ifBlank { "Not provided" },
-                                )
-
-                                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
-
-                                ProfileDetailRow(
-                                    icon = Icons.Default.AccountCircle,
-                                    label = "Firebase UID",
-                                    value = user.uid,
-                                )
                             }
                         }
                     }
@@ -284,48 +237,6 @@ fun ProfileContent(
                     }
                 }
             }
-        }
-    }
-}
-
-@Composable
-private fun ProfileDetailRow(
-    icon: ImageVector,
-    label: String,
-    value: String,
-    modifier: Modifier = Modifier,
-) {
-    Row(
-        modifier = modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(Spacing.md),
-    ) {
-        Surface(
-            shape = MaterialTheme.shapes.medium,
-            color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f),
-            modifier = Modifier.size(Spacing.xxl),
-        ) {
-            Box(contentAlignment = Alignment.Center) {
-                Icon(
-                    imageVector = icon,
-                    contentDescription = label,
-                    tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(Spacing.lg),
-                )
-            }
-        }
-        Column(modifier = Modifier.weight(1f)) {
-            Text(
-                text = label,
-                style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-            Text(
-                text = value,
-                style = MaterialTheme.typography.bodyMedium,
-                fontWeight = FontWeight.Medium,
-                color = MaterialTheme.colorScheme.onSurface,
-            )
         }
     }
 }

@@ -2,9 +2,8 @@ package com.snehonir.niyeesho.features.shopping_list.presentation.detail.model
 
 import com.snehonir.niyeesho.core.utils.SyncStatus
 import com.snehonir.niyeesho.core.utils.toDisplayDate
+import com.snehonir.niyeesho.core.utils.toDisplayTime
 import com.snehonir.niyeesho.features.shopping_list.domain.entity.ListItem
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
 
 data class ListItemUiModel(
     val id: String,
@@ -18,8 +17,7 @@ data class ListItemUiModel(
 ) {
     companion object {
         fun fromDomain(item: ListItem): ListItemUiModel {
-            val local = item.createdAt.toLocalDateTime(TimeZone.currentSystemDefault())
-            val timeStr = "${local.hour.toString().padStart(2, '0')}:${local.minute.toString().padStart(2, '0')}"
+            val timeStr = item.createdAt.toDisplayTime()
             val dateStr = item.createdAt.toDisplayDate()
             return ListItemUiModel(
                 id = item.id,

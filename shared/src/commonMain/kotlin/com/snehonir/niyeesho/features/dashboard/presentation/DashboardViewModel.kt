@@ -2,6 +2,7 @@ package com.snehonir.niyeesho.features.dashboard.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.snehonir.niyeesho.core.utils.logD
 import com.snehonir.niyeesho.features.contacts.domain.usecase.WatchContactsUseCase
 import com.snehonir.niyeesho.features.messaging.domain.entity.InviteData
 import com.snehonir.niyeesho.features.messaging.domain.usecase.GenerateInviteLinkUseCase
@@ -28,6 +29,7 @@ class DashboardViewModel(
     val uiEvent: Flow<DashboardUiEvent> = _uiEvent.receiveAsFlow()
 
     init {
+        logD("DashboardViewModel", "DashboardViewModel initialized, starting watchLists and watchContacts collection")
         viewModelScope.launch {
             combine(
                 watchLists(),
@@ -35,6 +37,7 @@ class DashboardViewModel(
             ) { listsResult, contactsResult ->
                 val lists = listsResult.getOrDefault(emptyList())
                 val contacts = contactsResult.getOrDefault(emptyList())
+                logD("DashboardViewModel", "Watched lists count: ${lists.size}, contacts count: ${contacts.size}")
 
                 val existingListIds = lists.map { it.id }.toSet()
                 val listModels = lists.map(DashboardUiModel::fromDomain)
@@ -59,6 +62,7 @@ class DashboardViewModel(
     }
 
     fun onAction(action: DashboardUiAction) {
+        logD("DashboardViewModel", "onAction called with action: $action")
         when (action) {
             DashboardUiAction.FabClicked -> _uiState.update { it.copy(isFabMenuVisible = true) }
             DashboardUiAction.FabMenuDismissed -> _uiState.update { it.copy(isFabMenuVisible = false) }
@@ -69,17 +73,22 @@ class DashboardViewModel(
             DashboardUiAction.CreateDismissed -> _uiState.update { it.copy(isCreateDialogVisible = false) }
             is DashboardUiAction.CreateConfirmed -> create(action.title, action.ownerId, action.members)
             is DashboardUiAction.ListClicked -> handleListClick(action.id)
-            DashboardUiAction.OpenProfile -> viewModelScope.launch { _uiEvent.send(DashboardUiEvent.NavigateToProfile) }
+            DashboardUiAction.OpenProfile -> viewModelScope.launch {
+                logD("DashboardViewModel", "Opening profile event")
+                _uiEvent.send(DashboardUiEvent.NavigateToProfile)
+            }
             DashboardUiAction.SyncNowClicked -> {}
             DashboardUiAction.ErrorDismissed -> _uiState.update { it.copy(error = null) }
         }
     }
 
     private fun generateInvite() {
+        logD("DashboardViewModel", "generateInvite() started")
         viewModelScope.launch {
             _uiState.update { it.copy(isFabMenuVisible = false) }
             generateInviteLink(InviteData.preview())
                 .onSuccess { link ->
+                    logD("DashboardViewModel", "generateInviteLink succeeded with link length: ${link.length}")
                     _uiState.update { it.copy(inviteLink = link, isInviteDialogVisible = true) }
                 }
                 .onFailure { fail(it) }
@@ -87,6 +96,7 @@ class DashboardViewModel(
     }
 
     private fun handleListClick(id: String) = viewModelScope.launch {
+        logD("DashboardViewModel", "handleListClick() for id: $id")
         if (id.startsWith("contact_list_")) {
             val existing = getShoppingList(id)
             if (existing.isFailure) {
@@ -95,6 +105,7 @@ class DashboardViewModel(
                 val contactName = contact?.displayName ?: "Contact Shopping List"
                 val contactMember = contact?.let { ListMember(it.uid, it.displayName, it.avatarUrl) }
                 val members = listOfNotNull(contactMember)
+                logD("DashboardViewModel", "Creating direct contact list for contactUid: $contactUid")
                 createList(title = contactName, ownerId = "user_demo", members = members, id = id)
             }
         }
@@ -102,8 +113,10 @@ class DashboardViewModel(
     }
 
     private fun create(title: String, ownerId: String, members: List<ListMember> = emptyList()) = viewModelScope.launch {
+        logD("DashboardViewModel", "create() list with title: $title")
         createList(title, ownerId, members)
             .onSuccess { createdList ->
+                logD("DashboardViewModel", "createList succeeded with id: ${createdList.id}")
                 _uiState.update { it.copy(isCreateDialogVisible = false) }
                 _uiEvent.send(DashboardUiEvent.NavigateToDetail(createdList.id))
             }
@@ -112,6 +125,7 @@ class DashboardViewModel(
 
     private fun fail(error: Throwable) {
         val message = error.message ?: "Unable to load dashboard data."
+        logD("DashboardViewModel", "Dashboard failure: $message")
         _uiState.update { it.copy(isLoading = false, error = message) }
         viewModelScope.launch { _uiEvent.send(DashboardUiEvent.ShowError(message)) }
     }

@@ -4,6 +4,7 @@ import com.snehonir.niyeesho.core.database.DatabaseDriverFactory
 import com.snehonir.niyeesho.core.di.coreModule
 import com.snehonir.niyeesho.core.di.databaseModule
 import com.snehonir.niyeesho.core.di.networkModule
+import com.snehonir.niyeesho.core.utils.logD
 import com.snehonir.niyeesho.features.auth.di.authModule
 import com.snehonir.niyeesho.features.contacts.di.contactsModule
 import com.snehonir.niyeesho.features.dashboard.di.dashboardModule
@@ -13,6 +14,7 @@ import com.snehonir.niyeesho.features.shopping_list.di.shoppingListModule
 import org.koin.core.context.startKoin
 
 fun initializeNiyeEsho(databaseDriverFactory: DatabaseDriverFactory) {
+    logD("NiyeEshoApp", "initializeNiyeEsho() starting Koin startKoin block")
     startKoin {
         modules(
             coreModule,
@@ -26,4 +28,5 @@ fun initializeNiyeEsho(databaseDriverFactory: DatabaseDriverFactory) {
             dashboardModule,
         )
     }
+    logD("NiyeEshoApp", "initializeNiyeEsho() Koin startKoin completed successfully")
 }

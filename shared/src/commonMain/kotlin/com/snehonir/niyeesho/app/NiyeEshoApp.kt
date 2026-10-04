@@ -18,6 +18,7 @@ import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoTheme
 import com.snehonir.niyeesho.core.navigation.NavGraphDestinations
 import com.snehonir.niyeesho.core.navigation.NavRoute
 import com.snehonir.niyeesho.core.navigation.NiyeEshoNavGraph
+import com.snehonir.niyeesho.core.utils.logD
 import com.snehonir.niyeesho.features.auth.domain.usecase.IsSignedInUseCase
 import com.snehonir.niyeesho.features.auth.presentation.profile.ProfileScreen
 import com.snehonir.niyeesho.features.auth.presentation.signin.SignInScreen
@@ -32,18 +33,22 @@ fun NiyeEshoApp(
     modifier: Modifier = Modifier,
     onShareInvite: (String) -> Unit = {},
 ) {
+    logD("NiyeEshoApp", "NiyeEshoApp composable starting")
     val navController = rememberNavController()
     val isSignedIn = koinInject<IsSignedInUseCase>()
     var startDestination by remember { mutableStateOf<String?>(null) }
 
     LaunchedEffect(Unit) {
-        startDestination = isSignedIn().getOrDefault(false).let { signedIn ->
-            if (signedIn) NavRoute.ShoppingLists.route else NavRoute.SignIn.route
-        }
+        logD("NiyeEshoApp", "LaunchedEffect checking auth status via IsSignedInUseCase")
+        val signedIn = isSignedIn().getOrDefault(false)
+        logD("NiyeEshoApp", "Auth check result signedIn = $signedIn")
+        startDestination = if (signedIn) NavRoute.ShoppingLists.route else NavRoute.SignIn.route
+        logD("NiyeEshoApp", "Determined startDestination = $startDestination")
     }
 
     NiyeEshoTheme {
         if (startDestination == null) {
+            logD("NiyeEshoApp", "Showing loading progress indicator while startDestination is loading")
             Box(
                 modifier = modifier.fillMaxSize().safeDrawingPadding(),
                 contentAlignment = Alignment.Center,
@@ -51,6 +56,7 @@ fun NiyeEshoApp(
                 CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
             }
         } else {
+            logD("NiyeEshoApp", "Navigating to NiyeEshoNavGraph with startDestination = $startDestination")
             NiyeEshoNavGraph(
                 navController = navController,
                 modifier = modifier.fillMaxSize().safeDrawingPadding(),
@@ -59,6 +65,7 @@ fun NiyeEshoApp(
                     signIn = {
                         SignInScreen(
                             onNavigateToShoppingLists = {
+                                logD("NiyeEshoApp", "Navigation: SignIn -> ShoppingLists")
                                 navController.navigate(NavRoute.ShoppingLists.route) {
                                     popUpTo(NavRoute.SignIn.route) { inclusive = true }
                                 }
@@ -68,9 +75,11 @@ fun NiyeEshoApp(
                     shoppingLists = {
                         DashboardScreen(
                             onNavigateToDetail = { id ->
+                                logD("NiyeEshoApp", "Navigation: Dashboard -> ListDetail for id = $id")
                                 navController.navigate(NavRoute.ListDetail(id).route)
                             },
                             onNavigateToProfile = {
+                                logD("NiyeEshoApp", "Navigation: Dashboard -> Profile")
                                 navController.navigate(NavRoute.Profile.route)
                             },
                             onShareInvite = onShareInvite,
@@ -79,9 +88,13 @@ fun NiyeEshoApp(
                     listDetail = { id ->
                         ListDetailScreen(
                             listId = id,
-                            onBack = { navController.popBackStack() },
+                            onBack = {
+                                logD("NiyeEshoApp", "Navigation: ListDetail -> Back")
+                                navController.popBackStack()
+                            },
                             onShareInvite = onShareInvite,
                             onNavigateToDetail = { listId ->
+                                logD("NiyeEshoApp", "Navigation: ListDetail -> ListDetail for listId = $listId")
                                 navController.navigate(NavRoute.ListDetail(listId).route)
                             },
                         )
@@ -89,20 +102,28 @@ fun NiyeEshoApp(
                     contacts = {
                         ContactsScreen(
                             onOpenContact = { listId ->
+                                logD("NiyeEshoApp", "Navigation: Contacts -> ListDetail for listId = $listId")
                                 navController.navigate(NavRoute.ListDetail(listId).route)
                             },
                             onShareInvite = onShareInvite,
-                            onBack = { navController.popBackStack() },
+                            onBack = {
+                                logD("NiyeEshoApp", "Navigation: Contacts -> Back")
+                                navController.popBackStack()
+                            },
                         )
                     },
                     profile = {
                         ProfileScreen(
                             onNavigateToSignIn = {
+                                logD("NiyeEshoApp", "Navigation: Profile -> SignIn (Signed out)")
                                 navController.navigate(NavRoute.SignIn.route) {
                                     popUpTo(0)
                                 }
                             },
-                            onBack = { navController.popBackStack() },
+                            onBack = {
+                                logD("NiyeEshoApp", "Navigation: Profile -> Back")
+                                navController.popBackStack()
+                            },
                         )
                     },
                     inviteAccept = { },
@@ -110,4 +131,5 @@ fun NiyeEshoApp(
             )
         }
     }
+    logD("NiyeEshoApp", "NiyeEshoApp composable completed render")
 }

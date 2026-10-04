@@ -1,6 +1,7 @@
 package com.snehonir.niyeesho.features.messaging.data.remote
 
 import com.snehonir.niyeesho.core.network.NetworkConstants
+import com.snehonir.niyeesho.core.utils.logD
 import com.snehonir.niyeesho.features.messaging.data.remote.dto.FcmMessageRequestDto
 import com.snehonir.niyeesho.features.messaging.data.remote.dto.FcmPayloadDto
 import com.snehonir.niyeesho.features.messaging.data.remote.dto.FcmSendRequestDto
@@ -16,6 +17,7 @@ class MessagingRemoteDataSourceImpl(
     private val json: Json = Json,
 ) : MessagingRemoteDataSource {
     override suspend fun send(recipientToken: String, payload: FcmPayloadDto): Result<Unit> = runCatching {
+        logD("MessagingRemote(Network)", "send() called for recipientToken: ${recipientToken.take(10)}..., payloadType: ${payload.type}")
         client.post(
             "${NetworkConstants.fcmBaseUrl}projects/${NetworkConstants.fcmProjectId}/messages:send",
         ) {
@@ -39,5 +41,8 @@ class MessagingRemoteDataSourceImpl(
                 ),
             )
         }
+        logD("MessagingRemote(Network)", "send() -> success")
+    }.onFailure {
+        logD("MessagingRemote(Network)", "send() -> failed: ${it.message}")
     }
 }

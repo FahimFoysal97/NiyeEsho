@@ -6,6 +6,8 @@ import kotlinx.datetime.Instant
 
 data class ProfileUiState(
     val user: User? = null,
+    val listCount: Int = 0,
+    val contactCount: Int = 0,
     val isLoading: Boolean = true,
     val isSigningOut: Boolean = false,
     val isSyncing: Boolean = false,
@@ -14,6 +16,6 @@ data class ProfileUiState(
     val error: String? = null,
 ) {
     companion object {
-        fun preview() = ProfileUiState(user = User.preview(), isLoading = false, lastSyncedAt = Clock.System.now())
+        fun preview() = ProfileUiState(user = User.preview(), listCount = 3, contactCount = 3, isLoading = false, lastSyncedAt = Clock.System.now())
     }
 }

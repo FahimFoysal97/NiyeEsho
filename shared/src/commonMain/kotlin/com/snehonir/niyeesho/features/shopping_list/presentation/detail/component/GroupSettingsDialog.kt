@@ -49,6 +49,7 @@ import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoCheckboxBorder
 import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoDarkBg
 import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoDarkSurface
 import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoGreenDarkMuted
+import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoGreenLight
 import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoGreenMuted
 import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoGreenPrimary
 import com.snehonir.niyeesho.core.designsystem.theme.Spacing
@@ -351,8 +352,13 @@ fun GroupSettingsDialog(
         dismissButton = {
             TextButton(
                 onClick = onDismiss,
-                colors = ButtonDefaults.textButtonColors(contentColor = NiyeEshoGreenDarkMuted),
-            ) { Text("Close") }
+                colors = ButtonDefaults.textButtonColors(contentColor = NiyeEshoGreenLight),
+            ) {
+                Text(
+                    text = "Close",
+                    style = MaterialTheme.typography.titleMedium,
+                )
+            }
         },
     )
 }

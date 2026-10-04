@@ -6,6 +6,7 @@ import com.russhwolf.settings.Settings
 import com.snehonir.niyeesho.core.utils.TokenManager
 import com.snehonir.niyeesho.features.auth.domain.usecase.GetCurrentUserUseCase
 import com.snehonir.niyeesho.features.auth.domain.usecase.SignOutUseCase
+import com.snehonir.niyeesho.features.contacts.domain.usecase.WatchContactsUseCase
 import com.snehonir.niyeesho.features.drive.domain.entity.DriveListItem
 import com.snehonir.niyeesho.features.drive.domain.entity.DriveListMember
 import com.snehonir.niyeesho.features.drive.domain.entity.DriveShoppingList
@@ -13,6 +14,7 @@ import com.snehonir.niyeesho.features.drive.domain.repository.DriveRepository
 import com.snehonir.niyeesho.features.drive.domain.usecase.SyncFromDriveUseCase
 import com.snehonir.niyeesho.features.shopping_list.data.local.ListItemLocalDataSource
 import com.snehonir.niyeesho.features.shopping_list.data.local.ShoppingListLocalDataSource
+import com.snehonir.niyeesho.features.shopping_list.domain.usecase.WatchShoppingListsUseCase
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -29,6 +31,8 @@ class ProfileViewModel(
     private val getCurrentUser: GetCurrentUserUseCase,
     private val signOutUseCase: SignOutUseCase,
     private val syncFromDrive: SyncFromDriveUseCase,
+    private val watchLists: WatchShoppingListsUseCase,
+    private val watchContacts: WatchContactsUseCase,
     private val shoppingListLocal: ShoppingListLocalDataSource,
     private val listItemLocal: ListItemLocalDataSource,
     private val driveRepository: DriveRepository,
@@ -43,6 +47,20 @@ class ProfileViewModel(
 
     init {
         onAction(ProfileUiAction.Load)
+        viewModelScope.launch {
+            watchLists().collect { result ->
+                result.onSuccess { lists ->
+                    _uiState.update { it.copy(listCount = lists.size) }
+                }
+            }
+        }
+        viewModelScope.launch {
+            watchContacts().collect { result ->
+                result.onSuccess { contacts ->
+                    _uiState.update { it.copy(contactCount = contacts.size) }
+                }
+            }
+        }
     }
 
     fun onAction(action: ProfileUiAction) {

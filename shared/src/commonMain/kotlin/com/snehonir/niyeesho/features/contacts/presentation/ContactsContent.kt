@@ -232,7 +232,7 @@ fun ContactsContent(
                 } else {
                     itemsIndexed(uiState.contacts, key = { _, item -> item.uid }) { index, contact ->
                         val avatarBg = avatarColors[index % avatarColors.size]
-                        val subtitleText = "Connected ${contact.email}"
+                        val subtitleText = contact.email
 
                         ContactCardRow(
                             contact = contact,

@@ -20,7 +20,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Search
@@ -61,6 +60,7 @@ import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoGreenPrimary
 import com.snehonir.niyeesho.core.designsystem.theme.Spacing
 import com.snehonir.niyeesho.core.utils.toDisplayDate
 import com.snehonir.niyeesho.core.utils.toDisplayTime
+import kotlinx.datetime.Clock
 
 @Composable
 fun ProfileContent(
@@ -200,14 +200,19 @@ fun ProfileContent(
 
                                     Spacer(Modifier.height(Spacing.xs))
 
-                                    // 3 Stat Boxes Row
+                                    val isDriveSyncedRecently = uiState.lastSyncedAt?.let { lastSynced ->
+                                        val now = Clock.System.now()
+                                        (now - lastSynced).inWholeHours < 24
+                                    } ?: false
+
+                                    // Dynamic 3 Stat Boxes Row (Real List & Contact counts)
                                     Row(
                                         modifier = Modifier.fillMaxWidth(),
                                         horizontalArrangement = Arrangement.spacedBy(Spacing.xs),
                                     ) {
-                                        StatBox("3", "Lists", Modifier.weight(1f))
-                                        StatBox("3", "Contacts", Modifier.weight(1f))
-                                        StatBox("✓", "Drive", Modifier.weight(1f), isSuccess = true)
+                                        StatBox(uiState.listCount.toString(), "Lists", Modifier.weight(1f))
+                                        StatBox(uiState.contactCount.toString(), "Contacts", Modifier.weight(1f))
+                                        StatBox("✓", "Sync", Modifier.weight(1f), isSuccess = isDriveSyncedRecently)
                                     }
                                 }
                             }
@@ -248,14 +253,14 @@ fun ProfileContent(
                                             Icon(
                                                 imageVector = Icons.Default.CheckCircle,
                                                 contentDescription = "Sync",
-                                                tint = NiyeEshoGreenPrimary,
+                                                tint = NiyeEshoGreenDarkMuted,
                                                 modifier = Modifier.size(20.dp),
                                             )
                                             Column {
                                                 Text("Last synced", style = MaterialTheme.typography.bodyMedium, color = Color.White)
                                                 val syncedText = uiState.lastSyncedAt?.let {
                                                     "${it.toDisplayTime()} (${it.toDisplayDate()})"
-                                                } ?: "2 minutes ago"
+                                                } ?: "Just now"
                                                 Text(syncedText, style = MaterialTheme.typography.bodySmall, color = NiyeEshoGreenDarkMuted)
                                             }
                                         }
@@ -267,7 +272,7 @@ fun ProfileContent(
                                         ) {
                                             if (uiState.isSyncing) {
                                                 CircularProgressIndicator(
-                                                    modifier = Modifier.size(16.dp),
+                                                    modifier = Modifier.size(20.dp),
                                                     color = NiyeEshoGreenPrimary,
                                                     strokeWidth = 2.dp,
                                                 )
@@ -275,14 +280,14 @@ fun ProfileContent(
                                                 Icon(
                                                     imageVector = Icons.Default.Refresh,
                                                     contentDescription = "Refresh",
-                                                    tint = NiyeEshoGreenDarkMuted,
-                                                    modifier = Modifier.size(18.dp),
+                                                    tint = NiyeEshoGreenPrimary,
+                                                    modifier = Modifier.size(24.dp),
                                                 )
                                             }
                                         }
                                     }
 
-                                    HorizontalDivider(color = NiyeEshoDarkBg, thickness = 1.dp)
+                                    /*HorizontalDivider(color = NiyeEshoDarkBg, thickness = 1.dp)
 
                                     Row(
                                         modifier = Modifier
@@ -306,12 +311,12 @@ fun ProfileContent(
                                                 Text("3 lists · 12KB", style = MaterialTheme.typography.bodySmall, color = NiyeEshoGreenDarkMuted)
                                             }
                                         }
-                                    }
+                                    }*/
                                 }
                             }
                         }
 
-                        // SETTINGS Card
+                        // SETTINGS Card (Skipping notification and search by email switches)
                         item {
                             Card(
                                 modifier = Modifier.fillMaxWidth(),

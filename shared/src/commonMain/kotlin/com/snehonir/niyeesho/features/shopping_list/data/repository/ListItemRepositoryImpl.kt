@@ -32,9 +32,10 @@ class ListItemRepositoryImpl(
     override suspend fun addItem(item: ListItem): Result<Unit> = runCatching {
         logD("ListItemRepo", "addItem() -> inserting item '${item.name}' (id: ${item.id}) for listId: ${item.listId} in LocalDB")
         local.upsert(item)
+        touchParentList(item.listId)
         logD("ListItemRepo", "addItem() -> successfully inserted item '${item.name}' in LocalDB")
         syncToRemote(item.listId)
-        notifyMembers(item.listId, "addItem", item.name)
+        notifyMembers(item.listId, FcmMessageType.ITEM_ADDED, item.name)
     }.onFailure {
         logD("ListItemRepo", "addItem() -> failed to insert item: ${it.message}")
     }
@@ -42,9 +43,10 @@ class ListItemRepositoryImpl(
     override suspend fun updateItem(item: ListItem): Result<Unit> = runCatching {
         logD("ListItemRepo", "updateItem() -> updating item '${item.name}' id: ${item.id} in LocalDB")
         local.upsert(item.copy(updatedAt = Clock.System.now()))
+        touchParentList(item.listId)
         logD("ListItemRepo", "updateItem() -> success")
         syncToRemote(item.listId)
-        notifyMembers(item.listId, "updateItem", item.name)
+        notifyMembers(item.listId, FcmMessageType.ITEM_UPDATED, item.name)
     }.onFailure {
         logD("ListItemRepo", "updateItem() -> failed: ${it.message}")
     }
@@ -55,9 +57,10 @@ class ListItemRepositoryImpl(
             local.get(itemId)?.let { item ->
                 val updated = item.copy(isChecked = checked, checkedBy = checkedBy, updatedAt = Clock.System.now())
                 local.upsert(updated)
+                touchParentList(item.listId)
                 logD("ListItemRepo", "toggleItem() -> success in LocalDB")
                 syncToRemote(item.listId)
-                notifyMembers(item.listId, "toggleItem", item.name)
+                notifyMembers(item.listId, FcmMessageType.ITEM_TOGGLED, item.name)
             } ?: logD("ListItemRepo", "toggleItem() -> item not found: $itemId")
         }.onFailure {
             logD("ListItemRepo", "toggleItem() -> failed: ${it.message}")
@@ -67,91 +70,84 @@ class ListItemRepositoryImpl(
         logD("ListItemRepo", "deleteItem() -> deleting itemId: $itemId from LocalDB")
         val item = local.get(itemId)
         local.delete(itemId)
-        logD("ListItemRepo", "deleteItem() -> success")
         item?.let {
+            touchParentList(it.listId)
             syncToRemote(it.listId)
-            notifyMembers(it.listId, "deleteItem", it.name)
+            notifyMembers(it.listId, FcmMessageType.ITEM_DELETED, it.name)
         }
-        Unit
+        logD("ListItemRepo", "deleteItem() -> success")
     }.onFailure {
         logD("ListItemRepo", "deleteItem() -> failed: ${it.message}")
     }
 
-    override suspend fun reorderItems(listId: String, orderedIds: List<String>): Result<Unit> =
+    override suspend fun reorderItems(listId: String, orderedIds: List<String>): Result<Unit> = runCatching {
+        local.reorder(listId, orderedIds)
+        touchParentList(listId)
+        syncToRemote(listId)
+    }.onFailure {
+        logD("ListItemRepo", "reorderItems() -> failed: ${it.message}")
+    }
+
+    private suspend fun touchParentList(listId: String) {
         runCatching {
-            logD("ListItemRepo", "reorderItems() for listId: $listId")
-            local.reorder(listId, orderedIds)
-            logD("ListItemRepo", "reorderItems() -> success")
-            syncToRemote(listId)
-        }.onFailure {
-            logD("ListItemRepo", "reorderItems() -> failed: ${it.message}")
+            shoppingListRepository.getShoppingList(listId).onSuccess { list ->
+                shoppingListRepository.updateShoppingList(list)
+            }
         }
+    }
 
     private suspend fun syncToRemote(listId: String) {
         runCatching {
             val token = tokenManager.getToken()
-            if (token.isNullOrBlank()) {
-                logD("ListItemRepo", "syncToRemote() -> skipped: No access token found.")
-                return
-            }
-            logD("ListItemRepo", "syncToRemote() -> backing up listId: $listId to Google Drive")
-            val listResult = shoppingListRepository.getShoppingList(listId)
-            if (listResult.isSuccess) {
-                val list = listResult.getOrThrow()
-                val items = local.watchForList(listId).first()
-                val driveList = DriveShoppingList(
-                    id = list.id,
-                    title = list.title,
-                    ownerId = list.ownerId,
-                    memberIds = list.memberIds,
-                    members = list.members.map { DriveListMember(it.uid, it.displayName, it.avatarUrl) },
-                    createdAt = list.createdAt,
-                    updatedAt = list.updatedAt,
-                    lastSyncedAt = list.lastSyncedAt,
-                    items = items.map { item ->
-                        DriveListItem(
-                            id = item.id,
-                            name = item.name,
-                            quantity = item.quantity,
-                            unit = item.unit,
-                            isChecked = item.isChecked,
-                            addedBy = item.addedBy,
-                            addedByName = item.addedByName,
-                            checkedBy = item.checkedBy,
-                            position = item.position,
-                            createdAt = item.createdAt,
-                            updatedAt = item.updatedAt,
-                        )
-                    },
-                    isArchived = list.isArchived,
-                )
-                driveRepository.saveList(token, driveList)
-                logD("ListItemRepo", "syncToRemote() -> Google Drive backup success for listId: $listId")
-            }
+            if (token.isNullOrBlank()) return
+            val list = shoppingListRepository.getShoppingList(listId).getOrNull() ?: return
+            val items = local.watchForList(listId).first()
+            val driveList = DriveShoppingList(
+                id = list.id,
+                title = list.title,
+                ownerId = list.ownerId,
+                memberIds = list.memberIds,
+                members = list.members.map { DriveListMember(it.uid, it.displayName, it.avatarUrl) },
+                createdAt = list.createdAt,
+                updatedAt = list.updatedAt,
+                lastSyncedAt = list.lastSyncedAt,
+                items = items.map { item ->
+                    DriveListItem(
+                        id = item.id,
+                        name = item.name,
+                        quantity = item.quantity,
+                        unit = item.unit,
+                        isChecked = item.isChecked,
+                        addedBy = item.addedBy,
+                        addedByName = item.addedByName,
+                        checkedBy = item.checkedBy,
+                        position = item.position,
+                        createdAt = item.createdAt,
+                        updatedAt = item.updatedAt,
+                    )
+                },
+                isArchived = list.isArchived,
+            )
+            driveRepository.saveList(token, driveList)
         }.onFailure {
-            logD("ListItemRepo", "syncToRemote() -> Google Drive backup failed: ${it.message}")
+            logD("ListItemRepo", "syncToRemote() -> failed: ${it.message}")
         }
     }
 
-    private suspend fun notifyMembers(listId: String, actionName: String, itemName: String) {
+    private suspend fun notifyMembers(listId: String, type: FcmMessageType, itemName: String) {
         runCatching {
-            val listResult = shoppingListRepository.getShoppingList(listId)
-            if (listResult.isSuccess) {
-                val list = listResult.getOrThrow()
-                val otherMembers = list.memberIds.filter { it != "user_demo" }
-                otherMembers.forEach { memberUid ->
-                    logD("ListItemRepo", "notifyMembers() -> broadcasting FCM message ($actionName) to member: $memberUid")
-                    messagingRepository.send(
-                        recipientUid = memberUid,
-                        message = FcmMessage(
-                            type = FcmMessageType.ITEM_ADDED,
-                            senderId = "user_demo",
-                            senderName = "Sneho Nir",
-                            listId = listId,
-                            timestamp = Clock.System.now(),
-                            data = "{\"action\":\"$actionName\",\"item\":\"$itemName\"}",
-                        ),
-                    )
+            val list = shoppingListRepository.getShoppingList(listId).getOrNull() ?: return
+            val message = FcmMessage(
+                type = type,
+                senderId = "user_demo",
+                senderName = "Sneho Nir",
+                listId = listId,
+                timestamp = Clock.System.now(),
+                data = itemName,
+            )
+            for (memberId in list.memberIds) {
+                if (memberId != "user_demo") {
+                    messagingRepository.send(memberId, message)
                 }
             }
         }.onFailure {

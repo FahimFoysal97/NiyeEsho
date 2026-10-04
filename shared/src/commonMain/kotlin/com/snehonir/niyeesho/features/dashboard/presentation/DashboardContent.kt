@@ -74,12 +74,12 @@ fun DashboardContent(
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
                 contentPadding = PaddingValues(
-                    start = Spacing.lg,
-                    end = Spacing.lg,
-                    top = Spacing.lg,
+                    start = Spacing.md,
+                    end = Spacing.md,
+                    top = Spacing.md,
                     bottom = Spacing.xl,
                 ),
-                verticalArrangement = Arrangement.spacedBy(Spacing.md),
+                verticalArrangement = Arrangement.spacedBy(Spacing.sm),
             ) {
                 // Header Row (Good morning / Sneho + Plus Button)
                 item {
@@ -88,15 +88,15 @@ fun DashboardContent(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        Column(/*verticalArrangement = Arrangement.spacedBy(Spacing.xs / 2)*/) {
+                        Column(verticalArrangement = Arrangement.spacedBy(Spacing.xs / 2)) {
                             Text(
-                                text = "Good morning,",
-                                style = MaterialTheme.typography.bodyMedium,
+                                text = "Good morning",
+                                style = MaterialTheme.typography.bodySmall,
                                 color = NiyeEshoGreenMuted,
                             )
                             Text(
-                                text = uiState.userName.ifBlank { "User" },
-                                style = MaterialTheme.typography.headlineMedium,
+                                text = uiState.userName.ifBlank { "Sneho" },
+                                style = MaterialTheme.typography.titleLarge,
                                 fontWeight = FontWeight.Bold,
                                 color = Color.White,
                             )
@@ -105,20 +105,20 @@ fun DashboardContent(
                             onClick = { onAction(DashboardUiAction.AddGroupClicked) },
                             modifier = Modifier
                                 .size(Spacing.xxl)
-                                .clip(RoundedCornerShape(Spacing.md))
+                                .clip(RoundedCornerShape(Spacing.sm))
                                 .background(NiyeEshoGreenPrimary),
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Add,
                                 contentDescription = "Create Group",
                                 tint = Color.White,
-                                modifier = Modifier.size(Spacing.lg),
+                                modifier = Modifier.size(Spacing.md),
                             )
                         }
                     }
                 }
 
-                // Most Active Hero Card
+                // Most Active Hero Card (Real Dynamic Data & Progress)
                 mostActiveList?.let { mostActive ->
                     item {
                         val activeMembersStr = if (mostActive.members.isNotEmpty()) {
@@ -139,7 +139,7 @@ fun DashboardContent(
                                 // Left accent border
                                 Box(
                                     modifier = Modifier
-                                        .width(Spacing.xs)
+                                        .width(Spacing.xs / 2)
                                         .height(110.dp)
                                         .background(NiyeEshoGreenPrimary),
                                 )
@@ -149,37 +149,57 @@ fun DashboardContent(
                                         .padding(Spacing.md),
                                     verticalArrangement = Arrangement.spacedBy(Spacing.xs),
                                 ) {
-                                    Text(
-                                        text = "Most active",
-                                        style = MaterialTheme.typography.labelSmall,
-                                        fontWeight = FontWeight.Bold,
-                                        color = NiyeEshoGreenPrimary,
-                                    )
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                        verticalAlignment = Alignment.CenterVertically,
+                                    ) {
+                                        Text(
+                                            text = "MOST ACTIVE LIST",
+                                            style = MaterialTheme.typography.labelSmall,
+                                            fontWeight = FontWeight.Bold,
+                                            color = NiyeEshoGreenPrimary,
+                                        )
+                                        if (mostActive.isDone) {
+                                            Icon(
+                                                imageVector = Icons.Default.CheckCircle,
+                                                contentDescription = "Completed",
+                                                tint = NiyeEshoGreenPrimary,
+                                                modifier = Modifier.size(Spacing.md),
+                                            )
+                                        } else {
+                                            Text(
+                                                text = mostActive.progressLabel,
+                                                style = MaterialTheme.typography.bodySmall,
+                                                color = NiyeEshoGreenMuted,
+                                            )
+                                        }
+                                    }
                                     Text(
                                         text = mostActive.title,
-                                        style = MaterialTheme.typography.titleLarge,
+                                        style = MaterialTheme.typography.titleMedium,
                                         fontWeight = FontWeight.Bold,
                                         color = Color.White,
                                     )
                                     Text(
-                                        text = "Updated: ${mostActive.updatedAtFormatted} · ${mostActive.memberCount} members",
+                                        text = "${mostActive.lastActivityText} · $activeMembersStr",
                                         style = MaterialTheme.typography.bodySmall,
                                         color = NiyeEshoGreenMuted,
                                     )
                                     Spacer(Modifier.height(Spacing.xs))
                                     LinearProgressIndicator(
-                                        progress = { 0.4f },
+                                        progress = { mostActive.progress },
                                         modifier = Modifier
                                             .fillMaxWidth()
-                                            .height(Spacing.xs)
+                                            .height(Spacing.xs / 2)
                                             .clip(RoundedCornerShape(Spacing.xs)),
-                                        color = NiyeEshoGreenPrimary,
+                                        color = if (mostActive.isDone) NiyeEshoGoldSecondary else NiyeEshoGreenPrimary,
                                         trackColor = NiyeEshoDarkBg,
                                     )
-                                    Spacer(Modifier.height(Spacing.xs))
+                                    Spacer(Modifier.height(Spacing.xs / 2))
                                     Text(
-                                        text = "${mostActive.memberCount} of 8 done",
-                                        style = MaterialTheme.typography.bodyMedium,
+                                        text = mostActive.progressDetailLabel,
+                                        style = MaterialTheme.typography.bodySmall,
                                         color = NiyeEshoGreenMuted,
                                     )
                                 }
@@ -192,22 +212,16 @@ fun DashboardContent(
                     item { ErrorView(UiText.Plain(error), modifier = Modifier.fillMaxWidth()) }
                 }
 
-                // Other Lists
+                // Other Lists (Real Dynamic Data & Progress)
                 if (otherLists.isNotEmpty()) {
                     itemsIndexed(otherLists, key = { _, item -> item.id }) { index, list ->
                         val accentColor = accentColors[(index + 1) % accentColors.size]
-                        val isDone = list.memberCount == 0
-                        val progress = if (isDone) 1.0f else if (index % 2 == 0) 0.37f else 0.17f
-                        val progressLabel = if (isDone) "100%" else if (index % 2 == 0) "3/8" else "1/6"
 
                         DashboardListRowCard(
                             list = list,
                             accentColor = accentColor,
                             avatarColors = accentColors,
                             userName = uiState.userName,
-                            isDone = isDone,
-                            progress = progress,
-                            progressLabel = progressLabel,
                             onClick = { onNavigateToDetail(list.id) },
                         )
                     }
@@ -275,9 +289,6 @@ private fun DashboardListRowCard(
     accentColor: Color,
     avatarColors: List<Color>,
     userName: String,
-    isDone: Boolean,
-    progress: Float,
-    progressLabel: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -345,7 +356,7 @@ private fun DashboardListRowCard(
                         }
                     }
 
-                    if (isDone) {
+                    if (list.isDone) {
                         Icon(
                             imageVector = Icons.Default.CheckCircle,
                             contentDescription = "Completed",
@@ -354,7 +365,7 @@ private fun DashboardListRowCard(
                         )
                     } else {
                         Text(
-                            text = progressLabel,
+                            text = list.progressLabel,
                             style = MaterialTheme.typography.bodySmall,
                             color = NiyeEshoGreenMuted,
                         )
@@ -363,12 +374,12 @@ private fun DashboardListRowCard(
 
                 // Full-width Progress Bar
                 LinearProgressIndicator(
-                    progress = { progress },
+                    progress = { list.progress },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(Spacing.xs / 2)
                         .clip(RoundedCornerShape(Spacing.xs)),
-                    color = accentColor,
+                    color = if (list.isDone) NiyeEshoGoldSecondary else accentColor,
                     trackColor = NiyeEshoDarkBg,
                 )
             }

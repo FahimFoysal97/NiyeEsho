@@ -82,7 +82,12 @@ class DashboardViewModel(
                 logD("DashboardViewModel", "Watched lists count: ${lists.size}, contacts count: ${contacts.size}")
 
                 val existingListIds = lists.map { it.id }.toSet()
-                val listModels = lists.map(DashboardUiModel::fromDomain)
+                val listModels = lists.map { list ->
+                    val items = listItemLocal.watchForList(list.id).first()
+                    val total = items.size
+                    val completed = items.count { it.isChecked }
+                    DashboardUiModel.fromDomain(list, total, completed)
+                }
                 val contactModels = contacts
                     .filter { "contact_list_${it.uid}" !in existingListIds }
                     .map(DashboardUiModel::fromContact)

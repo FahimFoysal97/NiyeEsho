@@ -232,12 +232,12 @@ fun ContactsContent(
                 } else {
                     itemsIndexed(uiState.contacts, key = { _, item -> item.uid }) { index, contact ->
                         val avatarBg = avatarColors[index % avatarColors.size]
-                        val listCountText = if (index == 0) "2 shared lists" else if (index == 1) "1 shared list" else "No shared lists yet"
+                        val subtitleText = "Connected ${contact.email}"
 
                         ContactCardRow(
                             contact = contact,
                             avatarBg = avatarBg,
-                            listCountText = listCountText,
+                            subtitleText = subtitleText,
                             onClick = { onAction(ContactsUiAction.ContactSelected(contact)) },
                             onDelete = { onAction(ContactsUiAction.RemoveContact(contact.uid)) },
                         )
@@ -274,7 +274,7 @@ fun ContactsContent(
 private fun ContactCardRow(
     contact: Contact,
     avatarBg: Color,
-    listCountText: String,
+    subtitleText: String,
     onClick: () -> Unit,
     onDelete: () -> Unit,
     modifier: Modifier = Modifier,
@@ -304,7 +304,7 @@ private fun ContactCardRow(
                 ) {
                     Box(contentAlignment = Alignment.Center) {
                         Text(
-                            text = contact.displayName.firstOrNull()?.uppercaseChar()?.toString() ?: "C",
+                            text = contact.displayName.trim().firstOrNull()?.uppercaseChar()?.toString() ?: "C",
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
                             color = Color.White,
@@ -319,7 +319,7 @@ private fun ContactCardRow(
                         color = Color.White,
                     )
                     Text(
-                        text = listCountText,
+                        text = subtitleText,
                         style = MaterialTheme.typography.bodySmall,
                         color = NiyeEshoGreenDarkMuted,
                     )
@@ -327,14 +327,14 @@ private fun ContactCardRow(
             }
 
             Row(verticalAlignment = Alignment.CenterVertically) {
-                IconButton(onClick = onClick) {
+                /*IconButton(onClick = {}) {
                     Icon(
                         imageVector = Icons.Default.Share,
                         contentDescription = "Share",
                         tint = NiyeEshoGreenPrimary,
                         modifier = Modifier.size(18.dp),
                     )
-                }
+                }*/
                 IconButton(onClick = onDelete) {
                     Icon(
                         imageVector = Icons.Default.Delete,

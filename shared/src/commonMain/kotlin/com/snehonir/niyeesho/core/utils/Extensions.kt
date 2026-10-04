@@ -1,5 +1,6 @@
 package com.snehonir.niyeesho.core.utils
 
+import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -21,4 +22,16 @@ fun Instant.toDisplayTime(): String {
         else -> hour24
     }
     return "$hour12:$minute $amPm"
+}
+
+fun Instant.toRelativeTimeString(): String {
+    val now = Clock.System.now()
+    val diffSec = (now - this).inWholeSeconds
+    return when {
+        diffSec < 60 -> "Just now"
+        diffSec < 3600 -> "${diffSec / 60}m ago"
+        diffSec < 86400 -> "${diffSec / 3600}h ago"
+        diffSec < 604800 -> "${diffSec / 86400}d ago"
+        else -> toDisplayDate()
+    }
 }

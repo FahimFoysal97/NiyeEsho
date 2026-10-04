@@ -25,7 +25,6 @@ import com.snehonir.niyeesho.features.auth.presentation.signin.SignInScreen
 import com.snehonir.niyeesho.features.contacts.presentation.ContactsScreen
 import com.snehonir.niyeesho.features.dashboard.presentation.DashboardScreen
 import com.snehonir.niyeesho.features.shopping_list.presentation.detail.ListDetailScreen
-import com.snehonir.niyeesho.features.shopping_list.presentation.list.ShoppingListScreen
 import org.koin.compose.koinInject
 
 @Composable
@@ -78,6 +77,10 @@ fun NiyeEshoApp(
                                 logD("NiyeEshoApp", "Navigation: Dashboard -> ListDetail for id = $id")
                                 navController.navigate(NavRoute.ListDetail(id).route)
                             },
+                            onNavigateToContacts = {
+                                logD("NiyeEshoApp", "Navigation: Dashboard -> Contacts")
+                                navController.navigate(NavRoute.Contacts.route)
+                            },
                             onNavigateToProfile = {
                                 logD("NiyeEshoApp", "Navigation: Dashboard -> Profile")
                                 navController.navigate(NavRoute.Profile.route)
@@ -110,6 +113,14 @@ fun NiyeEshoApp(
                                 logD("NiyeEshoApp", "Navigation: Contacts -> Back")
                                 navController.popBackStack()
                             },
+                            onNavigateToLists = {
+                                logD("NiyeEshoApp", "Navigation: Contacts -> ShoppingLists")
+                                navController.navigate(NavRoute.ShoppingLists.route)
+                            },
+                            onNavigateToProfile = {
+                                logD("NiyeEshoApp", "Navigation: Contacts -> Profile")
+                                navController.navigate(NavRoute.Profile.route)
+                            },
                         )
                     },
                     profile = {
@@ -123,6 +134,14 @@ fun NiyeEshoApp(
                             onBack = {
                                 logD("NiyeEshoApp", "Navigation: Profile -> Back")
                                 navController.popBackStack()
+                            },
+                            onNavigateToLists = {
+                                logD("NiyeEshoApp", "Navigation: Profile -> ShoppingLists")
+                                navController.navigate(NavRoute.ShoppingLists.route)
+                            },
+                            onNavigateToContacts = {
+                                logD("NiyeEshoApp", "Navigation: Profile -> Contacts")
+                                navController.navigate(NavRoute.Contacts.route)
                             },
                         )
                     },

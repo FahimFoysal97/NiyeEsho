@@ -1,15 +1,36 @@
 package com.snehonir.niyeesho.features.shopping_list.presentation.detail.component
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material3.*
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CheckboxDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoCheckboxBorder
+import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoDarkSurface
+import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoGreenDarkMuted
+import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoGreenMuted
+import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoGreenPrimary
 import com.snehonir.niyeesho.core.designsystem.theme.Spacing
 import com.snehonir.niyeesho.features.shopping_list.presentation.detail.model.ListItemUiModel
 import com.snehonir.niyeesho.features.shopping_list.presentation.list.component.SyncStatusIndicator
@@ -21,89 +42,73 @@ fun ListItemRow(
     onDelete: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val cardColor = if (item.checked) NiyeEshoDarkSurface.copy(alpha = 0.5f) else NiyeEshoDarkSurface
+
     Card(
         modifier = modifier.fillMaxWidth(),
-        shape = MaterialTheme.shapes.medium,
-        colors = CardDefaults.cardColors(
-            containerColor = if (!item.isRead) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.25f)
-            else MaterialTheme.colorScheme.surface,
-        ),
-        elevation = CardDefaults.cardElevation(defaultElevation = Spacing.xs),
+        shape = RoundedCornerShape(11.dp),
+        colors = CardDefaults.cardColors(containerColor = cardColor),
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = Spacing.md, vertical = Spacing.sm),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = Spacing.md, vertical = Spacing.sm),
             horizontalArrangement = Arrangement.spacedBy(Spacing.sm),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Checkbox(checked = item.checked, onCheckedChange = { onToggle() })
+            Checkbox(
+                checked = item.checked,
+                onCheckedChange = { onToggle() },
+                colors = CheckboxDefaults.colors(
+                    checkedColor = NiyeEshoGreenPrimary,
+                    uncheckedColor = NiyeEshoCheckboxBorder,
+                    checkmarkColor = Color.White,
+                ),
+            )
             Column(
-                modifier = Modifier.weight(1f).clickable(onClick = onToggle),
-                verticalArrangement = Arrangement.spacedBy(Spacing.xs),
+                modifier = Modifier
+                    .weight(1f)
+                    .clickable(onClick = onToggle),
+                verticalArrangement = Arrangement.spacedBy(2.dp),
             ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    Row(
-                        modifier = Modifier.weight(1f),
-                        horizontalArrangement = Arrangement.spacedBy(Spacing.xs),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        if (!item.isRead) {
-                            Surface(
-                                modifier = Modifier.size(8.dp),
-                                shape = MaterialTheme.shapes.extraSmall,
-                                color = MaterialTheme.colorScheme.primary,
-                            ) {}
-                        }
-                        Text(
-                            text = item.name,
-                            style = MaterialTheme.typography.bodyLarge,
-                            fontWeight = if (!item.isRead) FontWeight.Bold else FontWeight.Normal,
-                            color = if (item.checked) MaterialTheme.colorScheme.onSurfaceVariant
-                            else MaterialTheme.colorScheme.onSurface,
-                        )
-                    }
+                    Text(
+                        text = item.name,
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = if (!item.checked && !item.isRead) FontWeight.Bold else FontWeight.Medium,
+                        color = if (item.checked) NiyeEshoGreenMuted else Color.White,
+                        textDecoration = if (item.checked) TextDecoration.LineThrough else TextDecoration.None,
+                    )
                     Row(
                         horizontalArrangement = Arrangement.spacedBy(Spacing.xs),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        if (item.quantityLabel.isNotBlank()) {
-                            Surface(
-                                color = MaterialTheme.colorScheme.primaryContainer,
-                                shape = MaterialTheme.shapes.extraSmall,
-                            ) {
-                                Text(
-                                    text = item.quantityLabel,
-                                    modifier = Modifier.padding(horizontal = Spacing.xs, vertical = 2.dp),
-                                    style = MaterialTheme.typography.labelMedium,
-                                    color = MaterialTheme.colorScheme.onPrimaryContainer,
-                                )
-                            }
-                        }
-                        IconButton(onClick = onDelete, modifier = Modifier.size(32.dp)) {
+                        SyncStatusIndicator(item.syncStatus)
+                        IconButton(onClick = onDelete, modifier = Modifier.size(28.dp)) {
                             Icon(
                                 imageVector = Icons.Default.Delete,
                                 contentDescription = "Delete item",
-                                tint = MaterialTheme.colorScheme.error,
-                                modifier = Modifier.size(18.dp),
+                                tint = NiyeEshoGreenDarkMuted,
+                                modifier = Modifier.size(16.dp),
                             )
                         }
                     }
                 }
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Text(
-                        text = "Added by ${item.addedByName} • ${item.createdAtFormatted}",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f),
-                    )
-                    SyncStatusIndicator(item.syncStatus)
+                val subtitle = buildString {
+                    if (item.quantityLabel.isNotBlank()) {
+                        append("${item.quantityLabel} · ")
+                    }
+                    append("added by ${item.addedByName}")
                 }
+                Text(
+                    text = subtitle,
+                    fontSize = 10.sp,
+                    color = NiyeEshoGreenDarkMuted,
+                )
             }
         }
     }

@@ -10,7 +10,8 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun DashboardScreen(
     onNavigateToDetail: (String) -> Unit,
-    onNavigateToProfile: () -> Unit,
+    onNavigateToContacts: () -> Unit = {},
+    onNavigateToProfile: () -> Unit = {},
     onShareInvite: (String) -> Unit = {},
     modifier: Modifier = Modifier,
     viewModel: DashboardViewModel = koinViewModel(),
@@ -30,6 +31,7 @@ fun DashboardScreen(
         uiState = uiState,
         onAction = viewModel::onAction,
         onNavigateToDetail = onNavigateToDetail,
+        onNavigateToContacts = onNavigateToContacts,
         onNavigateToProfile = onNavigateToProfile,
         onShareInvite = onShareInvite,
         modifier = modifier,

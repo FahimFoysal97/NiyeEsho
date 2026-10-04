@@ -32,11 +32,13 @@ fun ContactsScreen(
         onNavigateToLists = onNavigateToLists,
         onNavigateToProfile = onNavigateToProfile,
     )
-    uiState.inviteLink?.let { link ->
-        InviteBottomSheet(
-            inviteLink = link,
-            onShare = { onShareInvite(link) },
-            onDismiss = { viewModel.onAction(ContactsUiAction.DismissInvite) },
-        )
+    if (uiState.isInviteBottomSheetVisible) {
+        uiState.inviteLink?.let { link ->
+            InviteBottomSheet(
+                inviteLink = link,
+                onShare = { onShareInvite(link) },
+                onDismiss = { viewModel.onAction(ContactsUiAction.DismissInvite) },
+            )
+        }
     }
 }

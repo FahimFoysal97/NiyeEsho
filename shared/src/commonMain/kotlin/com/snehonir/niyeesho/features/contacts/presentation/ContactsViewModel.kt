@@ -23,7 +23,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class ContactsViewModel(
-    private val watchLists: WatchContactsUseCase, // or watchContacts
+    private val watchLists: WatchContactsUseCase,
     private val removeContact: RemoveContactUseCase,
     private val searchContacts: SearchContactsUseCase,
     private val refreshToken: RefreshContactTokenUseCase,
@@ -45,6 +45,7 @@ class ContactsViewModel(
                 }.onFailure { fail(it) }
             }
         }
+        generateInviteLinkOnLoad()
     }
 
     fun onAction(action: ContactsUiAction) {
@@ -66,9 +67,26 @@ class ContactsViewModel(
             is ContactsUiAction.RefreshToken -> refresh(action.uid)
             ContactsUiAction.InviteClicked -> generateInvite()
             ContactsUiAction.ScanQrClicked -> Unit
-            ContactsUiAction.DismissInvite -> _uiState.update { it.copy(inviteLink = null) }
+            ContactsUiAction.DismissInvite -> _uiState.update { it.copy(isInviteBottomSheetVisible = false) }
             ContactsUiAction.DismissScanner -> Unit
             ContactsUiAction.ErrorDismissed -> _uiState.update { it.copy(error = null) }
+        }
+    }
+
+    private fun generateInviteLinkOnLoad() {
+        viewModelScope.launch {
+            val user = getCurrentUser().getOrNull()
+            val inviteData = InviteData(
+                uid = user?.uid ?: "user_demo",
+                name = user?.displayName ?: "User",
+                token = tokenManager.getFcmToken() ?: "fcm_token_placeholder",
+                driveUrl = user?.avatarUrl ?: "",
+                avatar = user?.avatarUrl,
+            )
+            generateInviteLink(inviteData)
+                .onSuccess { link ->
+                    _uiState.update { it.copy(inviteLink = link) }
+                }
         }
     }
 
@@ -117,20 +135,26 @@ class ContactsViewModel(
 
     private fun generateInvite() {
         viewModelScope.launch {
-            val user = getCurrentUser().getOrNull()
-            val inviteData = InviteData(
-                uid = user?.uid ?: "user_demo",
-                name = user?.displayName ?: "User",
-                token = tokenManager.getFcmToken() ?: "fcm_token_placeholder",
-                driveUrl = user?.avatarUrl ?: "",
-                avatar = user?.avatarUrl,
-            )
-            generateInviteLink(inviteData)
-                .onSuccess { link ->
-                    _uiState.update { it.copy(inviteLink = link) }
-                    _uiEvent.send(ContactsUiEvent.ShareInvite(link))
-                }
-                .onFailure { fail(it) }
+            val existing = _uiState.value.inviteLink
+            if (!existing.isNullOrBlank()) {
+                _uiState.update { it.copy(isInviteBottomSheetVisible = true) }
+                _uiEvent.send(ContactsUiEvent.ShareInvite(existing))
+            } else {
+                val user = getCurrentUser().getOrNull()
+                val inviteData = InviteData(
+                    uid = user?.uid ?: "user_demo",
+                    name = user?.displayName ?: "User",
+                    token = tokenManager.getFcmToken() ?: "fcm_token_placeholder",
+                    driveUrl = user?.avatarUrl ?: "",
+                    avatar = user?.avatarUrl,
+                )
+                generateInviteLink(inviteData)
+                    .onSuccess { link ->
+                        _uiState.update { it.copy(inviteLink = link, isInviteBottomSheetVisible = true) }
+                        _uiEvent.send(ContactsUiEvent.ShareInvite(link))
+                    }
+                    .onFailure { fail(it) }
+            }
         }
     }
 

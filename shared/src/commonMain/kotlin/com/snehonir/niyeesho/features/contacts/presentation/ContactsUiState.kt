@@ -13,6 +13,7 @@ data class ContactsUiState(
     val selectedContactForGroup: Contact? = null,
     val error: String? = null,
     val inviteLink: String? = null,
+    val isInviteBottomSheetVisible: Boolean = false,
 ) {
     companion object {
         fun preview() = ContactsUiState(

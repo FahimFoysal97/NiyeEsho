@@ -6,12 +6,16 @@ import com.snehonir.niyeesho.app.di.initializeNiyeEsho
 import com.snehonir.niyeesho.core.database.DatabaseDriverFactory
 import com.snehonir.niyeesho.core.utils.TokenManagerImpl
 import com.snehonir.niyeesho.core.utils.logD
+import com.snehonir.niyeesho.di.androidModule
 
 class NiyeEshoApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         logD("NiyeEshoApplication", "onCreate() started")
-        initializeNiyeEsho(DatabaseDriverFactory(this))
+        initializeNiyeEsho(
+            databaseDriverFactory = DatabaseDriverFactory(this),
+            extraModules = listOf(androidModule(this)),
+        )
 
         FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
             if (task.isSuccessful) {

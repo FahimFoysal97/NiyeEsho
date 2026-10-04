@@ -3,6 +3,7 @@ package com.snehonir.niyeesho.features.dashboard.presentation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.russhwolf.settings.Settings
+import com.snehonir.niyeesho.core.network.ConnectivityObserver
 import com.snehonir.niyeesho.core.utils.TokenManager
 import com.snehonir.niyeesho.core.utils.logD
 import com.snehonir.niyeesho.features.auth.domain.usecase.GetCurrentUserUseCase
@@ -14,6 +15,7 @@ import com.snehonir.niyeesho.features.drive.domain.entity.DriveShoppingList
 import com.snehonir.niyeesho.features.drive.domain.repository.DriveRepository
 import com.snehonir.niyeesho.features.drive.domain.usecase.SyncFromDriveUseCase
 import com.snehonir.niyeesho.features.messaging.domain.entity.InviteData
+import com.snehonir.niyeesho.features.messaging.domain.repository.MessagingRepository
 import com.snehonir.niyeesho.features.messaging.domain.usecase.GenerateInviteLinkUseCase
 import com.snehonir.niyeesho.features.shopping_list.data.local.ListItemLocalDataSource
 import com.snehonir.niyeesho.features.shopping_list.data.local.ShoppingListLocalDataSource
@@ -44,10 +46,12 @@ class DashboardViewModel(
     private val shoppingListLocal: ShoppingListLocalDataSource,
     private val listItemLocal: ListItemLocalDataSource,
     private val driveRepository: DriveRepository,
+    private val messagingRepository: MessagingRepository,
     private val tokenManager: TokenManager,
     private val deleteShoppingList: DeleteShoppingListUseCase,
     private val removeContactUseCase: RemoveContactUseCase,
     private val getCurrentUser: GetCurrentUserUseCase,
+    private val connectivityObserver: ConnectivityObserver? = null,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(DashboardUiState())
     val uiState = _uiState.asStateFlow()
@@ -59,6 +63,14 @@ class DashboardViewModel(
         logD("DashboardViewModel", "DashboardViewModel initialized, checking 24h / daily 1:00 AM sync rule")
         viewModelScope.launch {
             checkAndPerformScheduledOr24HourSync()
+        }
+        viewModelScope.launch {
+            connectivityObserver?.observe()?.collect { status ->
+                if (status == ConnectivityObserver.Status.Available) {
+                    logD("DashboardViewModel", "Network status: Available. Retrying pending FCM messages...")
+                    messagingRepository.retryPending()
+                }
+            }
         }
         viewModelScope.launch {
             combine(
@@ -93,6 +105,7 @@ class DashboardViewModel(
 
     private suspend fun checkAndPerformScheduledOr24HourSync() {
         runCatching {
+            messagingRepository.retryPending()
             val lastSyncedEpoch = settings.getLong("last_synced_at", 0L)
             val nowInstant = Clock.System.now()
             val nowEpoch = nowInstant.toEpochMilliseconds()

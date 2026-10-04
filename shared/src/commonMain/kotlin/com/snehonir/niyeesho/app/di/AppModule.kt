@@ -12,20 +12,26 @@ import com.snehonir.niyeesho.features.drive.di.driveModule
 import com.snehonir.niyeesho.features.messaging.di.messagingModule
 import com.snehonir.niyeesho.features.shopping_list.di.shoppingListModule
 import org.koin.core.context.startKoin
+import org.koin.core.module.Module
 
-fun initializeNiyeEsho(databaseDriverFactory: DatabaseDriverFactory) {
+fun initializeNiyeEsho(
+    databaseDriverFactory: DatabaseDriverFactory,
+    extraModules: List<Module> = emptyList(),
+) {
     logD("NiyeEshoApp", "initializeNiyeEsho() starting Koin startKoin block")
     startKoin {
         modules(
-            coreModule,
-            databaseModule(databaseDriverFactory),
-            networkModule,
-            authModule,
-            driveModule,
-            messagingModule,
-            contactsModule,
-            shoppingListModule,
-            dashboardModule,
+            listOf(
+                coreModule,
+                databaseModule(databaseDriverFactory),
+                networkModule,
+                authModule,
+                driveModule,
+                messagingModule,
+                contactsModule,
+                shoppingListModule,
+                dashboardModule,
+            ) + extraModules,
         )
     }
     logD("NiyeEshoApp", "initializeNiyeEsho() Koin startKoin completed successfully")

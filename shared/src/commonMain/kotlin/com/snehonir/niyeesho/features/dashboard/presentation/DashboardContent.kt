@@ -74,21 +74,23 @@ fun DashboardContent(
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
                 contentPadding = PaddingValues(
-                    start = Spacing.md,
-                    end = Spacing.md,
+                    start = Spacing.lg,
+                    end = Spacing.lg,
                     top = Spacing.md,
                     bottom = Spacing.xl,
                 ),
-                verticalArrangement = Arrangement.spacedBy(Spacing.sm),
+                verticalArrangement = Arrangement.spacedBy(Spacing.md),
             ) {
                 // Header Row (Good morning / Sneho + Plus Button)
                 item {
                     Row(
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = Spacing.xs),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        Column(verticalArrangement = Arrangement.spacedBy(Spacing.xs / 2)) {
+                        Column(verticalArrangement = Arrangement.spacedBy(Spacing.xs)) {
                             Text(
                                 text = "Good morning",
                                 style = MaterialTheme.typography.bodySmall,
@@ -112,13 +114,13 @@ fun DashboardContent(
                                 imageVector = Icons.Default.Add,
                                 contentDescription = "Create Group",
                                 tint = Color.White,
-                                modifier = Modifier.size(Spacing.md),
+                                modifier = Modifier.size(Spacing.lg),
                             )
                         }
                     }
                 }
 
-                // Most Active Hero Card (Real Dynamic Data & Progress)
+                // Most Active Hero Card
                 mostActiveList?.let { mostActive ->
                     item {
                         val activeMembersStr = if (mostActive.members.isNotEmpty()) {
@@ -139,7 +141,7 @@ fun DashboardContent(
                                 // Left accent border
                                 Box(
                                     modifier = Modifier
-                                        .width(Spacing.xs / 2)
+                                        .width(Spacing.xs)
                                         .height(110.dp)
                                         .background(NiyeEshoGreenPrimary),
                                 )
@@ -191,17 +193,17 @@ fun DashboardContent(
                                         progress = { mostActive.progress },
                                         modifier = Modifier
                                             .fillMaxWidth()
-                                            .height(Spacing.xs / 2)
+                                            .height(Spacing.xs)
                                             .clip(RoundedCornerShape(Spacing.xs)),
                                         color = if (mostActive.isDone) NiyeEshoGoldSecondary else NiyeEshoGreenPrimary,
                                         trackColor = NiyeEshoDarkBg,
                                     )
                                     Spacer(Modifier.height(Spacing.xs / 2))
-                                    Text(
+                                    /*Text(
                                         text = mostActive.progressDetailLabel,
                                         style = MaterialTheme.typography.bodySmall,
                                         color = NiyeEshoGreenMuted,
-                                    )
+                                    )*/
                                 }
                             }
                         }
@@ -212,7 +214,7 @@ fun DashboardContent(
                     item { ErrorView(UiText.Plain(error), modifier = Modifier.fillMaxWidth()) }
                 }
 
-                // Other Lists (Real Dynamic Data & Progress)
+                // Other Lists
                 if (otherLists.isNotEmpty()) {
                     itemsIndexed(otherLists, key = { _, item -> item.id }) { index, list ->
                         val accentColor = accentColors[(index + 1) % accentColors.size]
@@ -292,9 +294,7 @@ private fun DashboardListRowCard(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val displayMembers = if (list.members.isNotEmpty()) {
-        list.members
-    } else {
+    val displayMembers = list.members.ifEmpty {
         listOf(ListMember("user_demo", userName.ifBlank { "User" }, null))
     }
 
@@ -304,13 +304,14 @@ private fun DashboardListRowCard(
             .clickable(onClick = onClick),
         shape = RoundedCornerShape(Spacing.md),
         colors = CardDefaults.cardColors(containerColor = NiyeEshoDarkSurface),
+        elevation = CardDefaults.cardElevation(defaultElevation = Spacing.xs),
     ) {
         Row(modifier = Modifier.fillMaxWidth()) {
             // Left Accent Border
             Box(
                 modifier = Modifier
-                    .width(Spacing.xs / 2)
-                    .height(72.dp)
+                    .width(Spacing.xs)
+                    .height(Spacing.xxxl)
                     .background(accentColor),
             )
             Column(
@@ -339,7 +340,7 @@ private fun DashboardListRowCard(
                                 val bg = avatarColors[idx % avatarColors.size]
                                 val initial = member.displayName.trim().firstOrNull()?.uppercaseChar()?.toString() ?: "U"
                                 Surface(
-                                    modifier = Modifier.size(Spacing.md + Spacing.xs / 2),
+                                    modifier = Modifier.size(Spacing.md + Spacing.xs),
                                     shape = CircleShape,
                                     color = bg,
                                 ) {
@@ -377,7 +378,7 @@ private fun DashboardListRowCard(
                     progress = { list.progress },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(Spacing.xs / 2)
+                        .height(Spacing.xs)
                         .clip(RoundedCornerShape(Spacing.xs)),
                     color = if (list.isDone) NiyeEshoGoldSecondary else accentColor,
                     trackColor = NiyeEshoDarkBg,

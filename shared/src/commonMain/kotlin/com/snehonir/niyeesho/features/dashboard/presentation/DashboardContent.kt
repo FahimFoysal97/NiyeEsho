@@ -2,20 +2,52 @@ package com.snehonir.niyeesho.features.dashboard.presentation
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material3.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.snehonir.niyeesho.core.designsystem.component.AppTopBar
+import com.snehonir.niyeesho.core.designsystem.component.AppBottomBar
+import com.snehonir.niyeesho.core.designsystem.component.AppNavTab
 import com.snehonir.niyeesho.core.designsystem.component.ErrorView
+import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoDarkBg
+import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoDarkSurface
+import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoGoldSecondary
+import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoGreenDarkMuted
+import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoGreenMuted
+import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoGreenPrimary
+import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoIndigoTertiary
 import com.snehonir.niyeesho.core.designsystem.theme.Spacing
 import com.snehonir.niyeesho.core.utils.UiText
 import com.snehonir.niyeesho.features.shopping_list.presentation.detail.component.InviteMemberSheet
@@ -27,51 +59,126 @@ fun DashboardContent(
     uiState: DashboardUiState,
     onAction: (DashboardUiAction) -> Unit,
     onNavigateToDetail: (String) -> Unit,
+    onNavigateToContacts: () -> Unit,
     onNavigateToProfile: () -> Unit,
     onShareInvite: (String) -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
-    Column(modifier = modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
-        AppTopBar(
-            title = UiText.Plain("Niye Esho"),
-            actions = {
-                IconButton(onClick = onNavigateToProfile) {
-                    Icon(Icons.Default.AccountCircle, contentDescription = "Profile")
-                }
-            },
-        )
+    val accentColors = listOf(NiyeEshoGreenPrimary, NiyeEshoGoldSecondary, NiyeEshoIndigoTertiary)
+    val mostActiveList = uiState.lists.firstOrNull()
+    val otherLists = if (uiState.lists.isNotEmpty()) uiState.lists.drop(1) else emptyList()
+
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .background(NiyeEshoDarkBg),
+    ) {
         Box(modifier = Modifier.weight(1f)) {
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(start = Spacing.lg, end = Spacing.lg, top = Spacing.md, bottom = Spacing.xxl * 3),
+                contentPadding = PaddingValues(
+                    start = Spacing.lg,
+                    end = Spacing.lg,
+                    top = Spacing.lg,
+                    bottom = Spacing.xl,
+                ),
                 verticalArrangement = Arrangement.spacedBy(Spacing.md),
             ) {
-                // User Greeting Header Item in the Single List
+                // Header Row (Greeting & Plus Button)
                 item {
-                    Card(
+                    Row(
                         modifier = Modifier.fillMaxWidth(),
-                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
-                        shape = MaterialTheme.shapes.large,
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        Column(
-                            modifier = Modifier.padding(Spacing.lg),
-                            verticalArrangement = Arrangement.spacedBy(Spacing.sm),
+                        Column {
+                            Text(
+                                text = "Good morning,",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = NiyeEshoGreenMuted,
+                            )
+                            Text(
+                                text = uiState.userName.ifBlank { "Sneho" },
+                                style = MaterialTheme.typography.headlineMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = Color.White,
+                            )
+                        }
+                        IconButton(
+                            onClick = { onAction(DashboardUiAction.AddGroupClicked) },
+                            modifier = Modifier
+                                .size(44.dp)
+                                .clip(RoundedCornerShape(12.dp))
+                                .background(NiyeEshoGreenPrimary),
                         ) {
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                verticalAlignment = Alignment.CenterVertically,
-                            ) {
-                                Column {
+                            Icon(
+                                imageVector = Icons.Default.Add,
+                                contentDescription = "Create Group",
+                                tint = Color.White,
+                                modifier = Modifier.size(24.dp),
+                            )
+                        }
+                    }
+                }
+
+                // Most Active List Hero Card
+                mostActiveList?.let { mostActive ->
+                    item {
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable { onNavigateToDetail(mostActive.id) },
+                            shape = RoundedCornerShape(14.dp),
+                            colors = CardDefaults.cardColors(containerColor = NiyeEshoDarkSurface),
+                            elevation = CardDefaults.cardElevation(defaultElevation = Spacing.xs),
+                        ) {
+                            Row(modifier = Modifier.fillMaxWidth()) {
+                                // Accent line
+                                Box(
+                                    modifier = Modifier
+                                        .width(4.dp)
+                                        .height(110.dp)
+                                        .background(NiyeEshoGreenPrimary),
+                                )
+                                Column(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(Spacing.md),
+                                    verticalArrangement = Arrangement.spacedBy(Spacing.xs),
+                                ) {
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                        verticalAlignment = Alignment.CenterVertically,
+                                    ) {
+                                        Text(
+                                            text = "MOST ACTIVE LIST",
+                                            style = MaterialTheme.typography.labelSmall,
+                                            fontWeight = FontWeight.Bold,
+                                            color = NiyeEshoGreenPrimary,
+                                        )
+                                        SyncStatusIndicator(mostActive.syncStatus)
+                                    }
                                     Text(
-                                        text = "Hello, ${uiState.userName}",
+                                        text = mostActive.title,
                                         style = MaterialTheme.typography.titleLarge,
                                         fontWeight = FontWeight.Bold,
-                                        color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                        color = Color.White,
                                     )
                                     Text(
-                                        text = "Bari ferar age, shob mone koriye dei.",
+                                        text = "Updated: ${mostActive.updatedAtFormatted} · ${mostActive.memberCount} members",
                                         style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.85f),
+                                        color = NiyeEshoGreenMuted,
+                                    )
+                                    Spacer(Modifier.height(Spacing.xs))
+                                    LinearProgressIndicator(
+                                        progress = { 0.4f },
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .height(4.dp)
+                                            .clip(RoundedCornerShape(2.dp)),
+                                        color = NiyeEshoGreenPrimary,
+                                        trackColor = NiyeEshoDarkBg,
                                     )
                                 }
                             }
@@ -79,7 +186,7 @@ fun DashboardContent(
                     }
                 }
 
-                // 2 Action Buttons in a Row (Invite / Share & Create Group)
+                // 2 Action Buttons Row (Invite / Share & Create Group)
                 item {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -88,22 +195,26 @@ fun DashboardContent(
                         Button(
                             onClick = { onAction(DashboardUiAction.InviteShareClicked) },
                             modifier = Modifier.weight(1f),
+                            shape = RoundedCornerShape(12.dp),
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = MaterialTheme.colorScheme.primary,
-                                contentColor = MaterialTheme.colorScheme.onPrimary,
+                                containerColor = NiyeEshoGreenPrimary,
+                                contentColor = Color.White,
                             ),
+                            contentPadding = PaddingValues(vertical = Spacing.sm),
                         ) {
-                            Text("🔗 Invite / Share")
+                            Text("🔗 Invite / Share", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold)
                         }
                         Button(
                             onClick = { onAction(DashboardUiAction.AddGroupClicked) },
                             modifier = Modifier.weight(1f),
+                            shape = RoundedCornerShape(12.dp),
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = MaterialTheme.colorScheme.secondary,
-                                contentColor = MaterialTheme.colorScheme.onSecondary,
+                                containerColor = NiyeEshoDarkSurface,
+                                contentColor = Color.White,
                             ),
+                            contentPadding = PaddingValues(vertical = Spacing.sm),
                         ) {
-                            Text("👥 Create Group")
+                            Text("👥 Create Group", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold)
                         }
                     }
                 }
@@ -112,36 +223,63 @@ fun DashboardContent(
                     item { ErrorView(UiText.Plain(error), modifier = Modifier.fillMaxWidth()) }
                 }
 
-                // Unified list items (groups and contacts combined in single list)
-                items(uiState.lists, key = { it.id }) { list ->
-                    DashboardListCard(
-                        list = list,
-                        onClick = { onNavigateToDetail(list.id) },
-                        onDelete = {
-                            if (list.id.startsWith("contact_list_")) {
-                                onAction(DashboardUiAction.RemoveContact(list.id.removePrefix("contact_list_")))
-                            } else {
-                                onAction(DashboardUiAction.DeleteList(list.id))
-                            }
-                        },
-                    )
+                if (otherLists.isNotEmpty()) {
+                    item {
+                        Text(
+                            text = "ALL LISTS",
+                            style = MaterialTheme.typography.labelSmall,
+                            fontWeight = FontWeight.Bold,
+                            color = NiyeEshoGreenDarkMuted,
+                        )
+                    }
+
+                    itemsIndexed(otherLists, key = { _, item -> item.id }) { index, list ->
+                        val accentColor = accentColors[(index + 1) % accentColors.size]
+                        DashboardListRowCard(
+                            list = list,
+                            accentColor = accentColor,
+                            onClick = { onNavigateToDetail(list.id) },
+                            onDelete = {
+                                if (list.id.startsWith("contact_list_")) {
+                                    onAction(DashboardUiAction.RemoveContact(list.id.removePrefix("contact_list_")))
+                                } else {
+                                    onAction(DashboardUiAction.DeleteList(list.id))
+                                }
+                            },
+                        )
+                    }
                 }
 
                 if (uiState.lists.isEmpty() && !uiState.isLoading) {
                     item {
                         Box(
-                            modifier = Modifier.fillMaxWidth().padding(Spacing.xxl),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(Spacing.xxl),
                             contentAlignment = Alignment.Center,
                         ) {
                             Text(
-                                text = "No shopping lists or requests yet. Tap 'Create Group' to start!",
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                text = "No shopping lists yet. Tap 'Create Group' to start!",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = NiyeEshoGreenMuted,
                             )
                         }
                     }
                 }
             }
         }
+
+        // Bottom Navigation Bar
+        AppBottomBar(
+            currentTab = AppNavTab.LISTS,
+            onTabSelected = { tab ->
+                when (tab) {
+                    AppNavTab.LISTS -> Unit
+                    AppNavTab.CONTACTS -> onNavigateToContacts()
+                    AppNavTab.PROFILE -> onNavigateToProfile()
+                }
+            },
+        )
     }
 
     if (uiState.isInviteDialogVisible && uiState.inviteLink != null) {
@@ -169,56 +307,84 @@ private fun ItemCreateDialog(uiState: DashboardUiState, onAction: (DashboardUiAc
 }
 
 @Composable
-private fun DashboardListCard(
+private fun DashboardListRowCard(
     list: DashboardUiModel,
+    accentColor: Color,
     onClick: () -> Unit,
     onDelete: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Card(
-        modifier = modifier.fillMaxWidth(),
-        shape = MaterialTheme.shapes.medium,
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick),
+        shape = RoundedCornerShape(13.dp),
+        colors = CardDefaults.cardColors(containerColor = NiyeEshoDarkSurface),
         elevation = CardDefaults.cardElevation(defaultElevation = Spacing.xs),
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth().padding(Spacing.md),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Column(
-                modifier = Modifier.weight(1f).clickable(onClick = onClick),
-                verticalArrangement = Arrangement.spacedBy(Spacing.xs),
-            ) {
-                Text(
-                    text = list.title,
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold,
-                    color = MaterialTheme.colorScheme.onSurface,
-                )
-                Surface(
-                    color = MaterialTheme.colorScheme.secondaryContainer,
-                    shape = MaterialTheme.shapes.extraSmall,
-                ) {
-                    Text(
-                        text = "Updated: ${list.updatedAtFormatted}",
-                        modifier = Modifier.padding(horizontal = Spacing.xs, vertical = 2.dp),
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSecondaryContainer,
-                    )
-                }
-            }
+        Row(modifier = Modifier.fillMaxWidth()) {
+            // Left Accent Border
+            Box(
+                modifier = Modifier
+                    .width(4.dp)
+                    .height(72.dp)
+                    .background(accentColor),
+            )
             Row(
-                horizontalArrangement = Arrangement.spacedBy(Spacing.xs),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(Spacing.md),
+                horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                SyncStatusIndicator(list.syncStatus)
-                IconButton(onClick = onDelete) {
-                    Icon(
-                        imageVector = Icons.Default.Delete,
-                        contentDescription = "Delete list or contact",
-                        tint = MaterialTheme.colorScheme.error,
+                Column(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(Spacing.xs),
+                ) {
+                    Text(
+                        text = list.title,
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold,
+                        color = Color.White,
                     )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(Spacing.xs),
+                    ) {
+                        Surface(
+                            modifier = Modifier.size(20.dp),
+                            shape = CircleShape,
+                            color = accentColor,
+                        ) {
+                            Box(contentAlignment = Alignment.Center) {
+                                Text(
+                                    text = list.title.firstOrNull()?.uppercaseChar()?.toString() ?: "S",
+                                    style = MaterialTheme.typography.labelSmall,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color.White,
+                                )
+                            }
+                        }
+                        Text(
+                            text = "${list.memberCount} members · ${list.updatedAtFormatted}",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = NiyeEshoGreenMuted,
+                        )
+                    }
+                }
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(Spacing.xs),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    SyncStatusIndicator(list.syncStatus)
+                    IconButton(onClick = onDelete) {
+                        Icon(
+                            imageVector = Icons.Default.Delete,
+                            contentDescription = "Delete list",
+                            tint = NiyeEshoGreenDarkMuted,
+                            modifier = Modifier.size(20.dp),
+                        )
+                    }
                 }
             }
         }

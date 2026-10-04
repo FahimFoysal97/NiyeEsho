@@ -1,24 +1,64 @@
 package com.snehonir.niyeesho.features.auth.presentation.profile
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material3.*
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.snehonir.niyeesho.BuildKonfig
-import com.snehonir.niyeesho.core.designsystem.component.AppTopBar
-import com.snehonir.niyeesho.core.designsystem.component.AvatarImage
+import com.snehonir.niyeesho.core.designsystem.component.AppBottomBar
+import com.snehonir.niyeesho.core.designsystem.component.AppNavTab
+import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoDarkBg
+import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoDarkSurface
+import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoGreenDarkMuted
+import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoGreenMuted
+import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoGreenPrimary
 import com.snehonir.niyeesho.core.designsystem.theme.Spacing
-import com.snehonir.niyeesho.core.utils.UiText
 import com.snehonir.niyeesho.core.utils.toDisplayDate
 import com.snehonir.niyeesho.core.utils.toDisplayTime
 
@@ -28,8 +68,12 @@ fun ProfileContent(
     onAction: (ProfileUiAction) -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
+    onNavigateToLists: () -> Unit = {},
+    onNavigateToContacts: () -> Unit = {},
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
+    var notificationsEnabled by remember { mutableStateOf(true) }
+    var searchableEnabled by remember { mutableStateOf(true) }
 
     LaunchedEffect(uiState.error) {
         uiState.error?.let { errorMsg ->
@@ -43,189 +87,342 @@ fun ProfileContent(
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
-        topBar = {
-            AppTopBar(
-                title = UiText.Plain("Account Profile"),
-                onBackClick = onBack,
+        bottomBar = {
+            AppBottomBar(
+                currentTab = AppNavTab.PROFILE,
+                onTabSelected = { tab ->
+                    when (tab) {
+                        AppNavTab.LISTS -> onNavigateToLists()
+                        AppNavTab.CONTACTS -> onNavigateToContacts()
+                        AppNavTab.PROFILE -> Unit
+                    }
+                },
             )
         },
         snackbarHost = { SnackbarHost(snackbarHostState) },
+        containerColor = NiyeEshoDarkBg,
     ) { paddingValues ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .background(MaterialTheme.colorScheme.background),
+                .background(NiyeEshoDarkBg),
         ) {
             if (uiState.isLoading) {
                 Box(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center,
                 ) {
-                    CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
+                    CircularProgressIndicator(color = NiyeEshoGreenPrimary)
                 }
             } else {
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(horizontal = Spacing.lg),
-                    contentPadding = PaddingValues(vertical = Spacing.md),
+                    contentPadding = PaddingValues(top = Spacing.md, bottom = Spacing.md),
                     verticalArrangement = Arrangement.spacedBy(Spacing.md),
                 ) {
+                    item {
+                        Text(
+                            text = "Profile",
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White,
+                        )
+                    }
+
                     uiState.user?.let { user ->
-                        // Profile Hero Card
+                        // User Profile Hero Card
                         item {
                             Card(
                                 modifier = Modifier.fillMaxWidth(),
-                                shape = MaterialTheme.shapes.large,
-                                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f)),
-                                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                                shape = RoundedCornerShape(16.dp),
+                                colors = CardDefaults.cardColors(containerColor = NiyeEshoDarkSurface),
+                                elevation = CardDefaults.cardElevation(defaultElevation = Spacing.xs),
                             ) {
                                 Column(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .padding(Spacing.xl),
+                                        .padding(Spacing.lg),
                                     horizontalAlignment = Alignment.CenterHorizontally,
                                     verticalArrangement = Arrangement.spacedBy(Spacing.sm),
                                 ) {
-                                    AvatarImage(
-                                        avatarUrl = user.avatarUrl,
-                                        contentDescription = user.displayName,
-                                        size = 80.dp,
-                                    )
-
-                                    Text(
-                                        text = user.displayName.ifBlank { "Google User" },
-                                        style = MaterialTheme.typography.headlineSmall,
-                                        fontWeight = FontWeight.Bold,
-                                        color = MaterialTheme.colorScheme.onSurface,
-                                    )
-
-                                    Surface(
-                                        shape = MaterialTheme.shapes.small,
-                                        color = MaterialTheme.colorScheme.surface,
-                                        modifier = Modifier.padding(top = Spacing.xs),
-                                    ) {
-                                        Row(
-                                            modifier = Modifier.padding(horizontal = Spacing.md, vertical = Spacing.xs),
-                                            verticalAlignment = Alignment.CenterVertically,
-                                            horizontalArrangement = Arrangement.spacedBy(Spacing.xs),
+                                    // Avatar circle
+                                    Box(modifier = Modifier.size(68.dp)) {
+                                        Surface(
+                                            modifier = Modifier.size(68.dp),
+                                            shape = CircleShape,
+                                            color = NiyeEshoGreenPrimary,
+                                            border = androidx.compose.foundation.BorderStroke(2.dp, Color(0xFF2D6B55)),
                                         ) {
-                                            Icon(
-                                                imageVector = Icons.Default.CheckCircle,
-                                                contentDescription = null,
-                                                tint = MaterialTheme.colorScheme.primary,
-                                                modifier = Modifier.size(Spacing.md),
-                                            )
-                                            Text(
-                                                text = user.email.ifBlank { "account@gmail.com" },
-                                                style = MaterialTheme.typography.bodyMedium,
-                                                color = MaterialTheme.colorScheme.onSurface,
-                                            )
+                                            Box(contentAlignment = Alignment.Center) {
+                                                Text(
+                                                    text = user.displayName.firstOrNull()?.uppercaseChar()?.toString() ?: "S",
+                                                    style = MaterialTheme.typography.headlineMedium,
+                                                    fontWeight = FontWeight.Bold,
+                                                    color = Color.White,
+                                                )
+                                            }
+                                        }
+                                        Surface(
+                                            modifier = Modifier
+                                                .size(22.dp)
+                                                .align(Alignment.BottomEnd),
+                                            shape = CircleShape,
+                                            color = NiyeEshoDarkBg,
+                                            border = androidx.compose.foundation.BorderStroke(1.5.dp, NiyeEshoDarkSurface),
+                                        ) {
+                                            Box(contentAlignment = Alignment.Center) {
+                                                Icon(
+                                                    imageVector = Icons.Default.Edit,
+                                                    contentDescription = "Edit",
+                                                    tint = NiyeEshoGreenPrimary,
+                                                    modifier = Modifier.size(12.dp),
+                                                )
+                                            }
                                         }
                                     }
 
-                                    Text(
-                                        text = "Signed in via Gmail",
-                                        style = MaterialTheme.typography.labelMedium,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f),
-                                    )
+                                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                        Text(
+                                            text = user.displayName.ifBlank { "Sneho Nir" },
+                                            style = MaterialTheme.typography.titleMedium,
+                                            fontWeight = FontWeight.Bold,
+                                            color = Color.White,
+                                        )
+                                        Text(
+                                            text = user.email.ifBlank { "sneho@gmail.com" },
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = NiyeEshoGreenDarkMuted,
+                                        )
+                                    }
+
+                                    Spacer(Modifier.height(Spacing.xs))
+
+                                    // 3 Stat Boxes Row
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.spacedBy(Spacing.xs),
+                                    ) {
+                                        StatBox("3", "Lists", Modifier.weight(1f))
+                                        StatBox("3", "Contacts", Modifier.weight(1f))
+                                        StatBox("✓", "Drive", Modifier.weight(1f), isSuccess = true)
+                                    }
                                 }
                             }
                         }
 
-                        // Manual Sync & Cloud Status Card
+                        // GOOGLE DRIVE Card
                         item {
                             Card(
                                 modifier = Modifier.fillMaxWidth(),
-                                shape = MaterialTheme.shapes.medium,
-                                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                                elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+                                shape = RoundedCornerShape(14.dp),
+                                colors = CardDefaults.cardColors(containerColor = NiyeEshoDarkSurface),
+                                elevation = CardDefaults.cardElevation(defaultElevation = Spacing.xs),
                             ) {
-                                Row(
+                                Column(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .padding(Spacing.lg),
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                        .padding(Spacing.md),
+                                    verticalArrangement = Arrangement.spacedBy(Spacing.sm),
                                 ) {
-                                    Column(
-                                        modifier = Modifier.weight(1f).padding(end = Spacing.md),
-                                        verticalArrangement = Arrangement.spacedBy(Spacing.xs),
+                                    Text(
+                                        text = "GOOGLE DRIVE",
+                                        style = MaterialTheme.typography.labelSmall,
+                                        fontWeight = FontWeight.Bold,
+                                        color = NiyeEshoGreenDarkMuted,
+                                    )
+
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(vertical = Spacing.xs),
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.SpaceBetween,
                                     ) {
-                                        Text(
-                                            text = "Google Drive Sync",
-                                            style = MaterialTheme.typography.titleMedium,
-                                            fontWeight = FontWeight.SemiBold,
-                                            color = MaterialTheme.colorScheme.onSurface,
-                                        )
-                                        val syncedText = uiState.lastSyncedAt?.let {
-                                            "Last synced: ${it.toDisplayTime()} (${it.toDisplayDate()})"
-                                        } ?: "Not synced yet"
-                                        Text(
-                                            text = syncedText,
-                                            style = MaterialTheme.typography.bodySmall,
-                                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                        )
-                                    }
-                                    Button(
-                                        onClick = { onAction(ProfileUiAction.ManualSyncClicked) },
-                                        enabled = !uiState.isSyncing && !uiState.isSyncedSuccessfully,
-                                        colors = ButtonDefaults.buttonColors(
-                                            containerColor = if (uiState.isSyncedSuccessfully) MaterialTheme.colorScheme.primaryContainer
-                                            else MaterialTheme.colorScheme.primary,
-                                            contentColor = if (uiState.isSyncedSuccessfully) MaterialTheme.colorScheme.primary
-                                            else MaterialTheme.colorScheme.onPrimary,
-                                        ),
-                                    ) {
-                                        if (uiState.isSyncing) {
-                                            CircularProgressIndicator(
-                                                modifier = Modifier.size(18.dp),
-                                                color = MaterialTheme.colorScheme.onPrimary,
-                                                strokeWidth = 2.dp,
+                                        Row(
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            horizontalArrangement = Arrangement.spacedBy(Spacing.md),
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.Default.CheckCircle,
+                                                contentDescription = "Sync",
+                                                tint = NiyeEshoGreenPrimary,
+                                                modifier = Modifier.size(20.dp),
                                             )
-                                        } else if (uiState.isSyncedSuccessfully) {
-                                            Row(
-                                                horizontalArrangement = Arrangement.spacedBy(Spacing.xs),
-                                                verticalAlignment = Alignment.CenterVertically,
-                                            ) {
-                                                Icon(
-                                                    imageVector = Icons.Default.Check,
-                                                    contentDescription = "Synced",
-                                                    modifier = Modifier.size(18.dp),
-                                                    tint = MaterialTheme.colorScheme.primary,
-                                                )
-                                                Text("Done", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
+                                            Column {
+                                                Text("Last synced", style = MaterialTheme.typography.bodyMedium, color = Color.White)
+                                                val syncedText = uiState.lastSyncedAt?.let {
+                                                    "${it.toDisplayTime()} (${it.toDisplayDate()})"
+                                                } ?: "2 minutes ago"
+                                                Text(syncedText, style = MaterialTheme.typography.bodySmall, color = NiyeEshoGreenDarkMuted)
                                             }
-                                        } else {
-                                            Text("Sync Now")
+                                        }
+
+                                        IconButton(
+                                            onClick = { onAction(ProfileUiAction.ManualSyncClicked) },
+                                            modifier = Modifier.size(32.dp),
+                                            enabled = !uiState.isSyncing,
+                                        ) {
+                                            if (uiState.isSyncing) {
+                                                CircularProgressIndicator(
+                                                    modifier = Modifier.size(16.dp),
+                                                    color = NiyeEshoGreenPrimary,
+                                                    strokeWidth = 2.dp,
+                                                )
+                                            } else {
+                                                Icon(
+                                                    imageVector = Icons.Default.Refresh,
+                                                    contentDescription = "Refresh",
+                                                    tint = NiyeEshoGreenDarkMuted,
+                                                    modifier = Modifier.size(18.dp),
+                                                )
+                                            }
+                                        }
+                                    }
+
+                                    HorizontalDivider(color = NiyeEshoDarkBg, thickness = 1.dp)
+
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(vertical = Spacing.xs),
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                    ) {
+                                        Row(
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            horizontalArrangement = Arrangement.spacedBy(Spacing.md),
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.Default.Info,
+                                                contentDescription = "Folder",
+                                                tint = NiyeEshoGreenPrimary,
+                                                modifier = Modifier.size(20.dp),
+                                            )
+                                            Column {
+                                                Text("ShopSync folder", style = MaterialTheme.typography.bodyMedium, color = Color.White)
+                                                Text("3 lists · 12KB", style = MaterialTheme.typography.bodySmall, color = NiyeEshoGreenDarkMuted)
+                                            }
                                         }
                                     }
                                 }
                             }
                         }
-                    }
 
-                    // Sign Out Button
-                    item {
-                        Spacer(Modifier.height(Spacing.xs))
-                        Button(
-                            onClick = { onAction(ProfileUiAction.SignOutClicked) },
-                            modifier = Modifier.fillMaxWidth(),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = MaterialTheme.colorScheme.errorContainer,
-                                contentColor = MaterialTheme.colorScheme.onErrorContainer,
-                            ),
-                            enabled = !uiState.isSigningOut,
-                        ) {
-                            if (uiState.isSigningOut) {
-                                CircularProgressIndicator(
-                                    modifier = Modifier.size(Spacing.lg),
-                                    color = MaterialTheme.colorScheme.onErrorContainer,
-                                    strokeWidth = 2.dp,
-                                )
-                            } else {
-                                Text("Sign Out", fontWeight = FontWeight.SemiBold)
+                        // SETTINGS Card
+                        item {
+                            Card(
+                                modifier = Modifier.fillMaxWidth(),
+                                shape = RoundedCornerShape(14.dp),
+                                colors = CardDefaults.cardColors(containerColor = NiyeEshoDarkSurface),
+                                elevation = CardDefaults.cardElevation(defaultElevation = Spacing.xs),
+                            ) {
+                                Column(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(Spacing.md),
+                                    verticalArrangement = Arrangement.spacedBy(Spacing.xs),
+                                ) {
+                                    Text(
+                                        text = "SETTINGS",
+                                        style = MaterialTheme.typography.labelSmall,
+                                        fontWeight = FontWeight.Bold,
+                                        color = NiyeEshoGreenDarkMuted,
+                                    )
+
+                                    // Notifications
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(vertical = Spacing.xs),
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                    ) {
+                                        Row(
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            horizontalArrangement = Arrangement.spacedBy(Spacing.md),
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.Default.Notifications,
+                                                contentDescription = "Notifications",
+                                                tint = NiyeEshoGreenMuted,
+                                                modifier = Modifier.size(20.dp),
+                                            )
+                                            Text("Notifications", style = MaterialTheme.typography.bodyMedium, color = Color.White)
+                                        }
+                                        Switch(
+                                            checked = notificationsEnabled,
+                                            onCheckedChange = { notificationsEnabled = it },
+                                            colors = SwitchDefaults.colors(
+                                                checkedThumbColor = Color.White,
+                                                checkedTrackColor = NiyeEshoGreenPrimary,
+                                                uncheckedThumbColor = Color.White,
+                                                uncheckedTrackColor = NiyeEshoDarkBg,
+                                            ),
+                                        )
+                                    }
+
+                                    HorizontalDivider(color = NiyeEshoDarkBg, thickness = 1.dp)
+
+                                    // Searchable
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(vertical = Spacing.xs),
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                    ) {
+                                        Row(
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            horizontalArrangement = Arrangement.spacedBy(Spacing.md),
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.Default.Search,
+                                                contentDescription = "Searchable",
+                                                tint = NiyeEshoGreenMuted,
+                                                modifier = Modifier.size(20.dp),
+                                            )
+                                            Text("Searchable by email", style = MaterialTheme.typography.bodyMedium, color = Color.White)
+                                        }
+                                        Switch(
+                                            checked = searchableEnabled,
+                                            onCheckedChange = { searchableEnabled = it },
+                                            colors = SwitchDefaults.colors(
+                                                checkedThumbColor = Color.White,
+                                                checkedTrackColor = NiyeEshoGreenPrimary,
+                                                uncheckedThumbColor = Color.White,
+                                                uncheckedTrackColor = NiyeEshoDarkBg,
+                                            ),
+                                        )
+                                    }
+
+                                    HorizontalDivider(color = NiyeEshoDarkBg, thickness = 1.dp)
+
+                                    // Sign Out
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .clickable { onAction(ProfileUiAction.SignOutClicked) }
+                                            .padding(vertical = Spacing.sm),
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.spacedBy(Spacing.md),
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.AutoMirrored.Filled.ExitToApp,
+                                            contentDescription = "Sign out",
+                                            tint = Color(0xFFE05252),
+                                            modifier = Modifier.size(20.dp),
+                                        )
+                                        Text(
+                                            text = "Sign out",
+                                            style = MaterialTheme.typography.titleMedium,
+                                            fontWeight = FontWeight.SemiBold,
+                                            color = Color(0xFFE05252),
+                                        )
+                                    }
+                                }
                             }
                         }
                     }
@@ -243,17 +440,51 @@ fun ProfileContent(
                                 text = "Niye Esho v${BuildKonfig.APP_VERSION}",
                                 style = MaterialTheme.typography.labelLarge,
                                 fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                color = NiyeEshoGreenMuted,
                             )
                             Text(
                                 text = "Bari ferar age, shob mone koriye dei.",
-                                style = MaterialTheme.typography.labelMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = NiyeEshoGreenDarkMuted,
                             )
                         }
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun StatBox(
+    value: String,
+    label: String,
+    modifier: Modifier = Modifier,
+    isSuccess: Boolean = false,
+) {
+    Surface(
+        modifier = modifier,
+        shape = RoundedCornerShape(10.dp),
+        color = NiyeEshoDarkBg,
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = Spacing.sm, horizontal = Spacing.xs),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+        ) {
+            Text(
+                text = value,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                color = if (isSuccess) NiyeEshoGreenPrimary else Color.White,
+            )
+            Text(
+                text = label,
+                style = MaterialTheme.typography.labelSmall,
+                color = NiyeEshoGreenDarkMuted,
+            )
         }
     }
 }

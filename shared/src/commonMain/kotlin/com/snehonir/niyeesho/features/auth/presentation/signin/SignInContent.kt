@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -12,22 +13,26 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
 import com.snehonir.niyeesho.core.designsystem.component.ErrorView
-import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoAccentSoft
-import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoGradientBottom
-import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoGradientTop
+import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoDarkBg
+import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoDarkSurface
+import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoGreenDarkMuted
+import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoGreenLight
+import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoGreenMuted
+import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoGreenPrimary
 import com.snehonir.niyeesho.core.designsystem.theme.Spacing
 import com.snehonir.niyeesho.core.utils.UiText
 
@@ -37,130 +42,148 @@ fun SignInContent(
     onAction: (SignInUiAction) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val heroGradient = Brush.verticalGradient(
-        colors = listOf(NiyeEshoGradientTop, NiyeEshoGradientBottom),
-    )
-
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(heroGradient),
+            .background(NiyeEshoDarkBg),
         contentAlignment = Alignment.Center,
     ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .widthIn(max = 440.dp)
                 .verticalScroll(rememberScrollState())
-                .padding(Spacing.lg),
+                .padding(horizontal = Spacing.xl, vertical = Spacing.xxl),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
+            verticalArrangement = Arrangement.SpaceBetween,
         ) {
-            BrandHeader()
-
-            Spacer(Modifier.height(Spacing.xl))
-
-            Card(
+            // Brand Header Section
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .widthIn(max = Spacing.xxxl * 7),
-                shape = MaterialTheme.shapes.large,
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surface,
-                ),
-                elevation = CardDefaults.cardElevation(defaultElevation = Spacing.md),
+                    .padding(top = Spacing.lg),
+                horizontalAlignment = Alignment.Start,
             ) {
-                Column(
-                    modifier = Modifier.padding(Spacing.xl),
-                    verticalArrangement = Arrangement.spacedBy(Spacing.md),
-                    horizontalAlignment = Alignment.CenterHorizontally,
+                Box(
+                    modifier = Modifier
+                        .size(56.dp)
+                        .clip(RoundedCornerShape(18.dp))
+                        .background(NiyeEshoGreenPrimary),
+                    contentAlignment = Alignment.Center,
                 ) {
                     Text(
-                        text = UiText.Plain("Welcome back").resolve(),
-                        style = MaterialTheme.typography.headlineSmall,
-                        color = MaterialTheme.colorScheme.onSurface,
-                        textAlign = TextAlign.Center,
-                    )
-                    Text(
-                        text = UiText.Plain("Sign in to sync your shared lists with family and friends.").resolve(),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        textAlign = TextAlign.Center,
-                    )
-
-                    uiState.error?.let { error ->
-                        ErrorView(message = error, modifier = Modifier.fillMaxWidth())
-                    }
-
-                    Spacer(Modifier.height(Spacing.xs))
-
-                    GoogleSignInButton(
-                        enabled = !uiState.isLoading,
-                        onResult = { result ->
-                            result.fold(
-                                onSuccess = { token ->
-                                    onAction(SignInUiAction.GoogleSignInClicked(token))
-                                },
-                                onFailure = { error ->
-                                    onAction(SignInUiAction.GoogleSignInFailed(error))
-                                },
-                            )
-                        },
-                        modifier = Modifier.fillMaxWidth(),
-                    )
-
-                    Text(
-                        text = UiText.Plain(
-                            "We only use your Google account to identify you. Your lists stay in your own Drive.",
-                        ).resolve(),
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        textAlign = TextAlign.Center,
+                        text = "🛍️",
+                        style = MaterialTheme.typography.headlineMedium,
                     )
                 }
+
+                Spacer(Modifier.height(Spacing.xl))
+
+                Text(
+                    text = "নিয়ে\nএসো।",
+                    style = MaterialTheme.typography.displaySmall,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White,
+                )
+
+                Spacer(Modifier.height(Spacing.md))
+
+                Text(
+                    text = UiText.Plain(
+                        "Share lists with family and friends in real time. Your data stays in your Drive.",
+                    ).resolve(),
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = NiyeEshoGreenLight,
+                )
             }
 
-            Spacer(Modifier.height(Spacing.xl))
+            Spacer(Modifier.height(Spacing.xxl))
 
-            Text(
-                text = UiText.Plain("Bari ferar age, shob mone koriye dei.").resolve(),
-                style = MaterialTheme.typography.bodyMedium,
-                color = NiyeEshoAccentSoft,
-                textAlign = TextAlign.Center,
-            )
+            // Lower Action & Features Section
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(Spacing.md),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                uiState.error?.let { error ->
+                    ErrorView(message = error, modifier = Modifier.fillMaxWidth())
+                }
+
+                // 3 Feature Cards Row
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(Spacing.sm),
+                ) {
+                    FeatureCard(
+                        icon = "☁️",
+                        text = "Saved to\nyour Drive",
+                        modifier = Modifier.weight(1f),
+                    )
+                    FeatureCard(
+                        icon = "⚡",
+                        text = "Real-time\nsync",
+                        modifier = Modifier.weight(1f),
+                    )
+                    FeatureCard(
+                        icon = "🔒",
+                        text = "Private\nP2P",
+                        modifier = Modifier.weight(1f),
+                    )
+                }
+
+                Spacer(Modifier.height(Spacing.xs))
+
+                GoogleSignInButton(
+                    enabled = !uiState.isLoading,
+                    onResult = { result ->
+                        result.fold(
+                            onSuccess = { token ->
+                                onAction(SignInUiAction.GoogleSignInClicked(token))
+                            },
+                            onFailure = { error ->
+                                onAction(SignInUiAction.GoogleSignInFailed(error))
+                            },
+                        )
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                )
+
+                Text(
+                    text = "No account needed beyond Google. We store nothing about you.",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = NiyeEshoGreenDarkMuted,
+                    textAlign = TextAlign.Center,
+                )
+            }
         }
     }
 }
 
 @Composable
-private fun BrandHeader(modifier: Modifier = Modifier) {
-    Column(
+private fun FeatureCard(
+    icon: String,
+    text: String,
+    modifier: Modifier = Modifier,
+) {
+    Surface(
         modifier = modifier,
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(Spacing.md),
+        shape = RoundedCornerShape(12.dp),
+        color = NiyeEshoDarkSurface,
     ) {
-        Box(
+        Column(
             modifier = Modifier
-                .size(Spacing.xxxl + Spacing.md)
-                .clip(CircleShape)
-                .background(MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.16f)),
-            contentAlignment = Alignment.Center,
+                .fillMaxWidth()
+                .padding(vertical = Spacing.md, horizontal = Spacing.xs),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(Spacing.xs),
         ) {
+            Text(text = icon, style = MaterialTheme.typography.titleLarge)
             Text(
-                text = "\uD83D\uDED2",
-                style = MaterialTheme.typography.displaySmall,
+                text = text,
+                style = MaterialTheme.typography.labelMedium,
+                color = NiyeEshoGreenMuted,
+                textAlign = TextAlign.Center,
             )
         }
-        Text(
-            text = UiText.Plain("Niye Esho").resolve(),
-            style = MaterialTheme.typography.headlineLarge,
-            color = MaterialTheme.colorScheme.onPrimary,
-            textAlign = TextAlign.Center,
-        )
-        Text(
-            text = UiText.Plain("Shared shopping lists, remembered for you.").resolve(),
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.9f),
-            textAlign = TextAlign.Center,
-        )
     }
 }

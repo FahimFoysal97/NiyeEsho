@@ -1,12 +1,32 @@
 package com.snehonir.niyeesho.features.shopping_list.presentation.detail.component
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
+import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoDarkBg
+import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoDarkSurface
+import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoGreenDarkMuted
+import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoGreenPrimary
 import com.snehonir.niyeesho.core.designsystem.theme.Spacing
 import com.snehonir.niyeesho.features.contacts.domain.entity.Contact
 
@@ -20,7 +40,14 @@ fun ContactSettingsDialog(
     AlertDialog(
         onDismissRequest = onDismiss,
         modifier = modifier,
-        title = { Text("Contact Settings & Details") },
+        containerColor = NiyeEshoDarkSurface,
+        title = {
+            Text(
+                text = "Contact Details",
+                style = MaterialTheme.typography.titleMedium,
+                color = Color.White,
+            )
+        },
         text = {
             Column(
                 modifier = Modifier.fillMaxWidth(),
@@ -33,45 +60,65 @@ fun ContactSettingsDialog(
                         horizontalArrangement = Arrangement.spacedBy(Spacing.md),
                     ) {
                         Surface(
-                            shape = MaterialTheme.shapes.medium,
-                            color = MaterialTheme.colorScheme.primaryContainer,
+                            shape = RoundedCornerShape(12.dp),
+                            color = NiyeEshoGreenPrimary,
                             modifier = Modifier.size(Spacing.xxl),
                         ) {
                             Box(contentAlignment = Alignment.Center) {
                                 Icon(
                                     imageVector = Icons.Default.Person,
                                     contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                                    tint = Color.White,
                                     modifier = Modifier.size(Spacing.xl),
                                 )
                             }
                         }
                         Column(modifier = Modifier.weight(1f)) {
-                            Text(contact.displayName, style = MaterialTheme.typography.titleMedium)
-                            Text(contact.email, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                            Text("Connected", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary)
+                            Text(
+                                text = contact.displayName,
+                                style = MaterialTheme.typography.titleMedium,
+                                color = Color.White,
+                            )
+                            Text(
+                                text = contact.email,
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = NiyeEshoGreenDarkMuted,
+                            )
+                            Text(
+                                text = "Connected",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = NiyeEshoGreenPrimary,
+                            )
                         }
                     }
 
-                    HorizontalDivider()
+                    HorizontalDivider(color = NiyeEshoDarkBg)
 
                     Button(
                         onClick = onCreateGroupClicked,
                         modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = NiyeEshoGreenPrimary,
+                            contentColor = Color.White,
+                        ),
                     ) {
-                        Text("👥 Create Group with ${contact.displayName}")
+                        Text("👥 Create Group with ${contact.displayName}", style = MaterialTheme.typography.bodyMedium)
                     }
                 } else {
                     Text(
                         text = "Contact details unavailable.",
                         style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        color = NiyeEshoGreenDarkMuted,
                     )
                 }
             }
         },
         confirmButton = {
-            TextButton(onClick = onDismiss) { Text("Close") }
+            TextButton(
+                onClick = onDismiss,
+                colors = ButtonDefaults.textButtonColors(contentColor = NiyeEshoGreenPrimary),
+            ) { Text("Close") }
         },
     )
 }

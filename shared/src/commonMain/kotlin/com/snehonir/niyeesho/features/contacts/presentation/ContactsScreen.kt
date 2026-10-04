@@ -12,6 +12,8 @@ fun ContactsScreen(
     onOpenContact: (String) -> Unit,
     onShareInvite: (String) -> Unit,
     onBack: () -> Unit,
+    onNavigateToLists: () -> Unit = {},
+    onNavigateToProfile: () -> Unit = {},
     viewModel: ContactsViewModel = koinViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -23,7 +25,13 @@ fun ContactsScreen(
             is ContactsUiEvent.ShowError -> Unit
         }
     }
-    ContactsContent(uiState = uiState, onAction = viewModel::onAction, onBack = onBack)
+    ContactsContent(
+        uiState = uiState,
+        onAction = viewModel::onAction,
+        onBack = onBack,
+        onNavigateToLists = onNavigateToLists,
+        onNavigateToProfile = onNavigateToProfile,
+    )
     uiState.inviteLink?.let { link ->
         InviteBottomSheet(
             inviteLink = link,

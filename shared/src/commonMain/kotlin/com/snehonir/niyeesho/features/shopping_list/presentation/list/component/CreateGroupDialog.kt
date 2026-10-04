@@ -1,14 +1,35 @@
 package com.snehonir.niyeesho.features.shopping_list.presentation.list.component
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CheckboxDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import com.snehonir.niyeesho.core.designsystem.component.AppTextField
+import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoCheckboxBorder
+import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoDarkSurface
+import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoGreenDarkMuted
+import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoGreenMuted
+import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoGreenPrimary
 import com.snehonir.niyeesho.core.designsystem.theme.Spacing
 import com.snehonir.niyeesho.core.utils.UiText
 import com.snehonir.niyeesho.features.contacts.domain.entity.Contact
@@ -30,7 +51,14 @@ fun CreateGroupDialog(
     AlertDialog(
         onDismissRequest = onDismiss,
         modifier = modifier,
-        title = { Text("Create Group List") },
+        containerColor = NiyeEshoDarkSurface,
+        title = {
+            Text(
+                text = "Create Group List",
+                style = MaterialTheme.typography.titleMedium,
+                color = Color.White,
+            )
+        },
         text = {
             Column(
                 modifier = Modifier.fillMaxWidth(),
@@ -46,14 +74,14 @@ fun CreateGroupDialog(
                 Text(
                     text = "Owner: 👤 Sneho Nir (You)",
                     style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    color = NiyeEshoGreenMuted,
                 )
 
                 if (uniqueContacts.isNotEmpty()) {
                     Text(
                         text = "Add contacts to this group:",
                         style = MaterialTheme.typography.labelLarge,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        color = NiyeEshoGreenMuted,
                     )
 
                     LazyColumn(
@@ -79,8 +107,16 @@ fun CreateGroupDialog(
                                 horizontalArrangement = Arrangement.SpaceBetween,
                             ) {
                                 Column(modifier = Modifier.weight(1f)) {
-                                    Text(contact.displayName, style = MaterialTheme.typography.bodyMedium)
-                                    Text(contact.email, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                    Text(
+                                        text = contact.displayName,
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        color = Color.White,
+                                    )
+                                    Text(
+                                        text = contact.email,
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = NiyeEshoGreenDarkMuted,
+                                    )
                                 }
                                 Checkbox(
                                     checked = isSelected,
@@ -91,6 +127,11 @@ fun CreateGroupDialog(
                                             selectedUids - contact.uid
                                         }
                                     },
+                                    colors = CheckboxDefaults.colors(
+                                        checkedColor = NiyeEshoGreenPrimary,
+                                        uncheckedColor = NiyeEshoCheckboxBorder,
+                                        checkmarkColor = Color.White,
+                                    ),
                                 )
                             }
                         }
@@ -109,10 +150,14 @@ fun CreateGroupDialog(
                     }
                 },
                 enabled = title.isNotBlank(),
+                colors = ButtonDefaults.textButtonColors(contentColor = NiyeEshoGreenPrimary),
             ) { Text("Create Group") }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) { Text("Cancel") }
+            TextButton(
+                onClick = onDismiss,
+                colors = ButtonDefaults.textButtonColors(contentColor = NiyeEshoGreenDarkMuted),
+            ) { Text("Cancel") }
         },
     )
 }

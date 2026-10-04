@@ -1,18 +1,52 @@
 package com.snehonir.niyeesho.features.shopping_list.presentation.detail.component
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CheckboxDefaults
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
+import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoCheckboxBorder
+import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoDarkBg
+import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoDarkSurface
+import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoGreenDarkMuted
+import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoGreenMuted
+import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoGreenPrimary
 import com.snehonir.niyeesho.core.designsystem.theme.Spacing
 import com.snehonir.niyeesho.features.contacts.domain.entity.Contact
 import com.snehonir.niyeesho.features.shopping_list.domain.entity.ListMember
@@ -44,19 +78,23 @@ fun GroupSettingsDialog(
     if (showDeleteConfirm) {
         AlertDialog(
             onDismissRequest = { showDeleteConfirm = false },
-            title = { Text("Delete Shopping List?") },
-            text = { Text("Are you sure you want to delete this list? This action cannot be undone.") },
+            containerColor = NiyeEshoDarkSurface,
+            title = { Text("Delete Shopping List?", color = Color.White) },
+            text = { Text("Are you sure you want to delete this list? This action cannot be undone.", color = NiyeEshoGreenMuted) },
             confirmButton = {
                 TextButton(
                     onClick = {
                         showDeleteConfirm = false
                         onDeleteList()
                     },
-                    colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error),
+                    colors = ButtonDefaults.textButtonColors(contentColor = Color(0xFFE05252)),
                 ) { Text("Delete") }
             },
             dismissButton = {
-                TextButton(onClick = { showDeleteConfirm = false }) { Text("Cancel") }
+                TextButton(
+                    onClick = { showDeleteConfirm = false },
+                    colors = ButtonDefaults.textButtonColors(contentColor = NiyeEshoGreenDarkMuted),
+                ) { Text("Cancel") }
             },
         )
     }
@@ -64,7 +102,8 @@ fun GroupSettingsDialog(
     AlertDialog(
         onDismissRequest = onDismiss,
         modifier = modifier,
-        title = { Text("Group Settings & Details") },
+        containerColor = NiyeEshoDarkSurface,
+        title = { Text("Group Settings & Details", color = Color.White, style = MaterialTheme.typography.titleMedium) },
         text = {
             Column(
                 modifier = Modifier.fillMaxWidth().heightIn(max = Spacing.xxl * 6),
@@ -73,8 +112,8 @@ fun GroupSettingsDialog(
                 // Edit Title Section
                 Text(
                     text = "List Title",
-                    style = MaterialTheme.typography.titleSmall,
-                    color = MaterialTheme.colorScheme.primary,
+                    style = MaterialTheme.typography.labelMedium,
+                    color = NiyeEshoGreenPrimary,
                 )
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -86,7 +125,13 @@ fun GroupSettingsDialog(
                         onValueChange = { titleInput = it },
                         modifier = Modifier.weight(1f),
                         singleLine = true,
-                        shape = MaterialTheme.shapes.medium,
+                        shape = RoundedCornerShape(10.dp),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            unfocusedContainerColor = NiyeEshoDarkBg,
+                            focusedContainerColor = NiyeEshoDarkBg,
+                            unfocusedBorderColor = Color.Transparent,
+                            focusedBorderColor = NiyeEshoGreenPrimary,
+                        ),
                     )
                     IconButton(
                         onClick = { if (titleInput.isNotBlank()) onUpdateTitle(titleInput) },
@@ -95,18 +140,18 @@ fun GroupSettingsDialog(
                         Icon(
                             imageVector = Icons.Default.Edit,
                             contentDescription = "Update title",
-                            tint = MaterialTheme.colorScheme.primary,
+                            tint = NiyeEshoGreenPrimary,
                         )
                     }
                 }
 
-                HorizontalDivider()
+                HorizontalDivider(color = NiyeEshoDarkBg)
 
                 // Current Members Section
                 Text(
                     text = "Current Members (${members.size})",
-                    style = MaterialTheme.typography.titleSmall,
-                    color = MaterialTheme.colorScheme.primary,
+                    style = MaterialTheme.typography.labelMedium,
+                    color = NiyeEshoGreenPrimary,
                 )
                 LazyColumn(
                     modifier = Modifier.fillMaxWidth().heightIn(max = Spacing.xxl * 2),
@@ -125,25 +170,25 @@ fun GroupSettingsDialog(
                                 horizontalArrangement = Arrangement.spacedBy(Spacing.sm),
                             ) {
                                 Surface(
-                                    shape = MaterialTheme.shapes.small,
-                                    color = MaterialTheme.colorScheme.primaryContainer,
+                                    shape = RoundedCornerShape(8.dp),
+                                    color = NiyeEshoGreenPrimary,
                                     modifier = Modifier.size(Spacing.lg),
                                 ) {
                                     Box(contentAlignment = Alignment.Center) {
                                         Icon(
                                             imageVector = Icons.Default.Person,
                                             contentDescription = null,
-                                            tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                                            tint = Color.White,
                                             modifier = Modifier.size(Spacing.md),
                                         )
                                     }
                                 }
                                 Column(modifier = Modifier.weight(1f)) {
-                                    Text(member.displayName, style = MaterialTheme.typography.bodyMedium)
+                                    Text(member.displayName, style = MaterialTheme.typography.bodyMedium, color = Color.White)
                                     Text(
                                         text = if (isInContacts) member.uid else "${member.uid} (Not in contacts)",
                                         style = MaterialTheme.typography.bodySmall,
-                                        color = if (isInContacts) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.error,
+                                        color = if (isInContacts) NiyeEshoGreenDarkMuted else Color(0xFFE05252),
                                     )
                                 }
                             }
@@ -157,7 +202,7 @@ fun GroupSettingsDialog(
                                         Icon(
                                             imageVector = Icons.Default.Add,
                                             contentDescription = "Add to contacts",
-                                            tint = MaterialTheme.colorScheme.primary,
+                                            tint = NiyeEshoGreenPrimary,
                                         )
                                     }
                                 }
@@ -166,7 +211,7 @@ fun GroupSettingsDialog(
                                         Icon(
                                             imageVector = Icons.Default.Delete,
                                             contentDescription = "Remove member",
-                                            tint = MaterialTheme.colorScheme.error,
+                                            tint = Color(0xFFE05252),
                                         )
                                     }
                                 }
@@ -175,14 +220,14 @@ fun GroupSettingsDialog(
                     }
                 }
 
-                HorizontalDivider()
+                HorizontalDivider(color = NiyeEshoDarkBg)
 
                 // Add from Contacts Section
                 if (contactsNotAlreadyInGroup.isNotEmpty()) {
                     Text(
                         text = "Add from Contacts",
-                        style = MaterialTheme.typography.titleSmall,
-                        color = MaterialTheme.colorScheme.primary,
+                        style = MaterialTheme.typography.labelMedium,
+                        color = NiyeEshoGreenPrimary,
                     )
                     LazyColumn(
                         modifier = Modifier.fillMaxWidth().heightIn(max = Spacing.xxl * 2),
@@ -205,8 +250,8 @@ fun GroupSettingsDialog(
                                 horizontalArrangement = Arrangement.SpaceBetween,
                             ) {
                                 Column(modifier = Modifier.weight(1f)) {
-                                    Text(contact.displayName, style = MaterialTheme.typography.bodyMedium)
-                                    Text(contact.email, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                    Text(contact.displayName, style = MaterialTheme.typography.bodyMedium, color = Color.White)
+                                    Text(contact.email, style = MaterialTheme.typography.bodySmall, color = NiyeEshoGreenDarkMuted)
                                 }
                                 Checkbox(
                                     checked = isSelected,
@@ -217,18 +262,23 @@ fun GroupSettingsDialog(
                                             selectedContactUids - contact.uid
                                         }
                                     },
+                                    colors = CheckboxDefaults.colors(
+                                        checkedColor = NiyeEshoGreenPrimary,
+                                        uncheckedColor = NiyeEshoCheckboxBorder,
+                                        checkmarkColor = Color.White,
+                                    ),
                                 )
                             }
                         }
                     }
                 }
 
-                HorizontalDivider()
+                HorizontalDivider(color = NiyeEshoDarkBg)
 
                 // Delete List Danger Zone
                 TextButton(
                     onClick = { showDeleteConfirm = true },
-                    colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error),
+                    colors = ButtonDefaults.textButtonColors(contentColor = Color(0xFFE05252)),
                     modifier = Modifier.fillMaxWidth(),
                 ) {
                     Icon(
@@ -254,11 +304,15 @@ fun GroupSettingsDialog(
                         }
                     },
                     enabled = selectedContactUids.isNotEmpty(),
+                    colors = ButtonDefaults.textButtonColors(contentColor = NiyeEshoGreenPrimary),
                 ) { Text("Add Selected Contacts") }
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) { Text("Close") }
+            TextButton(
+                onClick = onDismiss,
+                colors = ButtonDefaults.textButtonColors(contentColor = NiyeEshoGreenDarkMuted),
+            ) { Text("Close") }
         },
     )
 }

@@ -1,22 +1,33 @@
 package com.snehonir.niyeesho.features.shopping_list.presentation.detail
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -25,8 +36,16 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.snehonir.niyeesho.core.designsystem.component.AppTopBar
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 import com.snehonir.niyeesho.core.designsystem.component.ErrorView
+import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoDarkBg
+import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoDarkSurface
+import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoGoldSecondary
+import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoGreenDarkMuted
+import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoGreenMuted
+import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoGreenPrimary
 import com.snehonir.niyeesho.core.designsystem.theme.Spacing
 import com.snehonir.niyeesho.core.utils.UiText
 import com.snehonir.niyeesho.features.shopping_list.presentation.detail.component.AddItemDialog
@@ -44,56 +63,147 @@ fun ListDetailContent(
 ) {
     var isAddDialogVisible by remember { mutableStateOf(false) }
 
-    Column(modifier = modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
-        AppTopBar(
-            title = UiText.Plain(uiState.list?.title ?: "Shopping List"),
-            onBackClick = onBack,
-            actions = {
-                IconButton(
-                    onClick = {
-                        if (uiState.isContactList) {
-                            onAction(ListDetailUiAction.OpenContactSettings)
-                        } else {
-                            onAction(ListDetailUiAction.OpenGroupSettings)
-                        }
-                    },
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Settings,
-                        contentDescription = "Settings",
-                    )
-                }
-            },
-        )
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .background(NiyeEshoDarkBg),
+    ) {
+        // Top Bar
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = Spacing.md, vertical = Spacing.md),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+        ) {
+            IconButton(onClick = onBack, modifier = Modifier.size(32.dp)) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = "Back",
+                    tint = Color.White,
+                    modifier = Modifier.size(20.dp),
+                )
+            }
+            Text(
+                text = uiState.list?.title ?: "Weekly groceries",
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold,
+                color = Color.White,
+                modifier = Modifier.weight(1f).padding(horizontal = Spacing.sm),
+            )
+            IconButton(
+                onClick = {
+                    if (uiState.isContactList) {
+                        onAction(ListDetailUiAction.OpenContactSettings)
+                    } else {
+                        onAction(ListDetailUiAction.OpenGroupSettings)
+                    }
+                },
+                modifier = Modifier.size(32.dp),
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Settings,
+                    contentDescription = "Settings",
+                    tint = NiyeEshoGreenPrimary,
+                    modifier = Modifier.size(20.dp),
+                )
+            }
+        }
+
         Box(modifier = Modifier.weight(1f)) {
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(start = Spacing.lg, end = Spacing.lg, top = Spacing.lg, bottom = Spacing.xxl * 3),
+                contentPadding = PaddingValues(
+                    start = Spacing.lg,
+                    end = Spacing.lg,
+                    top = Spacing.xs,
+                    bottom = 90.dp,
+                ),
                 verticalArrangement = Arrangement.spacedBy(Spacing.md),
             ) {
+                // Active Members & Synced Tag
                 item {
-                    Column(verticalArrangement = Arrangement.spacedBy(Spacing.xs)) {
-                        Text(
-                            text = uiState.list?.title ?: UiText.Plain("Shopping list").resolve(),
-                            style = MaterialTheme.typography.headlineMedium,
-                            color = MaterialTheme.colorScheme.onBackground,
-                        )
-                        Text(
-                            text = UiText.Plain("Add what you need before heading home.").resolve(),
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurface,
-                        )
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(Spacing.xs),
+                        ) {
+                            Surface(
+                                modifier = Modifier.size(24.dp),
+                                shape = CircleShape,
+                                color = NiyeEshoGreenPrimary,
+                            ) {
+                                Box(contentAlignment = Alignment.Center) {
+                                    Text("S", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold, color = Color.White)
+                                }
+                            }
+                            if ((uiState.list?.members?.size ?: 0) > 1) {
+                                Surface(
+                                    modifier = Modifier.size(24.dp),
+                                    shape = CircleShape,
+                                    color = NiyeEshoGoldSecondary,
+                                ) {
+                                    Box(contentAlignment = Alignment.Center) {
+                                        Text("R", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold, color = Color.White)
+                                    }
+                                }
+                            }
+                            val memberNames = uiState.list?.members?.joinToString(", ") { it.displayName } ?: "Sneho, Rahim"
+                            Text(
+                                text = memberNames,
+                                style = MaterialTheme.typography.bodySmall,
+                                color = NiyeEshoGreenMuted,
+                            )
+                        }
+
+                        // Synced Tag
+                        Surface(
+                            shape = RoundedCornerShape(20.dp),
+                            color = NiyeEshoDarkSurface,
+                        ) {
+                            Text(
+                                text = "Synced",
+                                modifier = Modifier.padding(horizontal = Spacing.md, vertical = 2.dp),
+                                style = MaterialTheme.typography.labelMedium,
+                                fontWeight = FontWeight.SemiBold,
+                                color = NiyeEshoGreenPrimary,
+                            )
+                        }
                     }
                 }
+
                 uiState.error?.let { message -> item { ErrorView(UiText.Plain(message)) } }
-                if (uiState.activeItems.isNotEmpty()) {
+
+                // TO GET Section Header
+                item {
+                    Text(
+                        text = "TO GET",
+                        style = MaterialTheme.typography.labelMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = NiyeEshoGreenDarkMuted,
+                    )
+                }
+
+                if (uiState.activeItems.isEmpty()) {
                     item {
-                        Text(
-                            text = UiText.Plain("Still to buy").resolve(),
-                            style = MaterialTheme.typography.titleLarge,
-                            color = MaterialTheme.colorScheme.primary,
-                        )
+                        Card(
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(12.dp),
+                            colors = CardDefaults.cardColors(containerColor = NiyeEshoDarkSurface),
+                        ) {
+                            Text(
+                                text = "No items left to get. Tap 'Add item' below!",
+                                modifier = Modifier.padding(Spacing.md),
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = NiyeEshoGreenDarkMuted,
+                            )
+                        }
                     }
+                } else {
                     items(uiState.activeItems, key = { it.id }) { item ->
                         ListItemRow(
                             item = item,
@@ -102,12 +212,16 @@ fun ListDetailContent(
                         )
                     }
                 }
+
+                // DONE Section Header
                 if (uiState.checkedItems.isNotEmpty()) {
                     item {
+                        Spacer(Modifier.padding(top = Spacing.xs))
                         Text(
-                            text = UiText.Plain("Already in the bag").resolve(),
-                            style = MaterialTheme.typography.titleLarge,
-                            color = MaterialTheme.colorScheme.primary,
+                            text = "DONE",
+                            style = MaterialTheme.typography.labelMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = NiyeEshoGreenDarkMuted,
                         )
                     }
                     items(uiState.checkedItems, key = { it.id }) { item ->
@@ -120,13 +234,35 @@ fun ListDetailContent(
                 }
             }
 
-            FloatingActionButton(
+            // Bottom Add Item Button
+            OutlinedButton(
                 onClick = { isAddDialogVisible = true },
-                modifier = Modifier.align(Alignment.BottomEnd).padding(Spacing.lg),
-                containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = MaterialTheme.colorScheme.onPrimary,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.BottomCenter)
+                    .padding(Spacing.lg),
+                shape = RoundedCornerShape(12.dp),
+                border = BorderStroke(1.5.dp, NiyeEshoGreenPrimary),
             ) {
-                Icon(Icons.Default.Add, contentDescription = "Add new item")
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center,
+                    modifier = Modifier.padding(vertical = Spacing.xs),
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = "Add item",
+                        tint = NiyeEshoGreenPrimary,
+                        modifier = Modifier.size(18.dp),
+                    )
+                    Spacer(Modifier.width(Spacing.xs))
+                    Text(
+                        text = "Add item",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold,
+                        color = NiyeEshoGreenPrimary,
+                    )
+                }
             }
         }
     }

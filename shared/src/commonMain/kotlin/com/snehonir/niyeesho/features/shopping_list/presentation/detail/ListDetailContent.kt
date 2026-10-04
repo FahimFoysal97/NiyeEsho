@@ -67,19 +67,19 @@ fun ListDetailContent(
             .fillMaxSize()
             .background(NiyeEshoDarkBg),
     ) {
-        // Top Header Bar
+        // Top Header Bar with Proper Spacing
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = Spacing.lg, vertical = Spacing.md),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween,
+            horizontalArrangement = Arrangement.spacedBy(Spacing.md),
         ) {
             IconButton(
                 onClick = onBack,
                 modifier = Modifier
-                    .size(36.dp)
-                    .clip(RoundedCornerShape(10.dp))
+                    .size(40.dp)
+                    .clip(RoundedCornerShape(12.dp))
                     .background(NiyeEshoDarkSurface),
             ) {
                 Icon(
@@ -94,9 +94,7 @@ fun ListDetailContent(
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
                 color = Color.White,
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(horizontal = Spacing.sm),
+                modifier = Modifier.weight(1f),
             )
             IconButton(
                 onClick = {
@@ -106,7 +104,10 @@ fun ListDetailContent(
                         onAction(ListDetailUiAction.OpenGroupSettings)
                     }
                 },
-                modifier = Modifier.size(36.dp),
+                modifier = Modifier
+                    .size(40.dp)
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(NiyeEshoDarkSurface),
             ) {
                 Icon(
                     imageVector = Icons.Default.Settings,
@@ -128,7 +129,7 @@ fun ListDetailContent(
                 ),
                 verticalArrangement = Arrangement.spacedBy(Spacing.md),
             ) {
-                // Active Members Chips Section (Member names as chips with accent colors, no letter badges)
+                // Active Members Chips Section
                 item {
                     val members = uiState.list?.members.takeIf { !it.isNullOrEmpty() }
                         ?: listOf(ListMember("user_demo", "Sneho Nir", null))

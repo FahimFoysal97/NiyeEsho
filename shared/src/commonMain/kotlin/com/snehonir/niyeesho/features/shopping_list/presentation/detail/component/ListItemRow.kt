@@ -71,33 +71,13 @@ fun ListItemRow(
                     .clickable(onClick = onToggle),
                 verticalArrangement = Arrangement.spacedBy(Spacing.xs / 2),
             ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Text(
-                        text = item.name,
-                        style = MaterialTheme.typography.bodyLarge,
-                        fontWeight = if (!item.checked && !item.isRead) FontWeight.Bold else FontWeight.Normal,
-                        color = if (item.checked) NiyeEshoGreenMuted else Color.White,
-                        textDecoration = if (item.checked) TextDecoration.LineThrough else TextDecoration.None,
-                    )
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(Spacing.xs),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        SyncStatusIndicator(item.syncStatus)
-                        IconButton(onClick = onDelete, modifier = Modifier.size(32.dp)) {
-                            Icon(
-                                imageVector = Icons.Default.Delete,
-                                contentDescription = "Delete item",
-                                tint = NiyeEshoGreenDarkMuted,
-                                modifier = Modifier.size(18.dp),
-                            )
-                        }
-                    }
-                }
+                Text(
+                    text = item.name,
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.SemiBold,
+                    color = if (item.checked) NiyeEshoGreenMuted else Color.White,
+                    textDecoration = if (item.checked) TextDecoration.LineThrough else TextDecoration.None,
+                )
                 val subtitle = buildString {
                     if (item.quantityLabel.isNotBlank()) {
                         append("${item.quantityLabel} · ")
@@ -109,6 +89,20 @@ fun ListItemRow(
                     style = MaterialTheme.typography.bodySmall,
                     color = NiyeEshoGreenDarkMuted,
                 )
+            }
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(Spacing.xs),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                SyncStatusIndicator(item.syncStatus)
+                IconButton(onClick = onDelete, modifier = Modifier.size(32.dp)) {
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = "Delete item",
+                        tint = NiyeEshoGreenDarkMuted,
+                        modifier = Modifier.size(18.dp),
+                    )
+                }
             }
         }
     }

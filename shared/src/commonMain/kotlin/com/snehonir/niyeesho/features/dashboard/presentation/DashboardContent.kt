@@ -388,7 +388,7 @@ private fun DashboardListRowCard(
                         .fillMaxWidth()
                         .height(4.dp)
                         .clip(RoundedCornerShape(Spacing.xs)),
-                    color = if (list.isDone) NiyeEshoGoldSecondary else accentColor,
+                    color = accentColor,
                     trackColor = NiyeEshoDarkBg,
                 )
             }

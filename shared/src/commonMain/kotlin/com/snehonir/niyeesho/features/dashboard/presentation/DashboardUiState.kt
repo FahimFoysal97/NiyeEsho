@@ -15,4 +15,6 @@ data class DashboardUiState(
     val error: String? = null,
     val userName: String = "Sneho Nir",
     val userEmail: String = "sneho@example.com",
+    val userAvatarUrl: String? = null,
+    val currentUserUid: String? = null,
 )

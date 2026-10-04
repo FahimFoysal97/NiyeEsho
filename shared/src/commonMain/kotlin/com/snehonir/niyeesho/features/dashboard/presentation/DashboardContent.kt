@@ -37,6 +37,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.snehonir.niyeesho.core.designsystem.component.AppBottomBar
+import com.snehonir.niyeesho.core.designsystem.component.AvatarImage
 import com.snehonir.niyeesho.core.designsystem.component.AppNavTab
 import com.snehonir.niyeesho.core.designsystem.component.ErrorView
 import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoDarkBg
@@ -126,7 +127,7 @@ fun DashboardContent(
                         val displayMembers = if (mostActive.members.isNotEmpty()) {
                             mostActive.members
                         } else {
-                            listOf(ListMember("user_demo", uiState.userName.ifBlank { "User" }, null))
+                            listOf(ListMember(uiState.currentUserUid ?: "user_demo", uiState.userName.ifBlank { "User" }, uiState.userAvatarUrl))
                         }
 
                         Card(
@@ -194,21 +195,12 @@ fun DashboardContent(
                                         ) {
                                             displayMembers.take(3).forEachIndexed { idx, member ->
                                                 val bg = accentColors[idx % accentColors.size]
-                                                val initial = member.displayName.trim().firstOrNull()?.uppercaseChar()?.toString() ?: "U"
-                                                Surface(
-                                                    modifier = Modifier.size(20.dp),
-                                                    shape = CircleShape,
-                                                    color = bg,
-                                                ) {
-                                                    Box(contentAlignment = Alignment.Center) {
-                                                        Text(
-                                                            text = initial,
-                                                            style = MaterialTheme.typography.labelSmall,
-                                                            fontWeight = FontWeight.Bold,
-                                                            color = Color.White,
-                                                        )
-                                                    }
-                                                }
+                                                AvatarImage(
+                                                    avatarUrl = member.avatarUrl,
+                                                    contentDescription = member.displayName,
+                                                    size = 20.dp,
+                                                    backgroundColor = bg,
+                                                )
                                             }
                                         }
                                         Text(
@@ -247,6 +239,7 @@ fun DashboardContent(
                             accentColor = accentColor,
                             avatarColors = accentColors,
                             userName = uiState.userName,
+                            userAvatarUrl = uiState.userAvatarUrl,
                             onClick = { onNavigateToDetail(list.id) },
                         )
                     }
@@ -314,13 +307,12 @@ private fun DashboardListRowCard(
     accentColor: Color,
     avatarColors: List<Color>,
     userName: String,
+    userAvatarUrl: String?,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val displayMembers = if (list.members.isNotEmpty()) {
-        list.members
-    } else {
-        listOf(ListMember("user_demo", userName.ifBlank { "User" }, null))
+    val displayMembers = list.members.ifEmpty {
+        listOf(ListMember("user_demo", userName.ifBlank { "User" }, userAvatarUrl))
     }
 
     Card(
@@ -363,21 +355,12 @@ private fun DashboardListRowCard(
                         ) {
                             displayMembers.take(3).forEachIndexed { idx, member ->
                                 val bg = avatarColors[idx % avatarColors.size]
-                                val initial = member.displayName.trim().firstOrNull()?.uppercaseChar()?.toString() ?: "U"
-                                Surface(
-                                    modifier = Modifier.size(20.dp),
-                                    shape = CircleShape,
-                                    color = bg,
-                                ) {
-                                    Box(contentAlignment = Alignment.Center) {
-                                        Text(
-                                            text = initial,
-                                            style = MaterialTheme.typography.labelSmall,
-                                            fontWeight = FontWeight.Bold,
-                                            color = Color.White,
-                                        )
-                                    }
-                                }
+                                AvatarImage(
+                                    avatarUrl = member.avatarUrl,
+                                    contentDescription = member.displayName,
+                                    size = 20.dp,
+                                    backgroundColor = bg,
+                                )
                             }
                         }
                     }

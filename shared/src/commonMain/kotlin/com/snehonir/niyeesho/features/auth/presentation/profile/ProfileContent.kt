@@ -43,6 +43,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import com.snehonir.niyeesho.core.designsystem.component.AvatarImage
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -150,22 +151,12 @@ fun ProfileContent(
                                 ) {
                                     // Avatar circle
                                     Box(modifier = Modifier.size(68.dp)) {
-                                        Surface(
+                                        AvatarImage(
+                                            avatarUrl = user.avatarUrl,
+                                            contentDescription = user.displayName,
                                             modifier = Modifier.size(68.dp),
-                                            shape = CircleShape,
-                                            color = NiyeEshoGreenPrimary,
-                                            border = androidx.compose.foundation.BorderStroke(2.dp, Color(0xFF2D6B55)),
-                                        ) {
-                                            Box(contentAlignment = Alignment.Center) {
-                                                Text(
-                                                    text = user.displayName.firstOrNull()?.uppercaseChar()?.toString() ?: "S",
-                                                    style = MaterialTheme.typography.headlineMedium,
-                                                    fontWeight = FontWeight.Bold,
-                                                    color = Color.White,
-                                                )
-                                            }
-                                        }
-                                        Surface(
+                                        )
+                                        /*Surface(
                                             modifier = Modifier
                                                 .size(22.dp)
                                                 .align(Alignment.BottomEnd),
@@ -181,7 +172,7 @@ fun ProfileContent(
                                                     modifier = Modifier.size(12.dp),
                                                 )
                                             }
-                                        }
+                                        }*/
                                     }
 
                                     Column(horizontalAlignment = Alignment.CenterHorizontally) {

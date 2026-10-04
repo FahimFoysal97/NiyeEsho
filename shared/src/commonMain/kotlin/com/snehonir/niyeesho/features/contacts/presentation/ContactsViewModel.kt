@@ -123,6 +123,7 @@ class ContactsViewModel(
                 name = user?.displayName ?: "User",
                 token = tokenManager.getFcmToken() ?: "fcm_token_placeholder",
                 driveUrl = user?.avatarUrl ?: "",
+                avatar = user?.avatarUrl,
             )
             generateInviteLink(inviteData)
                 .onSuccess { link ->

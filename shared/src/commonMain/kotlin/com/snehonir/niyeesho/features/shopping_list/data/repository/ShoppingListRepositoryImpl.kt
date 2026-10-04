@@ -2,6 +2,7 @@ package com.snehonir.niyeesho.features.shopping_list.data.repository
 
 import com.snehonir.niyeesho.core.utils.TokenManager
 import com.snehonir.niyeesho.core.utils.logD
+import com.snehonir.niyeesho.features.auth.data.local.AuthLocalDataSource
 import com.snehonir.niyeesho.features.drive.domain.entity.DriveListMember
 import com.snehonir.niyeesho.features.drive.domain.entity.DriveShoppingList
 import com.snehonir.niyeesho.features.drive.domain.repository.DriveRepository
@@ -21,6 +22,7 @@ class ShoppingListRepositoryImpl(
     private val listItemLocal: ListItemLocalDataSource,
     private val driveRepository: DriveRepository,
     private val tokenManager: TokenManager,
+    private val authLocal: AuthLocalDataSource,
 ) : ShoppingListRepository {
     override fun watchShoppingLists(): Flow<Result<List<ShoppingList>>> =
         local.watchAll().map { Result.success(it.filterNot(ShoppingList::isArchived)) }
@@ -37,7 +39,10 @@ class ShoppingListRepositoryImpl(
         id: String?,
     ): Result<ShoppingList> = runCatching {
         val now = Clock.System.now()
-        val ownerMember = ListMember(ownerId, "Sneho Nir", null)
+        val currentUser = authLocal.getUser()
+        val ownerName = currentUser?.displayName ?: "Sneho Nir"
+        val ownerAvatar = currentUser?.avatarUrl
+        val ownerMember = ListMember(ownerId, ownerName, ownerAvatar)
         val allMembers = (listOf(ownerMember) + members).distinctBy { it.uid }
         val allMemberIds = allMembers.map { it.uid }
         val listId = id ?: "list_${now.toEpochMilliseconds()}"

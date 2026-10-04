@@ -79,10 +79,27 @@ class DashboardViewModel(
             ) { listsResult, contactsResult ->
                 val lists = listsResult.getOrDefault(emptyList())
                 val contacts = contactsResult.getOrDefault(emptyList())
+                val currentUser = getCurrentUser().getOrNull()
+                val contactsMap = contacts.associateBy { it.uid }
                 logD("DashboardViewModel", "Watched lists count: ${lists.size}, contacts count: ${contacts.size}")
 
-                val existingListIds = lists.map { it.id }.toSet()
-                val listModels = lists.map { list ->
+                val resolvedLists = lists.map { list ->
+                    val resolvedMembers = list.members.map { member ->
+                        if (!member.avatarUrl.isNullOrBlank()) {
+                            member
+                        } else {
+                            val resolvedUrl = when {
+                                currentUser != null && (member.uid == currentUser.uid || member.uid == "user_demo") -> currentUser.avatarUrl
+                                else -> contactsMap[member.uid]?.avatarUrl
+                            }
+                            if (!resolvedUrl.isNullOrBlank()) member.copy(avatarUrl = resolvedUrl) else member
+                        }
+                    }
+                    list.copy(members = resolvedMembers)
+                }
+
+                val existingListIds = resolvedLists.map { it.id }.toSet()
+                val listModels = resolvedLists.map { list ->
                     val items = listItemLocal.watchForList(list.id).first()
                     val total = items.size
                     val completed = items.count { it.isChecked }
@@ -102,6 +119,10 @@ class DashboardViewModel(
                         lists = combined,
                         availableContacts = contacts.distinctBy { contact -> contact.uid }.toImmutableList(),
                         isLoading = false,
+                        userName = currentUser?.displayName ?: it.userName,
+                        userEmail = currentUser?.email ?: it.userEmail,
+                        userAvatarUrl = currentUser?.avatarUrl ?: it.userAvatarUrl,
+                        currentUserUid = currentUser?.uid,
                     )
                 }
             }.collect {}
@@ -220,6 +241,7 @@ class DashboardViewModel(
                 name = user?.displayName ?: "User",
                 token = tokenManager.getFcmToken() ?: "fcm_token_placeholder",
                 driveUrl = user?.avatarUrl ?: "",
+                avatar = user?.avatarUrl,
             )
             generateInviteLink(inviteData)
                 .onSuccess { link ->

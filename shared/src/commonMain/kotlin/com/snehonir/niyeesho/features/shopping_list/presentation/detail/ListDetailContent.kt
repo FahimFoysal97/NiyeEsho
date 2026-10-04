@@ -145,7 +145,7 @@ fun ListDetailContent(
                             modifier = Modifier.weight(1f),
                         ) {
                             members.forEachIndexed { idx, member ->
-                                val chipColor = accentColors[idx % accentColors.size]
+                                val chipColor = NiyeEshoGreenPrimary
                                 Surface(
                                     shape = RoundedCornerShape(16.dp),
                                     color = chipColor.copy(alpha = 0.2f),

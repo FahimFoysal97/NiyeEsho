@@ -38,6 +38,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.snehonir.niyeesho.core.designsystem.component.AppBottomBar
 import com.snehonir.niyeesho.core.designsystem.component.AppNavTab
+import com.snehonir.niyeesho.core.designsystem.component.AvatarImage
 import com.snehonir.niyeesho.core.designsystem.component.ErrorView
 import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoDarkBg
 import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoDarkSurface
@@ -299,20 +300,12 @@ private fun ContactCardRow(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(Spacing.md),
             ) {
-                Surface(
-                    modifier = Modifier.size(36.dp),
-                    shape = CircleShape,
-                    color = avatarBg,
-                ) {
-                    Box(contentAlignment = Alignment.Center) {
-                        Text(
-                            text = contact.displayName.trim().firstOrNull()?.uppercaseChar()?.toString() ?: "C",
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.White,
-                        )
-                    }
-                }
+                AvatarImage(
+                    avatarUrl = contact.avatarUrl,
+                    contentDescription = contact.displayName,
+                    size = 36.dp,
+                    backgroundColor = avatarBg,
+                )
                 Column {
                     Text(
                         text = contact.displayName,

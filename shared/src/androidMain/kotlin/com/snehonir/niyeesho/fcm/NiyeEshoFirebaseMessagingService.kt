@@ -1,5 +1,6 @@
 package com.snehonir.niyeesho.fcm
 
+import com.snehonir.niyeesho.core.utils.TokenManager
 import com.snehonir.niyeesho.features.messaging.data.mapper.toDomain
 import com.snehonir.niyeesho.features.messaging.data.remote.dto.FcmPayloadDto
 import com.snehonir.niyeesho.features.messaging.domain.usecase.HandleIncomingMessageUseCase
@@ -10,11 +11,13 @@ import kotlinx.serialization.json.Json
 
 class NiyeEshoFirebaseMessagingService(
     private val handleIncomingMessage: HandleIncomingMessageUseCase,
+    private val tokenManager: TokenManager,
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.Default),
     private val json: Json = Json { ignoreUnknownKeys = true },
 ) {
     fun onNewToken(token: String) {
         require(token.isNotBlank()) { "FCM token cannot be blank." }
+        tokenManager.saveFcmToken(token)
     }
 
     fun onMessageReceived(data: Map<String, String>) {

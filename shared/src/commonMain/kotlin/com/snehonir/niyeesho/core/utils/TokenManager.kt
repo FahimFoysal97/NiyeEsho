@@ -6,6 +6,9 @@ interface TokenManager {
     fun getToken(): String?
     fun saveToken(token: String)
     fun clearToken()
+
+    fun getFcmToken(): String?
+    fun saveFcmToken(token: String)
 }
 
 class TokenManagerImpl(
@@ -27,7 +30,19 @@ class TokenManagerImpl(
         settings.remove(KEY_TOKEN)
     }
 
+    override fun getFcmToken(): String? {
+        val token = settings.getStringOrNull(KEY_FCM_TOKEN)
+        logD("TokenManager", "getFcmToken() -> retrieved FCM token present: ${!token.isNullOrBlank()}")
+        return token
+    }
+
+    override fun saveFcmToken(token: String) {
+        logD("TokenManager", "saveFcmToken() -> saving FCM token")
+        settings.putString(KEY_FCM_TOKEN, token)
+    }
+
     companion object {
         private const val KEY_TOKEN = "auth_access_token"
+        private const val KEY_FCM_TOKEN = "fcm_device_token"
     }
 }

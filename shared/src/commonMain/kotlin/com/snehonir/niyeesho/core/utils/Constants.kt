@@ -1,7 +1,7 @@
 package com.snehonir.niyeesho.core.utils
 
 object Constants {
-    const val SHOP_SYNC_FOLDER = "NiyeEsho"
+    const val NIYE_ESHO_FOLDER = "NiyeEsho"
     const val PROFILE_FILE = "profile.json"
     const val METADATA_FILE = "metadata.json"
     const val CONTACTS_FILE = "contacts.json"

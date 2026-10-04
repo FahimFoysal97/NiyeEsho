@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -24,7 +25,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.snehonir.niyeesho.core.designsystem.component.AppButton
 import com.snehonir.niyeesho.core.designsystem.component.AppTopBar
 import com.snehonir.niyeesho.core.designsystem.component.ErrorView
 import com.snehonir.niyeesho.core.designsystem.theme.Spacing
@@ -68,7 +68,7 @@ fun ListDetailContent(
         Box(modifier = Modifier.weight(1f)) {
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
-                contentPadding = androidx.compose.foundation.layout.PaddingValues(Spacing.lg),
+                contentPadding = PaddingValues(start = Spacing.lg, end = Spacing.lg, top = Spacing.lg, bottom = Spacing.xxl * 3),
                 verticalArrangement = Arrangement.spacedBy(Spacing.md),
             ) {
                 item {
@@ -88,13 +88,21 @@ fun ListDetailContent(
                 if (uiState.activeItems.isNotEmpty()) {
                     item { Text(UiText.Plain("Still to buy").resolve(), style = MaterialTheme.typography.titleLarge) }
                     items(uiState.activeItems, key = { it.id }) { item ->
-                        ListItemRow(item, { onAction(ListDetailUiAction.ToggleItem(item.id, !item.checked)) })
+                        ListItemRow(
+                            item = item,
+                            onToggle = { onAction(ListDetailUiAction.ToggleItem(item.id, !item.checked)) },
+                            onDelete = { onAction(ListDetailUiAction.DeleteItem(item.id)) },
+                        )
                     }
                 }
                 if (uiState.checkedItems.isNotEmpty()) {
                     item { Text(UiText.Plain("Already in the bag").resolve(), style = MaterialTheme.typography.titleLarge) }
                     items(uiState.checkedItems, key = { it.id }) { item ->
-                        ListItemRow(item, { onAction(ListDetailUiAction.ToggleItem(item.id, false)) })
+                        ListItemRow(
+                            item = item,
+                            onToggle = { onAction(ListDetailUiAction.ToggleItem(item.id, false)) },
+                            onDelete = { onAction(ListDetailUiAction.DeleteItem(item.id)) },
+                        )
                     }
                 }
             }
@@ -139,8 +147,12 @@ fun ListDetailContent(
 
     if (uiState.isGroupSettingsVisible) {
         GroupSettingsDialog(
+            listTitle = uiState.list?.title ?: "",
             members = uiState.list?.members ?: emptyList(),
             availableContacts = uiState.availableContacts,
+            onUpdateTitle = { title -> onAction(ListDetailUiAction.UpdateList(title)) },
+            onDeleteList = { onAction(ListDetailUiAction.DeleteList) },
+            onRemoveMember = { memberId -> onAction(ListDetailUiAction.RemoveMember(memberId)) },
             onAddMembers = { members ->
                 onAction(ListDetailUiAction.AddMembersConfirmed(members))
             },

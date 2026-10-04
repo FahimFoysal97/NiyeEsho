@@ -6,6 +6,9 @@ sealed interface ListDetailUiAction {
     data class ToggleItem(val id: String, val checked: Boolean) : ListDetailUiAction
     data class DeleteItem(val id: String) : ListDetailUiAction
     data class AddItem(val name: String, val quantity: String?, val unit: String?) : ListDetailUiAction
+    data object DeleteList : ListDetailUiAction
+    data class UpdateList(val title: String) : ListDetailUiAction
+    data class RemoveMember(val memberId: String) : ListDetailUiAction
     data object InviteMember : ListDetailUiAction
     data object DismissInvite : ListDetailUiAction
     data class AddMembersConfirmed(val members: List<ListMember>) : ListDetailUiAction

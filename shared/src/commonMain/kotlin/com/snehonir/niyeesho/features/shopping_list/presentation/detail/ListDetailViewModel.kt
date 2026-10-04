@@ -13,8 +13,11 @@ import com.snehonir.niyeesho.features.shopping_list.domain.usecase.AddListItemUs
 import com.snehonir.niyeesho.features.shopping_list.domain.usecase.AddMembersToListUseCase
 import com.snehonir.niyeesho.features.shopping_list.domain.usecase.CreateShoppingListUseCase
 import com.snehonir.niyeesho.features.shopping_list.domain.usecase.DeleteListItemUseCase
+import com.snehonir.niyeesho.features.shopping_list.domain.usecase.DeleteShoppingListUseCase
 import com.snehonir.niyeesho.features.shopping_list.domain.usecase.GetShoppingListUseCase
+import com.snehonir.niyeesho.features.shopping_list.domain.usecase.RemoveMemberUseCase
 import com.snehonir.niyeesho.features.shopping_list.domain.usecase.ToggleListItemUseCase
+import com.snehonir.niyeesho.features.shopping_list.domain.usecase.UpdateShoppingListUseCase
 import com.snehonir.niyeesho.features.shopping_list.domain.usecase.WatchListItemsUseCase
 import com.snehonir.niyeesho.features.shopping_list.presentation.detail.model.ListItemUiModel
 import kotlinx.collections.immutable.toImmutableList
@@ -36,8 +39,11 @@ class ListDetailViewModel(
     private val generateInviteLink: GenerateInviteLinkUseCase,
     private val watchContacts: WatchContactsUseCase,
     private val addMembersToList: AddMembersToListUseCase,
+    private val removeMemberUseCase: RemoveMemberUseCase,
     private val createList: CreateShoppingListUseCase,
     private val addContact: AddContactFromInviteUseCase,
+    private val updateShoppingList: UpdateShoppingListUseCase,
+    private val deleteShoppingList: DeleteShoppingListUseCase,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(ListDetailUiState())
     val uiState = _uiState.asStateFlow()
@@ -104,6 +110,9 @@ class ListDetailViewModel(
             is ListDetailUiAction.ToggleItem -> mutate { toggleItem(action.id, action.checked, null) }
             is ListDetailUiAction.DeleteItem -> mutate { deleteItem(action.id) }
             is ListDetailUiAction.AddItem -> add(action)
+            is ListDetailUiAction.UpdateList -> updateList(action.title)
+            ListDetailUiAction.DeleteList -> deleteList()
+            is ListDetailUiAction.RemoveMember -> removeMember(action.memberId)
             ListDetailUiAction.InviteMember -> generateInvite()
             ListDetailUiAction.DismissInvite -> _uiState.update { it.copy(inviteLink = null) }
             is ListDetailUiAction.AddMembersConfirmed -> addMembers(action.members)
@@ -119,6 +128,36 @@ class ListDetailViewModel(
                 createGroup(action.title, action.members)
             }
             ListDetailUiAction.ErrorDismissed -> _uiState.update { it.copy(error = null) }
+        }
+    }
+
+    private fun updateList(title: String) {
+        viewModelScope.launch {
+            val list = _uiState.value.list ?: return@launch
+            updateShoppingList(list.copy(title = title)).onSuccess {
+                getList(currentListId).onSuccess { updated ->
+                    _uiState.update { it.copy(list = updated, isGroupSettingsVisible = false) }
+                }
+            }.onFailure { fail(it) }
+        }
+    }
+
+    private fun deleteList() {
+        viewModelScope.launch {
+            deleteShoppingList(currentListId).onSuccess {
+                _uiState.update { it.copy(isGroupSettingsVisible = false) }
+                _uiEvent.send(ListDetailUiEvent.ShowError("Shopping list deleted."))
+            }.onFailure { fail(it) }
+        }
+    }
+
+    private fun removeMember(memberId: String) {
+        viewModelScope.launch {
+            removeMemberUseCase(currentListId, memberId).onSuccess {
+                getList(currentListId).onSuccess { updatedList ->
+                    _uiState.update { it.copy(list = updatedList) }
+                }
+            }.onFailure { fail(it) }
         }
     }
 

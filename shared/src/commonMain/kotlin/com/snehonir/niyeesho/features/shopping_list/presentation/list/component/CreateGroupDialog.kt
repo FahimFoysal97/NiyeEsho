@@ -24,11 +24,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import com.snehonir.niyeesho.core.designsystem.component.AppTextField
 import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoCheckboxBorder
 import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoDarkSurface
 import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoGreenDarkMuted
-import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoGreenMuted
+import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoGreenLight
 import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoGreenPrimary
 import com.snehonir.niyeesho.core.designsystem.theme.Spacing
 import com.snehonir.niyeesho.core.utils.UiText
@@ -55,7 +56,8 @@ fun CreateGroupDialog(
         title = {
             Text(
                 text = "Create Group List",
-                style = MaterialTheme.typography.titleMedium,
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold,
                 color = Color.White,
             )
         },
@@ -73,15 +75,17 @@ fun CreateGroupDialog(
 
                 Text(
                     text = "Owner: 👤 Sneho Nir (You)",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = NiyeEshoGreenMuted,
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Medium,
+                    color = NiyeEshoGreenLight,
                 )
 
                 if (uniqueContacts.isNotEmpty()) {
                     Text(
                         text = "Add contacts to this group:",
-                        style = MaterialTheme.typography.labelLarge,
-                        color = NiyeEshoGreenMuted,
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.SemiBold,
+                        color = NiyeEshoGreenLight,
                     )
 
                     LazyColumn(
@@ -109,13 +113,14 @@ fun CreateGroupDialog(
                                 Column(modifier = Modifier.weight(1f)) {
                                     Text(
                                         text = contact.displayName,
-                                        style = MaterialTheme.typography.bodyMedium,
+                                        style = MaterialTheme.typography.bodyLarge,
+                                        fontWeight = FontWeight.SemiBold,
                                         color = Color.White,
                                     )
                                     Text(
                                         text = contact.email,
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = NiyeEshoGreenDarkMuted,
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        color = NiyeEshoGreenLight,
                                     )
                                 }
                                 Checkbox(
@@ -150,14 +155,28 @@ fun CreateGroupDialog(
                     }
                 },
                 enabled = title.isNotBlank(),
-                colors = ButtonDefaults.textButtonColors(contentColor = NiyeEshoGreenPrimary),
-            ) { Text("Create Group") }
+                colors = ButtonDefaults.textButtonColors(
+                    contentColor = NiyeEshoGreenPrimary,
+                    disabledContentColor = NiyeEshoGreenDarkMuted,
+                ),
+            ) {
+                Text(
+                    text = "Create Group",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                )
+            }
         },
         dismissButton = {
             TextButton(
                 onClick = onDismiss,
-                colors = ButtonDefaults.textButtonColors(contentColor = NiyeEshoGreenDarkMuted),
-            ) { Text("Cancel") }
+                colors = ButtonDefaults.textButtonColors(contentColor = NiyeEshoGreenLight),
+            ) {
+                Text(
+                    text = "Cancel",
+                    style = MaterialTheme.typography.titleMedium,
+                )
+            }
         },
     )
 }

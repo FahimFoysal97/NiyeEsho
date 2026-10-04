@@ -20,9 +20,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -44,15 +42,14 @@ import com.snehonir.niyeesho.core.designsystem.component.ErrorView
 import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoDarkBg
 import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoDarkSurface
 import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoGoldSecondary
-import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoGreenDarkMuted
 import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoGreenMuted
 import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoGreenPrimary
 import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoIndigoTertiary
 import com.snehonir.niyeesho.core.designsystem.theme.Spacing
 import com.snehonir.niyeesho.core.utils.UiText
+import com.snehonir.niyeesho.features.shopping_list.domain.entity.ListMember
 import com.snehonir.niyeesho.features.shopping_list.presentation.detail.component.InviteMemberSheet
 import com.snehonir.niyeesho.features.shopping_list.presentation.list.component.CreateGroupDialog
-import com.snehonir.niyeesho.features.shopping_list.presentation.list.component.SyncStatusIndicator
 
 @Composable
 fun DashboardContent(
@@ -84,21 +81,21 @@ fun DashboardContent(
                 ),
                 verticalArrangement = Arrangement.spacedBy(Spacing.md),
             ) {
-                // Header Row (Greeting & Plus Button)
+                // Header Row (Good morning / Sneho + Plus Button)
                 item {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        Column {
+                        Column(/*verticalArrangement = Arrangement.spacedBy(Spacing.xs / 2)*/) {
                             Text(
                                 text = "Good morning,",
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = NiyeEshoGreenMuted,
                             )
                             Text(
-                                text = uiState.userName.ifBlank { "Sneho" },
+                                text = uiState.userName.ifBlank { "User" },
                                 style = MaterialTheme.typography.headlineMedium,
                                 fontWeight = FontWeight.Bold,
                                 color = Color.White,
@@ -107,36 +104,42 @@ fun DashboardContent(
                         IconButton(
                             onClick = { onAction(DashboardUiAction.AddGroupClicked) },
                             modifier = Modifier
-                                .size(44.dp)
-                                .clip(RoundedCornerShape(12.dp))
+                                .size(Spacing.xxl)
+                                .clip(RoundedCornerShape(Spacing.md))
                                 .background(NiyeEshoGreenPrimary),
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Add,
                                 contentDescription = "Create Group",
                                 tint = Color.White,
-                                modifier = Modifier.size(24.dp),
+                                modifier = Modifier.size(Spacing.lg),
                             )
                         }
                     }
                 }
 
-                // Most Active List Hero Card
+                // Most Active Hero Card
                 mostActiveList?.let { mostActive ->
                     item {
+                        val activeMembersStr = if (mostActive.members.isNotEmpty()) {
+                            mostActive.members.joinToString(", ") { it.displayName }
+                        } else {
+                            uiState.userName.ifBlank { "Sneho" }
+                        }
+
                         Card(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .clickable { onNavigateToDetail(mostActive.id) },
-                            shape = RoundedCornerShape(14.dp),
+                            shape = RoundedCornerShape(Spacing.md),
                             colors = CardDefaults.cardColors(containerColor = NiyeEshoDarkSurface),
                             elevation = CardDefaults.cardElevation(defaultElevation = Spacing.xs),
                         ) {
                             Row(modifier = Modifier.fillMaxWidth()) {
-                                // Accent line
+                                // Left accent border
                                 Box(
                                     modifier = Modifier
-                                        .width(4.dp)
+                                        .width(Spacing.xs)
                                         .height(110.dp)
                                         .background(NiyeEshoGreenPrimary),
                                 )
@@ -146,19 +149,12 @@ fun DashboardContent(
                                         .padding(Spacing.md),
                                     verticalArrangement = Arrangement.spacedBy(Spacing.xs),
                                 ) {
-                                    Row(
-                                        modifier = Modifier.fillMaxWidth(),
-                                        horizontalArrangement = Arrangement.SpaceBetween,
-                                        verticalAlignment = Alignment.CenterVertically,
-                                    ) {
-                                        Text(
-                                            text = "MOST ACTIVE LIST",
-                                            style = MaterialTheme.typography.labelSmall,
-                                            fontWeight = FontWeight.Bold,
-                                            color = NiyeEshoGreenPrimary,
-                                        )
-                                        SyncStatusIndicator(mostActive.syncStatus)
-                                    }
+                                    Text(
+                                        text = "Most active",
+                                        style = MaterialTheme.typography.labelSmall,
+                                        fontWeight = FontWeight.Bold,
+                                        color = NiyeEshoGreenPrimary,
+                                    )
                                     Text(
                                         text = mostActive.title,
                                         style = MaterialTheme.typography.titleLarge,
@@ -175,46 +171,19 @@ fun DashboardContent(
                                         progress = { 0.4f },
                                         modifier = Modifier
                                             .fillMaxWidth()
-                                            .height(4.dp)
-                                            .clip(RoundedCornerShape(2.dp)),
+                                            .height(Spacing.xs)
+                                            .clip(RoundedCornerShape(Spacing.xs)),
                                         color = NiyeEshoGreenPrimary,
                                         trackColor = NiyeEshoDarkBg,
                                     )
+                                    Spacer(Modifier.height(Spacing.xs))
+                                    Text(
+                                        text = "${mostActive.memberCount} of 8 done",
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        color = NiyeEshoGreenMuted,
+                                    )
                                 }
                             }
-                        }
-                    }
-                }
-
-                // 2 Action Buttons Row (Invite / Share & Create Group)
-                item {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(Spacing.sm),
-                    ) {
-                        Button(
-                            onClick = { onAction(DashboardUiAction.InviteShareClicked) },
-                            modifier = Modifier.weight(1f),
-                            shape = RoundedCornerShape(12.dp),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = NiyeEshoGreenPrimary,
-                                contentColor = Color.White,
-                            ),
-                            contentPadding = PaddingValues(vertical = Spacing.sm),
-                        ) {
-                            Text("🔗 Invite / Share", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold)
-                        }
-                        Button(
-                            onClick = { onAction(DashboardUiAction.AddGroupClicked) },
-                            modifier = Modifier.weight(1f),
-                            shape = RoundedCornerShape(12.dp),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = NiyeEshoDarkSurface,
-                                contentColor = Color.White,
-                            ),
-                            contentPadding = PaddingValues(vertical = Spacing.sm),
-                        ) {
-                            Text("👥 Create Group", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold)
                         }
                     }
                 }
@@ -223,29 +192,23 @@ fun DashboardContent(
                     item { ErrorView(UiText.Plain(error), modifier = Modifier.fillMaxWidth()) }
                 }
 
+                // Other Lists
                 if (otherLists.isNotEmpty()) {
-                    item {
-                        Text(
-                            text = "ALL LISTS",
-                            style = MaterialTheme.typography.labelSmall,
-                            fontWeight = FontWeight.Bold,
-                            color = NiyeEshoGreenDarkMuted,
-                        )
-                    }
-
                     itemsIndexed(otherLists, key = { _, item -> item.id }) { index, list ->
                         val accentColor = accentColors[(index + 1) % accentColors.size]
+                        val isDone = list.memberCount == 0
+                        val progress = if (isDone) 1.0f else if (index % 2 == 0) 0.37f else 0.17f
+                        val progressLabel = if (isDone) "100%" else if (index % 2 == 0) "3/8" else "1/6"
+
                         DashboardListRowCard(
                             list = list,
                             accentColor = accentColor,
+                            avatarColors = accentColors,
+                            userName = uiState.userName,
+                            isDone = isDone,
+                            progress = progress,
+                            progressLabel = progressLabel,
                             onClick = { onNavigateToDetail(list.id) },
-                            onDelete = {
-                                if (list.id.startsWith("contact_list_")) {
-                                    onAction(DashboardUiAction.RemoveContact(list.id.removePrefix("contact_list_")))
-                                } else {
-                                    onAction(DashboardUiAction.DeleteList(list.id))
-                                }
-                            },
                         )
                     }
                 }
@@ -259,7 +222,7 @@ fun DashboardContent(
                             contentAlignment = Alignment.Center,
                         ) {
                             Text(
-                                text = "No shopping lists yet. Tap 'Create Group' to start!",
+                                text = "No shopping lists yet. Tap '+' to create one!",
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = NiyeEshoGreenMuted,
                             )
@@ -310,82 +273,104 @@ private fun ItemCreateDialog(uiState: DashboardUiState, onAction: (DashboardUiAc
 private fun DashboardListRowCard(
     list: DashboardUiModel,
     accentColor: Color,
+    avatarColors: List<Color>,
+    userName: String,
+    isDone: Boolean,
+    progress: Float,
+    progressLabel: String,
     onClick: () -> Unit,
-    onDelete: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val displayMembers = if (list.members.isNotEmpty()) {
+        list.members
+    } else {
+        listOf(ListMember("user_demo", userName.ifBlank { "User" }, null))
+    }
+
     Card(
         modifier = modifier
             .fillMaxWidth()
             .clickable(onClick = onClick),
-        shape = RoundedCornerShape(13.dp),
+        shape = RoundedCornerShape(Spacing.md),
         colors = CardDefaults.cardColors(containerColor = NiyeEshoDarkSurface),
-        elevation = CardDefaults.cardElevation(defaultElevation = Spacing.xs),
     ) {
         Row(modifier = Modifier.fillMaxWidth()) {
             // Left Accent Border
             Box(
                 modifier = Modifier
-                    .width(4.dp)
+                    .width(Spacing.xs / 2)
                     .height(72.dp)
                     .background(accentColor),
             )
-            Row(
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(Spacing.md),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
+                    .padding(horizontal = Spacing.md, vertical = Spacing.sm),
+                verticalArrangement = Arrangement.spacedBy(Spacing.xs),
             ) {
-                Column(
-                    modifier = Modifier.weight(1f),
-                    verticalArrangement = Arrangement.spacedBy(Spacing.xs),
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.Top,
                 ) {
-                    Text(
-                        text = list.title,
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.SemiBold,
-                        color = Color.White,
-                    )
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(Spacing.xs),
-                    ) {
-                        Surface(
-                            modifier = Modifier.size(20.dp),
-                            shape = CircleShape,
-                            color = accentColor,
+                    Column(verticalArrangement = Arrangement.spacedBy(Spacing.xs / 2)) {
+                        Text(
+                            text = list.title,
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.SemiBold,
+                            color = Color.White,
+                        )
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy((-4).dp),
+                            verticalAlignment = Alignment.CenterVertically,
                         ) {
-                            Box(contentAlignment = Alignment.Center) {
-                                Text(
-                                    text = list.title.firstOrNull()?.uppercaseChar()?.toString() ?: "S",
-                                    style = MaterialTheme.typography.labelSmall,
-                                    fontWeight = FontWeight.Bold,
-                                    color = Color.White,
-                                )
+                            displayMembers.take(3).forEachIndexed { idx, member ->
+                                val bg = avatarColors[idx % avatarColors.size]
+                                val initial = member.displayName.trim().firstOrNull()?.uppercaseChar()?.toString() ?: "U"
+                                Surface(
+                                    modifier = Modifier.size(Spacing.md + Spacing.xs / 2),
+                                    shape = CircleShape,
+                                    color = bg,
+                                ) {
+                                    Box(contentAlignment = Alignment.Center) {
+                                        Text(
+                                            text = initial,
+                                            style = MaterialTheme.typography.labelSmall,
+                                            fontWeight = FontWeight.Bold,
+                                            color = Color.White,
+                                        )
+                                    }
+                                }
                             }
                         }
+                    }
+
+                    if (isDone) {
+                        Icon(
+                            imageVector = Icons.Default.CheckCircle,
+                            contentDescription = "Completed",
+                            tint = NiyeEshoGreenPrimary,
+                            modifier = Modifier.size(Spacing.md),
+                        )
+                    } else {
                         Text(
-                            text = "${list.memberCount} members · ${list.updatedAtFormatted}",
+                            text = progressLabel,
                             style = MaterialTheme.typography.bodySmall,
                             color = NiyeEshoGreenMuted,
                         )
                     }
                 }
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(Spacing.xs),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    SyncStatusIndicator(list.syncStatus)
-                    IconButton(onClick = onDelete) {
-                        Icon(
-                            imageVector = Icons.Default.Delete,
-                            contentDescription = "Delete list",
-                            tint = NiyeEshoGreenDarkMuted,
-                            modifier = Modifier.size(20.dp),
-                        )
-                    }
-                }
+
+                // Full-width Progress Bar
+                LinearProgressIndicator(
+                    progress = { progress },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(Spacing.xs / 2)
+                        .clip(RoundedCornerShape(Spacing.xs)),
+                    color = accentColor,
+                    trackColor = NiyeEshoDarkBg,
+                )
             }
         }
     }

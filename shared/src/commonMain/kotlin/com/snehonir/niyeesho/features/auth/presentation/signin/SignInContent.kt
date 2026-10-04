@@ -15,6 +15,12 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -22,19 +28,21 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.snehonir.niyeesho.core.designsystem.component.ErrorView
 import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoDarkBg
 import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoDarkSurface
-import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoGreenDarkMuted
 import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoGreenLight
-import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoGreenMuted
-import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoGreenPrimary
-import com.snehonir.niyeesho.core.designsystem.theme.Spacing
-import com.snehonir.niyeesho.core.utils.UiText
 
 @Composable
 fun SignInContent(
@@ -42,6 +50,10 @@ fun SignInContent(
     onAction: (SignInUiAction) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val gradientBrush = Brush.horizontalGradient(
+        colors = listOf(NiyeEshoGreenLight, Color(0xFF34D399)),
+    )
+
     Box(
         modifier = modifier
             .fillMaxSize()
@@ -51,58 +63,86 @@ fun SignInContent(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .widthIn(max = 440.dp)
+                .widthIn(max = 400.dp)
                 .verticalScroll(rememberScrollState())
-                .padding(horizontal = Spacing.xl, vertical = Spacing.xxl),
+                .padding(horizontal = 24.dp, vertical = 32.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceBetween,
         ) {
-            // Brand Header Section
+            // Upper Logo & Hero Title Section
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = Spacing.lg),
-                horizontalAlignment = Alignment.Start,
+                    .padding(top = 16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
             ) {
+                // Logo Icon Box (60px x 60px, rounded 20dp, gradient background)
                 Box(
                     modifier = Modifier
-                        .size(56.dp)
-                        .clip(RoundedCornerShape(18.dp))
-                        .background(NiyeEshoGreenPrimary),
+                        .size(60.dp)
+                        .clip(RoundedCornerShape(20.dp))
+                        .background(
+                            Brush.linearGradient(
+                                colors = listOf(Color(0xFF22A07E), Color(0xFF146B52)),
+                            ),
+                        ),
                     contentAlignment = Alignment.Center,
                 ) {
-                    Text(
-                        text = "🛍️",
-                        style = MaterialTheme.typography.headlineMedium,
+                    Icon(
+                        imageVector = Icons.Default.ShoppingCart,
+                        contentDescription = "Niye Esho Logo",
+                        tint = Color(0xFFD1FAE5),
+                        modifier = Modifier.size(30.dp),
                     )
                 }
 
-                Spacer(Modifier.height(Spacing.xl))
+                Spacer(Modifier.height(28.dp))
 
+                // h1 Bengali Headline: নিয়ে \n এসো। (with gradient on "এসো।")
                 Text(
-                    text = "নিয়ে\nএসো।",
-                    style = MaterialTheme.typography.displaySmall,
+                    text = "নিয়ে",
+                    fontSize = 54.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.White,
+                    lineHeight = 56.sp,
+                    textAlign = TextAlign.Center,
+                )
+                Text(
+                    text = "এসো।",
+                    style = TextStyle(
+                        brush = gradientBrush,
+                        fontSize = 54.sp,
+                        fontWeight = FontWeight.Bold,
+                        lineHeight = 56.sp,
+                        textAlign = TextAlign.Center,
+                    ),
                 )
 
-                Spacer(Modifier.height(Spacing.md))
+                Spacer(Modifier.height(16.dp))
+
+                // Tagline with bold emphasis on "Your data stays in your Drive."
+                val tagText = buildAnnotatedString {
+                    append("Share lists with family and friends in real time. ")
+                    withStyle(style = SpanStyle(fontWeight = FontWeight.Bold, color = Color.White)) {
+                        append("Your data stays in your Drive.")
+                    }
+                }
 
                 Text(
-                    text = UiText.Plain(
-                        "Share lists with family and friends in real time. Your data stays in your Drive.",
-                    ).resolve(),
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = NiyeEshoGreenLight,
+                    text = tagText,
+                    fontSize = 15.sp,
+                    color = Color(0xFFB9D8C9),
+                    textAlign = TextAlign.Center,
+                    lineHeight = 22.sp,
                 )
             }
 
-            Spacer(Modifier.height(Spacing.xxl))
+            Spacer(Modifier.height(24.dp))
 
-            // Lower Action & Features Section
+            // Lower Action & Features Container
             Column(
                 modifier = Modifier.fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(Spacing.md),
+                verticalArrangement = Arrangement.spacedBy(14.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 uiState.error?.let { error ->
@@ -112,27 +152,29 @@ fun SignInContent(
                 // 3 Feature Cards Row
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(Spacing.sm),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
-                    FeatureCard(
-                        icon = "☁️",
-                        text = "Saved to\nyour Drive",
+                    RefinedFeatureCard(
+                        icon = Icons.Default.CheckCircle,
+                        title = "Saved to",
+                        subtitle = "your Drive",
                         modifier = Modifier.weight(1f),
                     )
-                    FeatureCard(
-                        icon = "⚡",
-                        text = "Real-time\nsync",
+                    RefinedFeatureCard(
+                        icon = Icons.Default.Star,
+                        title = "Real-time",
+                        subtitle = "sync",
                         modifier = Modifier.weight(1f),
                     )
-                    FeatureCard(
-                        icon = "🔒",
-                        text = "Private\nP2P",
+                    RefinedFeatureCard(
+                        icon = Icons.Default.Lock,
+                        title = "Private",
+                        subtitle = "P2P",
                         modifier = Modifier.weight(1f),
                     )
                 }
 
-                Spacer(Modifier.height(Spacing.xs))
-
+                // Google Button
                 GoogleSignInButton(
                     enabled = !uiState.isLoading,
                     onResult = { result ->
@@ -148,41 +190,57 @@ fun SignInContent(
                     modifier = Modifier.fillMaxWidth(),
                 )
 
-                Text(
-                    text = "No account needed beyond Google. We store nothing about you.",
-                    style = MaterialTheme.typography.labelMedium,
-                    color = NiyeEshoGreenDarkMuted,
-                    textAlign = TextAlign.Center,
-                )
+                // Fine print footer note
+                Row(
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(
+                        text = "No account needed beyond Google. We store nothing about you.",
+                        fontSize = 11.5.sp,
+                        color = Color(0xFF6F8F7F),
+                        textAlign = TextAlign.Center,
+                        lineHeight = 16.sp,
+                    )
+                }
             }
         }
     }
 }
 
 @Composable
-private fun FeatureCard(
-    icon: String,
-    text: String,
+private fun RefinedFeatureCard(
+    icon: ImageVector,
+    title: String,
+    subtitle: String,
     modifier: Modifier = Modifier,
 ) {
     Surface(
         modifier = modifier,
-        shape = RoundedCornerShape(12.dp),
-        color = NiyeEshoDarkSurface,
+        shape = RoundedCornerShape(14.dp),
+        color = NiyeEshoDarkSurface.copy(alpha = 0.6f),
+        border = androidx.compose.foundation.BorderStroke(1.dp, Color.White.copy(alpha = 0.07f)),
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = Spacing.md, horizontal = Spacing.xs),
+                .padding(vertical = 11.dp, horizontal = 6.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(Spacing.xs),
+            verticalArrangement = Arrangement.spacedBy(6.dp),
         ) {
-            Text(text = icon, style = MaterialTheme.typography.titleLarge)
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = Color(0xFF34D399),
+                modifier = Modifier.size(20.dp),
+            )
             Text(
-                text = text,
-                style = MaterialTheme.typography.labelMedium,
-                color = NiyeEshoGreenMuted,
+                text = "$title\n$subtitle",
+                style = MaterialTheme.typography.labelSmall,
+                color = Color(0xFF7F9D8E),
                 textAlign = TextAlign.Center,
+                fontSize = 10.5.sp,
+                lineHeight = 14.sp,
             )
         }
     }

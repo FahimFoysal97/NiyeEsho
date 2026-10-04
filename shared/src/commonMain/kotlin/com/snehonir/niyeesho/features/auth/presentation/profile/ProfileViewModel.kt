@@ -4,17 +4,31 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.snehonir.niyeesho.features.auth.domain.usecase.GetCurrentUserUseCase
 import com.snehonir.niyeesho.features.auth.domain.usecase.SignOutUseCase
+import com.snehonir.niyeesho.features.drive.domain.entity.DriveListItem
+import com.snehonir.niyeesho.features.drive.domain.entity.DriveListMember
+import com.snehonir.niyeesho.features.drive.domain.entity.DriveShoppingList
+import com.snehonir.niyeesho.features.drive.domain.repository.DriveRepository
+import com.snehonir.niyeesho.features.drive.domain.usecase.SyncFromDriveUseCase
+import com.snehonir.niyeesho.features.shopping_list.data.local.ListItemLocalDataSource
+import com.snehonir.niyeesho.features.shopping_list.data.local.ShoppingListLocalDataSource
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.datetime.Clock
 
 class ProfileViewModel(
     private val getCurrentUser: GetCurrentUserUseCase,
     private val signOutUseCase: SignOutUseCase,
+    private val syncFromDrive: SyncFromDriveUseCase,
+    private val shoppingListLocal: ShoppingListLocalDataSource,
+    private val listItemLocal: ListItemLocalDataSource,
+    private val driveRepository: DriveRepository,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(ProfileUiState())
     val uiState = _uiState.asStateFlow()
@@ -29,6 +43,7 @@ class ProfileViewModel(
     fun onAction(action: ProfileUiAction) {
         when (action) {
             ProfileUiAction.Load -> load()
+            ProfileUiAction.ManualSyncClicked -> manualSync()
             ProfileUiAction.SignOutClicked -> signOut()
             ProfileUiAction.ErrorDismissed -> _uiState.update { it.copy(error = null) }
         }
@@ -38,8 +53,58 @@ class ProfileViewModel(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
             getCurrentUser()
-                .onSuccess { user -> _uiState.update { it.copy(user = user, isLoading = false) } }
+                .onSuccess { user -> _uiState.update { it.copy(user = user, isLoading = false, lastSyncedAt = Clock.System.now()) } }
                 .onFailure { throwable -> fail(throwable) }
+        }
+    }
+
+    private fun manualSync() {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isSyncing = true) }
+            runCatching {
+                // 1. Upload unuploaded local data to cloud first
+                val localLists = shoppingListLocal.watchAll().first()
+                for (list in localLists) {
+                    val items = listItemLocal.watchForList(list.id).first()
+                    val driveList = DriveShoppingList(
+                        id = list.id,
+                        title = list.title,
+                        ownerId = list.ownerId,
+                        memberIds = list.memberIds,
+                        members = list.members.map { DriveListMember(it.uid, it.displayName, it.avatarUrl) },
+                        createdAt = list.createdAt,
+                        updatedAt = list.updatedAt,
+                        lastSyncedAt = list.lastSyncedAt,
+                        items = items.map { item ->
+                            DriveListItem(
+                                id = item.id,
+                                name = item.name,
+                                quantity = item.quantity,
+                                unit = item.unit,
+                                isChecked = item.isChecked,
+                                addedBy = item.addedBy,
+                                addedByName = item.addedByName,
+                                checkedBy = item.checkedBy,
+                                position = item.position,
+                                createdAt = item.createdAt,
+                                updatedAt = item.updatedAt,
+                            )
+                        },
+                        isArchived = list.isArchived,
+                    )
+                    driveRepository.saveList("demo_access_token", driveList).getOrThrow()
+                }
+
+                // 2. Sync from cloud
+                syncFromDrive("demo_access_token").getOrThrow()
+            }.onSuccess {
+                _uiState.update { it.copy(isSyncing = false, isSyncedSuccessfully = true, lastSyncedAt = Clock.System.now()) }
+                delay(1000)
+                _uiState.update { it.copy(isSyncedSuccessfully = false) }
+            }.onFailure { throwable ->
+                _uiState.update { it.copy(isSyncing = false) }
+                fail(throwable)
+            }
         }
     }
 

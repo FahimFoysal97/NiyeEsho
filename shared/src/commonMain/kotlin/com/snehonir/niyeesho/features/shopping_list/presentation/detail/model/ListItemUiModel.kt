@@ -14,6 +14,7 @@ data class ListItemUiModel(
     val createdAtFormatted: String,
     val checked: Boolean,
     val syncStatus: SyncStatus,
+    val isRead: Boolean,
 ) {
     companion object {
         fun fromDomain(item: ListItem): ListItemUiModel {
@@ -28,6 +29,7 @@ data class ListItemUiModel(
                 createdAtFormatted = "$dateStr at $timeStr",
                 checked = item.isChecked,
                 syncStatus = item.syncStatus,
+                isRead = item.isRead,
             )
         }
     }

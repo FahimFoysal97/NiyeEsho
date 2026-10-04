@@ -19,6 +19,7 @@ data class ListItem(
     val createdAt: Instant,
     val updatedAt: Instant,
     val syncStatus: SyncStatus = SyncStatus.Synced,
+    val isRead: Boolean = true,
 ) {
     companion object {
         fun preview() = ListItem(
@@ -34,6 +35,7 @@ data class ListItem(
             position = 0,
             createdAt = Instant.parse("2026-06-15T09:00:00Z"),
             updatedAt = Instant.parse("2026-06-15T09:22:00Z"),
+            isRead = false,
         )
     }
 }

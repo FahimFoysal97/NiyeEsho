@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Person
@@ -22,6 +23,8 @@ import com.snehonir.niyeesho.core.designsystem.component.ErrorView
 import com.snehonir.niyeesho.core.designsystem.theme.Spacing
 import com.snehonir.niyeesho.core.utils.UiText
 import com.snehonir.niyeesho.core.utils.toDisplayDate
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 
 @Composable
 fun ProfileContent(
@@ -74,7 +77,7 @@ fun ProfileContent(
                                 )
 
                                 Text(
-                                    text = user.displayName,
+                                    text = user.displayName.ifBlank { "Google User" },
                                     style = MaterialTheme.typography.headlineSmall,
                                     fontWeight = FontWeight.Bold,
                                     color = MaterialTheme.colorScheme.onSurface,
@@ -97,7 +100,7 @@ fun ProfileContent(
                                             modifier = Modifier.size(Spacing.md),
                                         )
                                         Text(
-                                            text = user.email,
+                                            text = user.email.ifBlank { "account@gmail.com" },
                                             style = MaterialTheme.typography.bodyMedium,
                                             color = MaterialTheme.colorScheme.onSurface,
                                         )
@@ -105,7 +108,7 @@ fun ProfileContent(
                                 }
 
                                 Text(
-                                    text = "Joined on ${user.createdAt.toDisplayDate()}",
+                                    text = "Signed in via Gmail",
                                     style = MaterialTheme.typography.labelMedium,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f),
                                 )
@@ -113,7 +116,79 @@ fun ProfileContent(
                         }
                     }
 
-                    // User Details Information Card
+                    // Manual Sync & Cloud Status Card
+                    item {
+                        Card(
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = MaterialTheme.shapes.medium,
+                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                            elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+                        ) {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(Spacing.lg),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                            ) {
+                                Column(
+                                    modifier = Modifier.weight(1f).padding(end = Spacing.md),
+                                    verticalArrangement = Arrangement.spacedBy(Spacing.xs),
+                                ) {
+                                    Text(
+                                        text = "Google Drive Sync",
+                                        style = MaterialTheme.typography.titleMedium,
+                                        fontWeight = FontWeight.SemiBold,
+                                        color = MaterialTheme.colorScheme.onSurface,
+                                    )
+                                    val syncedText = uiState.lastSyncedAt?.let {
+                                        val local = it.toLocalDateTime(TimeZone.currentSystemDefault())
+                                        "Last synced: ${local.hour.toString().padStart(2, '0')}:${local.minute.toString().padStart(2, '0')} (${it.toDisplayDate()})"
+                                    } ?: "Not synced yet"
+                                    Text(
+                                        text = syncedText,
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    )
+                                }
+                                Button(
+                                    onClick = { onAction(ProfileUiAction.ManualSyncClicked) },
+                                    enabled = !uiState.isSyncing && !uiState.isSyncedSuccessfully,
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = if (uiState.isSyncedSuccessfully) MaterialTheme.colorScheme.primaryContainer
+                                        else MaterialTheme.colorScheme.primary,
+                                        contentColor = if (uiState.isSyncedSuccessfully) MaterialTheme.colorScheme.primary
+                                        else MaterialTheme.colorScheme.onPrimary,
+                                    ),
+                                ) {
+                                    if (uiState.isSyncing) {
+                                        CircularProgressIndicator(
+                                            modifier = Modifier.size(18.dp),
+                                            color = MaterialTheme.colorScheme.onPrimary,
+                                            strokeWidth = 2.dp,
+                                        )
+                                    } else if (uiState.isSyncedSuccessfully) {
+                                        Row(
+                                            horizontalArrangement = Arrangement.spacedBy(Spacing.xs),
+                                            verticalAlignment = Alignment.CenterVertically,
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.Default.Check,
+                                                contentDescription = "Synced",
+                                                modifier = Modifier.size(18.dp),
+                                                tint = MaterialTheme.colorScheme.primary,
+                                            )
+                                            Text("Done", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
+                                        }
+                                    } else {
+                                        Text("Sync Now")
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    // User Details Information Card (Gmail / Auth actual data)
                     item {
                         Card(
                             modifier = Modifier.fillMaxWidth(),
@@ -126,7 +201,7 @@ fun ProfileContent(
                                 verticalArrangement = Arrangement.spacedBy(Spacing.md),
                             ) {
                                 Text(
-                                    text = "User Information",
+                                    text = "Google Account Details",
                                     style = MaterialTheme.typography.titleMedium,
                                     fontWeight = FontWeight.SemiBold,
                                     color = MaterialTheme.colorScheme.primary,
@@ -134,23 +209,23 @@ fun ProfileContent(
 
                                 ProfileDetailRow(
                                     icon = Icons.Default.Person,
-                                    label = "Full Name",
-                                    value = user.displayName,
+                                    label = "Display Name",
+                                    value = user.displayName.ifBlank { "Not provided" },
                                 )
 
                                 HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
 
                                 ProfileDetailRow(
                                     icon = Icons.Default.Email,
-                                    label = "Email Address",
-                                    value = user.email,
+                                    label = "Gmail Address",
+                                    value = user.email.ifBlank { "Not provided" },
                                 )
 
                                 HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
 
                                 ProfileDetailRow(
                                     icon = Icons.Default.AccountCircle,
-                                    label = "User ID",
+                                    label = "Firebase UID",
                                     value = user.uid,
                                 )
                             }
@@ -226,7 +301,7 @@ private fun ProfileDetailRow(
         horizontalArrangement = Arrangement.spacedBy(Spacing.md),
     ) {
         Surface(
-            shape = MaterialTheme.shapes.small,
+            shape = MaterialTheme.shapes.medium,
             color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f),
             modifier = Modifier.size(Spacing.xxl),
         ) {

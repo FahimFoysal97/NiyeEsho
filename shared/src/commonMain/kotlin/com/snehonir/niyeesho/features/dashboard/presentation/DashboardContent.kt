@@ -12,12 +12,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 import com.snehonir.niyeesho.core.designsystem.component.AppTopBar
 import com.snehonir.niyeesho.core.designsystem.component.ErrorView
 import com.snehonir.niyeesho.core.designsystem.theme.Spacing
 import com.snehonir.niyeesho.core.utils.UiText
 import com.snehonir.niyeesho.features.shopping_list.presentation.detail.component.InviteMemberSheet
 import com.snehonir.niyeesho.features.shopping_list.presentation.list.component.CreateGroupDialog
+import com.snehonir.niyeesho.features.shopping_list.presentation.list.component.SyncStatusIndicator
 
 @Composable
 fun DashboardContent(
@@ -155,32 +157,34 @@ private fun DashboardListCard(list: DashboardUiModel, onClick: () -> Unit, modif
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = Spacing.xs),
     ) {
-        Column(
-            modifier = Modifier.padding(Spacing.md),
-            verticalArrangement = Arrangement.spacedBy(Spacing.xs),
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(Spacing.md),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
         ) {
-            Text(
-                text = list.title,
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.SemiBold,
-                color = MaterialTheme.colorScheme.onSurface,
-            )
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(Spacing.xs),
             ) {
                 Text(
-                    text = "Updated: ${list.updatedAtFormatted}",
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f),
+                    text = list.title,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold,
+                    color = MaterialTheme.colorScheme.onSurface,
                 )
-                Text(
-                    text = "Created: ${list.createdAtFormatted}",
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f),
-                )
+                Surface(
+                    color = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.5f),
+                    shape = MaterialTheme.shapes.extraSmall,
+                ) {
+                    Text(
+                        text = "Updated: ${list.updatedAtFormatted}",
+                        modifier = Modifier.padding(horizontal = Spacing.xs, vertical = 2.dp),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSecondaryContainer,
+                    )
+                }
             }
+            SyncStatusIndicator(list.syncStatus)
         }
     }
 }

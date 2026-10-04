@@ -6,6 +6,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.snehonir.niyeesho.core.designsystem.theme.Spacing
 import com.snehonir.niyeesho.features.shopping_list.presentation.detail.model.ListItemUiModel
@@ -16,7 +17,10 @@ fun ListItemRow(item: ListItemUiModel, onToggle: () -> Unit, modifier: Modifier 
     Card(
         modifier = modifier.fillMaxWidth().clickable(onClick = onToggle),
         shape = MaterialTheme.shapes.medium,
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        colors = CardDefaults.cardColors(
+            containerColor = if (!item.isRead) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.25f)
+            else MaterialTheme.colorScheme.surface,
+        ),
         elevation = CardDefaults.cardElevation(defaultElevation = Spacing.xs),
     ) {
         Row(
@@ -34,12 +38,25 @@ fun ListItemRow(item: ListItemUiModel, onToggle: () -> Unit, modifier: Modifier 
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    Text(
-                        text = item.name,
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = if (item.checked) MaterialTheme.colorScheme.onSurfaceVariant
-                        else MaterialTheme.colorScheme.onSurface,
-                    )
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(Spacing.xs),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        if (!item.isRead) {
+                            Surface(
+                                modifier = Modifier.size(8.dp),
+                                shape = MaterialTheme.shapes.extraSmall,
+                                color = MaterialTheme.colorScheme.primary,
+                            ) {}
+                        }
+                        Text(
+                            text = item.name,
+                            style = MaterialTheme.typography.bodyLarge,
+                            fontWeight = if (!item.isRead) FontWeight.Bold else FontWeight.Normal,
+                            color = if (item.checked) MaterialTheme.colorScheme.onSurfaceVariant
+                            else MaterialTheme.colorScheme.onSurface,
+                        )
+                    }
                     if (item.quantityLabel.isNotBlank()) {
                         Surface(
                             color = MaterialTheme.colorScheme.primaryContainer,

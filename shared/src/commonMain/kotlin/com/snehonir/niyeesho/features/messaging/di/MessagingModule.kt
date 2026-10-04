@@ -26,10 +26,7 @@ import org.koin.dsl.module
 
 val messagingModule = module {
     singleOf(::MessagingLocalDataSourceImpl).bind<MessagingLocalDataSource>()
-    single<MessagingRemoteDataSource> {
-        if (BuildKonfig.USE_FAKE_DATA) FakeMessagingRemoteDataSource()
-        else MessagingRemoteDataSourceImpl(get())
-    }
+    single<MessagingRemoteDataSource> { MessagingRemoteDataSourceImpl(get()) }
     single { ContactMessageHandler { get<MessagingLocalDataSource>().emitIncoming(it).let { Result.success(Unit) } } }
     single { ListMessageHandler { get<MessagingLocalDataSource>().emitIncoming(it).let { Result.success(Unit) } } }
     single { ItemMessageHandler { get<MessagingLocalDataSource>().emitIncoming(it).let { Result.success(Unit) } } }

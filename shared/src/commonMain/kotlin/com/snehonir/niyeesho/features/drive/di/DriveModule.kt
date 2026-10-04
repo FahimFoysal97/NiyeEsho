@@ -20,9 +20,7 @@ import org.koin.dsl.bind
 import org.koin.dsl.module
 
 val driveModule = module {
-    single<DriveRemoteDataSource> {
-        if (BuildKonfig.USE_FAKE_DATA) FakeDriveRemoteDataSource() else DriveRemoteDataSourceImpl(get())
-    }
+    single<DriveRemoteDataSource> { DriveRemoteDataSourceImpl(get()) }
     singleOf(::DriveRepositoryImpl).bind<DriveRepository>()
     singleOf(::InitializeDriveFolderUseCase)
     singleOf(::SyncFromDriveUseCase)

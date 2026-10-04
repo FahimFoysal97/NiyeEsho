@@ -23,13 +23,7 @@ import org.koin.dsl.module
 
 val authModule = module {
     singleOf(::AuthLocalDataSourceImpl).bind<AuthLocalDataSource>()
-    single<AuthRemoteDataSource> {
-        if (BuildKonfig.USE_FAKE_DATA) {
-            FakeAuthRemoteDataSource()
-        } else {
-            AuthRemoteDataSourceImpl(Firebase.auth)
-        }
-    }
+    single<AuthRemoteDataSource> { AuthRemoteDataSourceImpl(Firebase.auth) }
     singleOf(::AuthRepositoryImpl).bind<AuthRepository>()
     singleOf(::SignInWithGoogleUseCase)
     singleOf(::SignOutUseCase)

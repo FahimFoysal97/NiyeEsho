@@ -7,7 +7,7 @@ import com.snehonir.niyeesho.features.auth.data.remote.AuthRemoteDataSource
 import com.snehonir.niyeesho.features.auth.domain.entity.AuthState
 import com.snehonir.niyeesho.features.auth.domain.entity.User
 import com.snehonir.niyeesho.features.auth.domain.repository.AuthRepository
-import com.snehonir.niyeesho.features.drive.domain.usecase.ImportUserDataFromDriveUseCase
+import com.snehonir.niyeesho.features.drive.domain.repository.DriveRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
@@ -16,7 +16,7 @@ import kotlinx.coroutines.flow.onStart
 class AuthRepositoryImpl(
     private val local: AuthLocalDataSource,
     private val remote: AuthRemoteDataSource,
-    private val importDriveData: ImportUserDataFromDriveUseCase,
+    private val driveRepository: DriveRepository,
     private val tokenManager: TokenManager,
 ) : AuthRepository {
     override fun observeAuthState(): Flow<Result<AuthState>> =
@@ -33,7 +33,7 @@ class AuthRepositoryImpl(
         remote.signInWithGoogle(idToken).onSuccess { user ->
             local.saveUser(user)
             tokenManager.saveToken(idToken)
-            importDriveData(idToken)
+            driveRepository.syncFromDrive(idToken)
         }
 
     override suspend fun signOut(): Result<Unit> =

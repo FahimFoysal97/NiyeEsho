@@ -5,18 +5,14 @@ import com.snehonir.niyeesho.features.contacts.data.mapper.toContact
 import com.snehonir.niyeesho.features.contacts.data.mapper.toDriveContact
 import com.snehonir.niyeesho.features.contacts.domain.entity.Contact
 import com.snehonir.niyeesho.features.contacts.domain.repository.ContactsRepository
-import com.snehonir.niyeesho.features.drive.domain.usecase.GetProfileFromDriveUrlUseCase
-import com.snehonir.niyeesho.features.drive.domain.usecase.ReadContactsFromDriveUseCase
-import com.snehonir.niyeesho.features.drive.domain.usecase.SaveContactsToDriveUseCase
+import com.snehonir.niyeesho.features.drive.domain.repository.DriveRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 
 class ContactsRepositoryImpl(
     private val local: ContactsLocalDataSource,
-    private val readContacts: ReadContactsFromDriveUseCase,
-    private val saveContacts: SaveContactsToDriveUseCase,
-    private val getProfile: GetProfileFromDriveUrlUseCase,
+    private val driveRepository: DriveRepository,
 ) : ContactsRepository {
     override fun watchContacts(): Flow<Result<List<Contact>>> =
         local.watchAll().map { Result.success(it) }.catch { emit(Result.failure(it)) }
@@ -41,7 +37,7 @@ class ContactsRepositoryImpl(
     override suspend fun refreshContactToken(uid: String): Result<Contact> = runCatching {
         val contact = local.getAll().firstOrNull { it.uid == uid }
             ?: error("Contact not found.")
-        val profile = getProfile(contact.profileDriveUrl).getOrThrow()
+        val profile = driveRepository.getProfileFromDriveUrl(contact.profileDriveUrl).getOrThrow()
         val refreshed = contact.copy(
             displayName = profile.displayName,
             email = profile.email,
@@ -54,8 +50,8 @@ class ContactsRepositoryImpl(
     }
 
     override suspend fun syncWithDrive(accessToken: String): Result<Unit> = runCatching {
-        val remoteContacts = readContacts(accessToken).getOrThrow().map { it.toContact() }
+        val remoteContacts = driveRepository.readContacts(accessToken).getOrThrow().map { it.toContact() }
         local.upsertAll(remoteContacts)
-        saveContacts(accessToken, local.getAll().map { it.toDriveContact() }).getOrThrow()
+        driveRepository.saveContacts(accessToken, local.getAll().map { it.toDriveContact() }).getOrThrow()
     }
 }

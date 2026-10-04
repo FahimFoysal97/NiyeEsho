@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.russhwolf.settings.Settings
 import com.snehonir.niyeesho.core.utils.TokenManager
 import com.snehonir.niyeesho.core.utils.logD
+import com.snehonir.niyeesho.features.contacts.domain.usecase.RemoveContactUseCase
 import com.snehonir.niyeesho.features.contacts.domain.usecase.WatchContactsUseCase
 import com.snehonir.niyeesho.features.drive.domain.entity.DriveListItem
 import com.snehonir.niyeesho.features.drive.domain.entity.DriveListMember
@@ -17,6 +18,7 @@ import com.snehonir.niyeesho.features.shopping_list.data.local.ListItemLocalData
 import com.snehonir.niyeesho.features.shopping_list.data.local.ShoppingListLocalDataSource
 import com.snehonir.niyeesho.features.shopping_list.domain.entity.ListMember
 import com.snehonir.niyeesho.features.shopping_list.domain.usecase.CreateShoppingListUseCase
+import com.snehonir.niyeesho.features.shopping_list.domain.usecase.DeleteShoppingListUseCase
 import com.snehonir.niyeesho.features.shopping_list.domain.usecase.GetShoppingListUseCase
 import com.snehonir.niyeesho.features.shopping_list.domain.usecase.WatchShoppingListsUseCase
 import kotlinx.collections.immutable.toImmutableList
@@ -42,6 +44,8 @@ class DashboardViewModel(
     private val listItemLocal: ListItemLocalDataSource,
     private val driveRepository: DriveRepository,
     private val tokenManager: TokenManager,
+    private val deleteShoppingList: DeleteShoppingListUseCase,
+    private val removeContactUseCase: RemoveContactUseCase,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(DashboardUiState())
     val uiState = _uiState.asStateFlow()
@@ -108,41 +112,43 @@ class DashboardViewModel(
             if (needs24HourSync || isScheduled1AmDue) {
                 logD("DashboardViewModel", "Sync required (Daily 1:00 AM schedule or 24h rule). Performing sync...")
                 val localLists = shoppingListLocal.watchAll().first()
-                val token = tokenManager.getToken() ?: "demo_access_token"
-                for (list in localLists) {
-                    val items = listItemLocal.watchForList(list.id).first()
-                    val driveList = DriveShoppingList(
-                        id = list.id,
-                        title = list.title,
-                        ownerId = list.ownerId,
-                        memberIds = list.memberIds,
-                        members = list.members.map { DriveListMember(it.uid, it.displayName, it.avatarUrl) },
-                        createdAt = list.createdAt,
-                        updatedAt = list.updatedAt,
-                        lastSyncedAt = list.lastSyncedAt,
-                        items = items.map { item ->
-                            DriveListItem(
-                                id = item.id,
-                                name = item.name,
-                                quantity = item.quantity,
-                                unit = item.unit,
-                                isChecked = item.isChecked,
-                                addedBy = item.addedBy,
-                                addedByName = item.addedByName,
-                                checkedBy = item.checkedBy,
-                                position = item.position,
-                                createdAt = item.createdAt,
-                                updatedAt = item.updatedAt,
-                            )
-                        },
-                        isArchived = list.isArchived,
-                    )
-                    driveRepository.saveList(token, driveList).getOrThrow()
+                val token = tokenManager.getToken()
+                if (!token.isNullOrBlank()) {
+                    for (list in localLists) {
+                        val items = listItemLocal.watchForList(list.id).first()
+                        val driveList = DriveShoppingList(
+                            id = list.id,
+                            title = list.title,
+                            ownerId = list.ownerId,
+                            memberIds = list.memberIds,
+                            members = list.members.map { DriveListMember(it.uid, it.displayName, it.avatarUrl) },
+                            createdAt = list.createdAt,
+                            updatedAt = list.updatedAt,
+                            lastSyncedAt = list.lastSyncedAt,
+                            items = items.map { item ->
+                                DriveListItem(
+                                    id = item.id,
+                                    name = item.name,
+                                    quantity = item.quantity,
+                                    unit = item.unit,
+                                    isChecked = item.isChecked,
+                                    addedBy = item.addedBy,
+                                    addedByName = item.addedByName,
+                                    checkedBy = item.checkedBy,
+                                    position = item.position,
+                                    createdAt = item.createdAt,
+                                    updatedAt = item.updatedAt,
+                                )
+                            },
+                            isArchived = list.isArchived,
+                        )
+                        driveRepository.saveList(token, driveList).getOrThrow()
+                    }
+                    val remoteLists = syncFromDrive(token).getOrThrow()
+                    val syncTime = remoteLists.maxOfOrNull { it.lastSyncedAt ?: it.updatedAt }?.toEpochMilliseconds() ?: nowEpoch
+                    settings.putLong("last_synced_at", syncTime)
+                    logD("DashboardViewModel", "Daily 1:00 AM / 24h sync completed successfully at $syncTime")
                 }
-                syncFromDrive(token).getOrThrow()
-                val syncTime = Clock.System.now().toEpochMilliseconds()
-                settings.putLong("last_synced_at", syncTime)
-                logD("DashboardViewModel", "Daily 1:00 AM / 24h sync completed successfully at $syncTime")
             }
         }.onFailure {
             logD("DashboardViewModel", "Scheduled daily sync failed: ${it.message}")
@@ -161,12 +167,26 @@ class DashboardViewModel(
             DashboardUiAction.CreateDismissed -> _uiState.update { it.copy(isCreateDialogVisible = false) }
             is DashboardUiAction.CreateConfirmed -> create(action.title, action.ownerId, action.members)
             is DashboardUiAction.ListClicked -> handleListClick(action.id)
+            is DashboardUiAction.DeleteList -> deleteList(action.id)
+            is DashboardUiAction.RemoveContact -> removeContact(action.uid)
             DashboardUiAction.OpenProfile -> viewModelScope.launch {
                 logD("DashboardViewModel", "Opening profile event")
                 _uiEvent.send(DashboardUiEvent.NavigateToProfile)
             }
             DashboardUiAction.SyncNowClicked -> {}
             DashboardUiAction.ErrorDismissed -> _uiState.update { it.copy(error = null) }
+        }
+    }
+
+    private fun deleteList(id: String) {
+        viewModelScope.launch {
+            deleteShoppingList(id).onFailure { fail(it) }
+        }
+    }
+
+    private fun removeContact(uid: String) {
+        viewModelScope.launch {
+            removeContactUseCase(uid).onFailure { fail(it) }
         }
     }
 

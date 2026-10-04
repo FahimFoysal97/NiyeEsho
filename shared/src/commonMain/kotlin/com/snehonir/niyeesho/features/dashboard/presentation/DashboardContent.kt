@@ -7,6 +7,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -41,8 +42,8 @@ fun DashboardContent(
         )
         Box(modifier = Modifier.weight(1f)) {
             LazyColumn(
-                modifier = Modifier.fillMaxSize().padding(horizontal = Spacing.lg),
-                contentPadding = PaddingValues(vertical = Spacing.md),
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(start = Spacing.lg, end = Spacing.lg, top = Spacing.md, bottom = Spacing.xxl * 3),
                 verticalArrangement = Arrangement.spacedBy(Spacing.md),
             ) {
                 // User Greeting Header Item in the Single List
@@ -105,7 +106,17 @@ fun DashboardContent(
 
                 // Unified list items (groups and contacts combined in single list)
                 items(uiState.lists, key = { it.id }) { list ->
-                    DashboardListCard(list = list, onClick = { onNavigateToDetail(list.id) })
+                    DashboardListCard(
+                        list = list,
+                        onClick = { onNavigateToDetail(list.id) },
+                        onDelete = {
+                            if (list.id.startsWith("contact_list_")) {
+                                onAction(DashboardUiAction.RemoveContact(list.id.removePrefix("contact_list_")))
+                            } else {
+                                onAction(DashboardUiAction.DeleteList(list.id))
+                            }
+                        },
+                    )
                 }
 
                 if (uiState.lists.isEmpty() && !uiState.isLoading) {
@@ -150,9 +161,14 @@ private fun ItemCreateDialog(uiState: DashboardUiState, onAction: (DashboardUiAc
 }
 
 @Composable
-private fun DashboardListCard(list: DashboardUiModel, onClick: () -> Unit, modifier: Modifier = Modifier) {
+private fun DashboardListCard(
+    list: DashboardUiModel,
+    onClick: () -> Unit,
+    onDelete: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     Card(
-        modifier = modifier.fillMaxWidth().clickable(onClick = onClick),
+        modifier = modifier.fillMaxWidth(),
         shape = MaterialTheme.shapes.medium,
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = Spacing.xs),
@@ -163,7 +179,7 @@ private fun DashboardListCard(list: DashboardUiModel, onClick: () -> Unit, modif
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Column(
-                modifier = Modifier.weight(1f),
+                modifier = Modifier.weight(1f).clickable(onClick = onClick),
                 verticalArrangement = Arrangement.spacedBy(Spacing.xs),
             ) {
                 Text(
@@ -184,7 +200,19 @@ private fun DashboardListCard(list: DashboardUiModel, onClick: () -> Unit, modif
                     )
                 }
             }
-            SyncStatusIndicator(list.syncStatus)
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(Spacing.xs),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                SyncStatusIndicator(list.syncStatus)
+                IconButton(onClick = onDelete) {
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = "Delete list or contact",
+                        tint = MaterialTheme.colorScheme.error,
+                    )
+                }
+            }
         }
     }
 }

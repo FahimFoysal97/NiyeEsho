@@ -4,6 +4,8 @@ import com.snehonir.niyeesho.features.shopping_list.domain.entity.ListMember
 
 sealed interface DashboardUiAction {
     data class ListClicked(val id: String) : DashboardUiAction
+    data class DeleteList(val id: String) : DashboardUiAction
+    data class RemoveContact(val uid: String) : DashboardUiAction
     data object FabClicked : DashboardUiAction
     data object FabMenuDismissed : DashboardUiAction
     data object AddGroupClicked : DashboardUiAction

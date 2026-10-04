@@ -71,6 +71,9 @@ fun ContactsContent(
                             onClick = {
                                 onAction(ContactsUiAction.ContactSelected(contact))
                             },
+                            onDelete = {
+                                onAction(ContactsUiAction.RemoveContact(contact.uid))
+                            },
                         )
                     }
                 }

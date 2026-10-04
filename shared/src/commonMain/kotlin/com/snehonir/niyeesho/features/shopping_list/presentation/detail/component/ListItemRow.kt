@@ -2,6 +2,8 @@ package com.snehonir.niyeesho.features.shopping_list.presentation.detail.compone
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -13,9 +15,14 @@ import com.snehonir.niyeesho.features.shopping_list.presentation.detail.model.Li
 import com.snehonir.niyeesho.features.shopping_list.presentation.list.component.SyncStatusIndicator
 
 @Composable
-fun ListItemRow(item: ListItemUiModel, onToggle: () -> Unit, modifier: Modifier = Modifier) {
+fun ListItemRow(
+    item: ListItemUiModel,
+    onToggle: () -> Unit,
+    onDelete: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     Card(
-        modifier = modifier.fillMaxWidth().clickable(onClick = onToggle),
+        modifier = modifier.fillMaxWidth(),
         shape = MaterialTheme.shapes.medium,
         colors = CardDefaults.cardColors(
             containerColor = if (!item.isRead) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.25f)
@@ -30,7 +37,7 @@ fun ListItemRow(item: ListItemUiModel, onToggle: () -> Unit, modifier: Modifier 
         ) {
             Checkbox(checked = item.checked, onCheckedChange = { onToggle() })
             Column(
-                modifier = Modifier.weight(1f),
+                modifier = Modifier.weight(1f).clickable(onClick = onToggle),
                 verticalArrangement = Arrangement.spacedBy(Spacing.xs),
             ) {
                 Row(
@@ -39,6 +46,7 @@ fun ListItemRow(item: ListItemUiModel, onToggle: () -> Unit, modifier: Modifier 
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Row(
+                        modifier = Modifier.weight(1f),
                         horizontalArrangement = Arrangement.spacedBy(Spacing.xs),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
@@ -57,16 +65,29 @@ fun ListItemRow(item: ListItemUiModel, onToggle: () -> Unit, modifier: Modifier 
                             else MaterialTheme.colorScheme.onSurface,
                         )
                     }
-                    if (item.quantityLabel.isNotBlank()) {
-                        Surface(
-                            color = MaterialTheme.colorScheme.primaryContainer,
-                            shape = MaterialTheme.shapes.extraSmall,
-                        ) {
-                            Text(
-                                text = item.quantityLabel,
-                                modifier = Modifier.padding(horizontal = Spacing.xs, vertical = 2.dp),
-                                style = MaterialTheme.typography.labelMedium,
-                                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(Spacing.xs),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        if (item.quantityLabel.isNotBlank()) {
+                            Surface(
+                                color = MaterialTheme.colorScheme.primaryContainer,
+                                shape = MaterialTheme.shapes.extraSmall,
+                            ) {
+                                Text(
+                                    text = item.quantityLabel,
+                                    modifier = Modifier.padding(horizontal = Spacing.xs, vertical = 2.dp),
+                                    style = MaterialTheme.typography.labelMedium,
+                                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                )
+                            }
+                        }
+                        IconButton(onClick = onDelete, modifier = Modifier.size(32.dp)) {
+                            Icon(
+                                imageVector = Icons.Default.Delete,
+                                contentDescription = "Delete item",
+                                tint = MaterialTheme.colorScheme.error,
+                                modifier = Modifier.size(18.dp),
                             )
                         }
                     }

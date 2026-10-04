@@ -76,17 +76,24 @@ fun ListDetailContent(
                         Text(
                             text = uiState.list?.title ?: UiText.Plain("Shopping list").resolve(),
                             style = MaterialTheme.typography.headlineMedium,
+                            color = MaterialTheme.colorScheme.onBackground,
                         )
                         Text(
                             text = UiText.Plain("Add what you need before heading home.").resolve(),
                             style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            color = MaterialTheme.colorScheme.onSurface,
                         )
                     }
                 }
                 uiState.error?.let { message -> item { ErrorView(UiText.Plain(message)) } }
                 if (uiState.activeItems.isNotEmpty()) {
-                    item { Text(UiText.Plain("Still to buy").resolve(), style = MaterialTheme.typography.titleLarge) }
+                    item {
+                        Text(
+                            text = UiText.Plain("Still to buy").resolve(),
+                            style = MaterialTheme.typography.titleLarge,
+                            color = MaterialTheme.colorScheme.primary,
+                        )
+                    }
                     items(uiState.activeItems, key = { it.id }) { item ->
                         ListItemRow(
                             item = item,
@@ -96,7 +103,13 @@ fun ListDetailContent(
                     }
                 }
                 if (uiState.checkedItems.isNotEmpty()) {
-                    item { Text(UiText.Plain("Already in the bag").resolve(), style = MaterialTheme.typography.titleLarge) }
+                    item {
+                        Text(
+                            text = UiText.Plain("Already in the bag").resolve(),
+                            style = MaterialTheme.typography.titleLarge,
+                            color = MaterialTheme.colorScheme.primary,
+                        )
+                    }
                     items(uiState.checkedItems, key = { it.id }) { item ->
                         ListItemRow(
                             item = item,

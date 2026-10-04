@@ -7,21 +7,57 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 
 private val LightColors = lightColorScheme(
-    primary = NiyeEshoPrimary,
-    onPrimary = NiyeEshoOnPrimary,
-    secondary = NiyeEshoSecondary,
-    surface = NiyeEshoSurface,
-    background = NiyeEshoBackground,
-    onSurface = NiyeEshoOnSurface,
-    tertiary = NiyeEshoTertiary,
-    error = NiyeEshoError,
+    primary = TealPrimaryLight,
+    onPrimary = OnTealPrimaryLight,
+    primaryContainer = TealPrimaryContainerLight,
+    onPrimaryContainer = OnTealPrimaryContainerLight,
+    secondary = AmberSecondaryLight,
+    onSecondary = OnAmberSecondaryLight,
+    secondaryContainer = AmberSecondaryContainerLight,
+    onSecondaryContainer = OnAmberSecondaryContainerLight,
+    tertiary = IndigoTertiaryLight,
+    onTertiary = OnIndigoTertiaryLight,
+    tertiaryContainer = IndigoTertiaryContainerLight,
+    onTertiaryContainer = OnIndigoTertiaryContainerLight,
+    background = SlateBackgroundLight,
+    onBackground = OnSlateBackgroundLight,
+    surface = SlateSurfaceLight,
+    onSurface = OnSlateSurfaceLight,
+    surfaceVariant = SlateSurfaceVariantLight,
+    onSurfaceVariant = OnSlateSurfaceVariantLight,
+    outline = OutlineLight,
+    outlineVariant = OutlineVariantLight,
+    error = ErrorLight,
+    onError = OnErrorLight,
+    errorContainer = ErrorContainerLight,
+    onErrorContainer = OnErrorContainerLight,
 )
 
 private val DarkColors = darkColorScheme(
-    primary = ColorTokens.DarkPrimary,
-    secondary = ColorTokens.DarkSecondary,
-    tertiary = NiyeEshoTertiary,
-    error = NiyeEshoError,
+    primary = MintPrimaryDark,
+    onPrimary = OnMintPrimaryDark,
+    primaryContainer = TealPrimaryContainerDark,
+    onPrimaryContainer = OnTealPrimaryContainerDark,
+    secondary = AmberSecondaryDark,
+    onSecondary = OnAmberSecondaryDark,
+    secondaryContainer = AmberSecondaryContainerDark,
+    onSecondaryContainer = OnAmberSecondaryContainerDark,
+    tertiary = IndigoTertiaryDark,
+    onTertiary = OnIndigoTertiaryDark,
+    tertiaryContainer = IndigoTertiaryContainerDark,
+    onTertiaryContainer = OnIndigoTertiaryContainerDark,
+    background = SlateBackgroundDark,
+    onBackground = OnSlateBackgroundDark,
+    surface = SlateSurfaceDark,
+    onSurface = OnSlateSurfaceDark,
+    surfaceVariant = SlateSurfaceVariantDark,
+    onSurfaceVariant = OnSlateSurfaceVariantDark,
+    outline = OutlineDark,
+    outlineVariant = OutlineVariantDark,
+    error = ErrorDark,
+    onError = OnErrorDark,
+    errorContainer = ErrorContainerDark,
+    onErrorContainer = OnErrorContainerDark,
 )
 
 @Composable
@@ -35,9 +71,4 @@ fun NiyeEshoTheme(
         shapes = NiyeEshoShapes,
         content = content,
     )
-}
-
-private object ColorTokens {
-    val DarkPrimary = NiyeEshoPrimary.copy(alpha = 0.9f)
-    val DarkSecondary = NiyeEshoSecondary.copy(alpha = 0.9f)
 }

@@ -12,8 +12,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
-import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoGradientBottom
-import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoGradientTop
 import com.snehonir.niyeesho.core.designsystem.theme.Spacing
 
 @Composable
@@ -28,7 +26,7 @@ fun BrandPageHeader(
             .fillMaxWidth()
             .background(
                 brush = Brush.horizontalGradient(
-                    colors = listOf(NiyeEshoGradientBottom, NiyeEshoGradientTop),
+                    colors = listOf(MaterialTheme.colorScheme.primary, MaterialTheme.colorScheme.primaryContainer),
                 ),
                 shape = RoundedCornerShape(Spacing.lg),
             )
@@ -47,7 +45,7 @@ fun BrandPageHeader(
             Text(
                 text = subtitle,
                 style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.82f),
+                color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.9f),
             )
         }
         trailing?.invoke()

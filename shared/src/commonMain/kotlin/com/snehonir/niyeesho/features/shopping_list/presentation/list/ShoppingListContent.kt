@@ -56,10 +56,16 @@ fun ShoppingListContent(
                 )
                 uiState.error?.let { ErrorView(UiText.Plain(it), modifier = Modifier.fillMaxWidth()) }
                 if (uiState.lists.isEmpty()) {
-                    Text(
-                        text = "No lists yet. Create one for your next trip.",
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
+                    Box(
+                        modifier = Modifier.fillMaxWidth().padding(Spacing.xxl),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Text(
+                            text = "No lists yet. Create one for your next trip.",
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.onSurface,
+                        )
+                    }
                 } else {
                     LazyColumn(
                         modifier = Modifier.fillMaxWidth(),

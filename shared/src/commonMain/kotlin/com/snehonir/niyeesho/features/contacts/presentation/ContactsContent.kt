@@ -58,7 +58,11 @@ fun ContactsContent(
                     modifier = Modifier.fillMaxWidth().weight(1f),
                     contentAlignment = Alignment.Center,
                 ) {
-                    Text("No contacts yet. Tap 'Create Group List' to start!", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text(
+                        text = "No contacts yet. Tap 'Create Group List' to start!",
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onSurface,
+                    )
                 }
             } else {
                 LazyColumn(

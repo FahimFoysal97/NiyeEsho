@@ -71,7 +71,7 @@ fun DashboardContent(
                                     Text(
                                         text = "Bari ferar age, shob mone koriye dei.",
                                         style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f),
+                                        color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.85f),
                                     )
                                 }
                             }
@@ -88,12 +88,20 @@ fun DashboardContent(
                         Button(
                             onClick = { onAction(DashboardUiAction.InviteShareClicked) },
                             modifier = Modifier.weight(1f),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.primary,
+                                contentColor = MaterialTheme.colorScheme.onPrimary,
+                            ),
                         ) {
                             Text("🔗 Invite / Share")
                         }
                         Button(
                             onClick = { onAction(DashboardUiAction.AddGroupClicked) },
                             modifier = Modifier.weight(1f),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.secondary,
+                                contentColor = MaterialTheme.colorScheme.onSecondary,
+                            ),
                         ) {
                             Text("👥 Create Group")
                         }
@@ -189,7 +197,7 @@ private fun DashboardListCard(
                     color = MaterialTheme.colorScheme.onSurface,
                 )
                 Surface(
-                    color = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.5f),
+                    color = MaterialTheme.colorScheme.secondaryContainer,
                     shape = MaterialTheme.shapes.extraSmall,
                 ) {
                     Text(

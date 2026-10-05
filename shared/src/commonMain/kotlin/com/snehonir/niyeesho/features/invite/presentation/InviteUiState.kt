@@ -1,6 +1,6 @@
 package com.snehonir.niyeesho.features.invite.presentation
 
-enum class ScannerStep { SCAN, PASTE, CONNECTED }
+enum class ScannerStep { SCAN, CONNECTED }
 
 data class InviteUiState(
     val inviteLink: String = "niyeesho.app/invite?uid=user_demo&token=demo_token",

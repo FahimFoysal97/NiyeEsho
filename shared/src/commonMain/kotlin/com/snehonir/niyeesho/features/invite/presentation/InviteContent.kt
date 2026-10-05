@@ -34,6 +34,7 @@ import com.snehonir.niyeesho.features.contacts.presentation.component.QrCodeDisp
 import com.snehonir.niyeesho.features.contacts.presentation.component.rememberQrImageHelper
 import niyeesho.shared.generated.resources.Res
 import niyeesho.shared.generated.resources.content_copy
+import niyeesho.shared.generated.resources.content_paste
 import niyeesho.shared.generated.resources.download
 import org.jetbrains.compose.resources.painterResource
 
@@ -360,69 +361,64 @@ fun InviteContent(
                                 HorizontalDivider(modifier = Modifier.weight(1f), color = NiyeEshoDarkSurface)
                             }
 
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .clip(RoundedCornerShape(14.dp))
-                                    .background(Color(0xFF111F18))
-                                    .border(1.5.dp, Color(0xFF2A3D32), RoundedCornerShape(14.dp))
-                                    .clickable { onAction(InviteUiAction.SwitchToPasteLink) }
-                                    .padding(horizontal = 12.dp, vertical = 12.dp),
-                            ) {
-                                Text("niyeesho.app/i/...", color = Color(0xFF4A6358), style = MaterialTheme.typography.bodyMedium)
-                            }
-
-                            Button(
-                                onClick = { },
+                            // Read-only link box (.lf) with Paste button on the right
+                            val hasLink = uiState.pastedLink.isNotBlank()
+                            Surface(
                                 modifier = Modifier.fillMaxWidth(),
-                                shape = RoundedCornerShape(13.dp),
-                                colors = ButtonDefaults.buttonColors(containerColor = NiyeEshoDarkSurface, contentColor = Color(0xFF4A6358)),
-                                contentPadding = PaddingValues(12.dp),
+                                shape = RoundedCornerShape(14.dp),
+                                color = Color(0xFF111F18),
+                                border = BorderStroke(1.5.dp, if (hasLink) NiyeEshoGreenPrimary else Color(0xFF2A3D32)),
                             ) {
-                                Text("Connect", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
-                            }
-                        }
-
-                        ScannerStep.PASTE -> {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .weight(1f),
-                                contentAlignment = Alignment.Center,
-                            ) {
-                                Column(
-                                    horizontalAlignment = Alignment.CenterHorizontally,
-                                    verticalArrangement = Arrangement.spacedBy(12.dp),
-                                    modifier = Modifier.fillMaxWidth(),
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(start = 14.dp, top = 6.dp, bottom = 6.dp, end = 6.dp),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.SpaceBetween,
                                 ) {
-                                    OutlinedTextField(
-                                        value = uiState.pastedLink,
-                                        onValueChange = { onAction(InviteUiAction.PastedLinkClicked(it)) },
-                                        modifier = Modifier.fillMaxWidth(),
-                                        placeholder = { Text("niyeesho.app/i/...", color = Color(0xFF4A6358)) },
-                                        singleLine = true,
-                                        shape = RoundedCornerShape(14.dp),
-                                        colors = OutlinedTextFieldDefaults.colors(
-                                            unfocusedContainerColor = Color(0xFF111F18),
-                                            focusedContainerColor = Color(0xFF111F18),
-                                            unfocusedBorderColor = Color(0xFF1B8A6B),
-                                            focusedBorderColor = Color(0xFF1B8A6B),
-                                            unfocusedTextColor = Color.White,
-                                            focusedTextColor = Color.White,
-                                        ),
+                                    Text(
+                                        text = if (hasLink) uiState.pastedLink else "niyeesho.app/i/...",
+                                        color = if (hasLink) Color.White else Color(0xFF4A6358),
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        maxLines = 1,
+                                        modifier = Modifier.weight(1f),
                                     )
 
-                                    val isValidLink = uiState.pastedLink.isNotBlank() && uiState.pastedLink.contains("niyeesho")
-                                    Text(
-                                        text = if (uiState.pastedLink.isBlank()) "" else if (isValidLink) "Link looks good" else "That doesn't look like a Niye Esho invite link",
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = if (isValidLink) Color(0xFF34D399) else Color(0xFFFF8083),
-                                        textAlign = TextAlign.Center,
-                                    )
+                                    Surface(
+                                        onClick = {
+                                            val clipboardText = clipboardManager.getText()?.text.orEmpty()
+                                            onAction(InviteUiAction.PastedLinkClicked(clipboardText))
+                                        },
+                                        shape = RoundedCornerShape(9.dp),
+                                        color = Color(0xFF1F2D24),
+                                    ) {
+                                        Box(
+                                            modifier = Modifier.padding(8.dp),
+                                            contentAlignment = Alignment.Center,
+                                        ) {
+                                            Icon(painterResource(Res.drawable.content_paste), contentDescription = "Paste", modifier = Modifier.size(18.dp), tint = Color(0xFF34D399))
+                                        }
+                                    }
                                 }
                             }
 
                             val isValidLink = uiState.pastedLink.isNotBlank() && uiState.pastedLink.contains("niyeesho")
+                            if (uiState.pastedLink.isBlank()) {
+                                Text(
+                                    text = ".",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = Color.Transparent,
+                                )
+                            } else {
+                                Text(
+                                    text = if (isValidLink) "Link looks good" else "That doesn't look like a Niye Esho invite link",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = if (isValidLink) Color(0xFF34D399) else Color(0xFFFF8083),
+                                    textAlign = TextAlign.Center,
+                                    fontWeight = FontWeight.SemiBold,
+                                )
+                            }
+
                             Button(
                                 onClick = { if (isValidLink) onAction(InviteUiAction.ConnectInviteClicked) },
                                 modifier = Modifier.fillMaxWidth(),

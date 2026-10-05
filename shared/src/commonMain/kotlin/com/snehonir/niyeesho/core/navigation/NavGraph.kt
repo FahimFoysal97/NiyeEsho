@@ -50,7 +50,7 @@ fun NiyeEshoNavGraph(
         composable(NavRoute.Contacts.route) {
             destinations.contacts()
         }
-        composable(NavRoute.Scan.route) {
+        composable(NavRoute.Invite.route) {
             destinations.invite()
         }
         composable(NavRoute.Profile.route) {

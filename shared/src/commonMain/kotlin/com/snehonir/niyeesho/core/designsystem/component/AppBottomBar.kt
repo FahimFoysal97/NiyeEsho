@@ -12,13 +12,13 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -28,6 +28,9 @@ import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoDarkSurface
 import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoGreenDarkMuted
 import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoGreenPrimary
 import com.snehonir.niyeesho.core.designsystem.theme.Spacing
+import niyeesho.shared.generated.resources.Res
+import niyeesho.shared.generated.resources.person_add
+import org.jetbrains.compose.resources.painterResource
 
 enum class AppNavTab {
     LISTS, CONTACTS, INVITE, PROFILE
@@ -66,7 +69,7 @@ fun AppBottomBar(
             )
             NavItem(
                 label = "Invite",
-                icon = Icons.Default.Share,
+                icon = painterResource(Res.drawable.person_add),
                 isSelected = currentTab == AppNavTab.INVITE,
                 onClick = { onTabSelected(AppNavTab.INVITE) },
             )
@@ -83,7 +86,7 @@ fun AppBottomBar(
 @Composable
 private fun NavItem(
     label: String,
-    icon: ImageVector,
+    icon: Any,
     isSelected: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -98,12 +101,24 @@ private fun NavItem(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(2.dp),
     ) {
-        Icon(
-            imageVector = icon,
-            contentDescription = label,
-            tint = if (isSelected) activeColor else inactiveColor,
-            modifier = Modifier.size(22.dp),
-        )
+        when (icon) {
+            is ImageVector -> {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = label,
+                    tint = if (isSelected) activeColor else inactiveColor,
+                    modifier = Modifier.size(22.dp),
+                )
+            }
+            is Painter -> {
+                Icon(
+                    painter = icon,
+                    contentDescription = label,
+                    tint = if (isSelected) activeColor else inactiveColor,
+                    modifier = Modifier.size(22.dp),
+                )
+            }
+        }
         Text(
             text = label,
             fontSize = 10.sp,

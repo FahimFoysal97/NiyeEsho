@@ -88,7 +88,7 @@ fun NiyeEshoApp(
                             },
                             onNavigateToInvite = {
                                 logD("NiyeEshoApp", "Navigation: Dashboard -> Invite")
-                                navController.navigate(NavRoute.Scan.route)
+                                navController.navigate(NavRoute.Invite.route)
                             },
                             onShareInvite = onShareInvite,
                         )
@@ -128,7 +128,7 @@ fun NiyeEshoApp(
                             },
                             onNavigateToInvite = {
                                 logD("NiyeEshoApp", "Navigation: Contacts -> Invite")
-                                navController.navigate(NavRoute.Scan.route)
+                                navController.navigate(NavRoute.Invite.route)
                             },
                         )
                     },
@@ -174,7 +174,7 @@ fun NiyeEshoApp(
                             },
                             onNavigateToInvite = {
                                 logD("NiyeEshoApp", "Navigation: Profile -> Invite")
-                                navController.navigate(NavRoute.Scan.route)
+                                navController.navigate(NavRoute.Invite.route)
                             },
                         )
                     },

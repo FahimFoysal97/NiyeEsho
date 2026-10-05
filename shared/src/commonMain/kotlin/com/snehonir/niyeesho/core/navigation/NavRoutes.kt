@@ -19,8 +19,8 @@ sealed interface NavRoute {
         override val route: String = "contacts"
     }
 
-    data object Scan : NavRoute {
-        override val route: String = "scan"
+    data object Invite : NavRoute {
+        override val route: String = "invite"
     }
 
     data object Profile : NavRoute {

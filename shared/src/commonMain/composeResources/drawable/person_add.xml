@@ -1,0 +1,26 @@
+﻿<vector xmlns:android="http://schemas.android.com/apk/res/android"
+	android:width="24dp"
+	android:height="24dp"
+	android:viewportWidth="24"
+	android:viewportHeight="24">
+
+	<!-- 1. Refined Profile Head (Centered & Balanced) -->
+	<path
+		android:fillColor="#FFFFFFFF"
+		android:pathData="M8,10 C10.21,10 12,8.21 12,6 C12,3.79 10.21,2 8,2 C5.79,2 4,3.79 4,6 C4,8.21 5.79,10 8,10 Z" />
+
+	<!-- 2. Refined Torso (Balanced with left-side alignment) -->
+	<path
+		android:fillColor="#FFFFFFFF"
+		android:pathData="M8,12 C4.67,12 1,13.67 1,17 V19 C1,19.55 1.45,20 2,20 H14 C14.55,20 15,19.55 15,19 V17 C15,13.67 11.33,12 8,12 Z" />
+
+	<!-- 3. Bold, Full Plus Sign (+) with Perfect Alignment -->
+	<path
+		android:fillColor="#FFFFFFFF"
+		android:strokeColor="#FFFFFFFF"
+		android:strokeWidth="1"
+		android:strokeLineCap="round"
+		android:strokeLineJoin="round"
+		android:pathData="M19,6 V14 M15,10 H23" />
+
+</vector>

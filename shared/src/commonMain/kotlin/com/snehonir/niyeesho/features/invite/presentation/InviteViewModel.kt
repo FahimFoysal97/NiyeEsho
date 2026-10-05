@@ -61,7 +61,6 @@ class InviteViewModel(
     fun onAction(action: InviteUiAction) {
         when (action) {
             is InviteUiAction.SubTabSelected -> _uiState.update { it.copy(selectedSubTab = action.index) }
-            InviteUiAction.SwitchToPasteLink -> _uiState.update { it.copy(scannerStep = ScannerStep.PASTE) }
             InviteUiAction.SwitchToScan -> _uiState.update { it.copy(scannerStep = ScannerStep.SCAN, pastedLink = "") }
             is InviteUiAction.PastedLinkClicked -> _uiState.update { it.copy(pastedLink = action.link) }
             InviteUiAction.ConnectInviteClicked -> handleConnectInvite()

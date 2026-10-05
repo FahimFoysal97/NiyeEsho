@@ -1,0 +1,30 @@
+﻿<vector xmlns:android="http://schemas.android.com/apk/res/android"
+	android:width="24dp"
+	android:height="24dp"
+	android:viewportWidth="24"
+	android:viewportHeight="24">
+
+	<!-- Main Clipboard Board Outline (Hollow with rounded corners) -->
+	<path
+		android:strokeColor="#FFFFFFFF"
+		android:strokeWidth="2"
+		android:strokeLineCap="round"
+		android:strokeLineJoin="round"
+		android:fillColor="#00000000"
+		android:pathData="M18,4 C19.1,4 20,4.9 20,6 V19 C20,20.1 19.1,21 18,21 H6 C4.9,21 4,20.1 4,19 V6 C4,4.9 4.9,4 6,4" />
+
+	<!-- Top Paper Clip/Clamp Frame -->
+	<path
+		android:strokeColor="#FFFFFFFF"
+		android:strokeWidth="2"
+		android:strokeLineCap="round"
+		android:strokeLineJoin="round"
+		android:fillColor="#00000000"
+		android:pathData="M9,4 V3 C9,2.4 9.4,2 10,2 H14 C14.6,2 15,2.4 15,3 V4" />
+
+	<!-- Tiny center rivet/dot inside the clamp -->
+	<path
+		android:fillColor="#FFFFFFFF"
+		android:pathData="M12,4.5 m-1,0 a1,1 0 1,1 2,0 a1,1 0 1,1 -2,0" />
+
+</vector>

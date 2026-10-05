@@ -221,9 +221,7 @@ fun ContactsContent(
                                         Box(
                                             modifier = Modifier
                                                 .size(130.dp)
-                                                .clip(RoundedCornerShape(16.dp))
-                                                .background(Color.White)
-                                                .padding(10.dp),
+                                                .clip(RoundedCornerShape(16.dp)),
                                             contentAlignment = Alignment.Center,
                                         ) {
                                             QrCodeDisplay(

@@ -32,6 +32,7 @@ import com.snehonir.niyeesho.core.designsystem.component.AppNavTab
 import com.snehonir.niyeesho.core.designsystem.theme.*
 import com.snehonir.niyeesho.features.contacts.presentation.component.QrCodeDisplay
 import com.snehonir.niyeesho.features.contacts.presentation.component.rememberQrImageHelper
+import com.snehonir.niyeesho.features.invite.presentation.component.CameraQrScannerView
 import niyeesho.shared.generated.resources.Res
 import niyeesho.shared.generated.resources.content_copy
 import niyeesho.shared.generated.resources.content_paste
@@ -316,6 +317,15 @@ fun InviteContent(
                                     ),
                                 contentAlignment = Alignment.Center,
                             ) {
+                                CameraQrScannerView(
+                                    onQrCodeScanned = { scannedLink ->
+                                        if (scannedLink.isNotBlank()) {
+                                            onAction(InviteUiAction.PastedLinkClicked(scannedLink))
+                                        }
+                                    },
+                                    modifier = Modifier.fillMaxSize(),
+                                )
+
                                 Box(modifier = Modifier.size(180.dp)) {
                                     Box(modifier = Modifier.size(30.dp).align(Alignment.TopStart).border(3.5.dp, NiyeEshoGreenPrimary, RoundedCornerShape(topStart = 10.dp)))
                                     Box(modifier = Modifier.size(30.dp).align(Alignment.TopEnd).border(3.5.dp, NiyeEshoGreenPrimary, RoundedCornerShape(topEnd = 10.dp)))

@@ -17,7 +17,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
@@ -25,10 +24,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Button
@@ -81,6 +78,7 @@ import com.snehonir.niyeesho.features.shopping_list.presentation.list.component.
 import niyeesho.shared.generated.resources.Res
 import niyeesho.shared.generated.resources.content_copy
 import niyeesho.shared.generated.resources.download
+import niyeesho.shared.generated.resources.scan
 import org.jetbrains.compose.resources.painterResource
 
 private enum class InviteTab { QR, LINK }
@@ -124,12 +122,12 @@ fun ContactsContent(
                 color = NiyeEshoDarkSurface,
                 modifier = Modifier.clickable { onAction(ContactsUiAction.ScanQrClicked) },
             ) {
-                Text(
-                    text = "⌖ Scan",
-                    style = MaterialTheme.typography.bodySmall,
-                    fontWeight = FontWeight.SemiBold,
-                    color = Color(0xFFCFE3D8),
-                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
+                Icon(
+                    painter = painterResource(Res.drawable.scan),
+                    contentDescription = "Open scanner",
+                    tint = NiyeEshoGreenPrimary,
+                    modifier = Modifier
+                        .padding(horizontal = 10.dp, vertical = 6.dp),
                 )
             }
         }

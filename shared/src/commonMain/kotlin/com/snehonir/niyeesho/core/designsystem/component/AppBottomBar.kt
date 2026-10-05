@@ -12,6 +12,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -29,7 +30,7 @@ import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoGreenPrimary
 import com.snehonir.niyeesho.core.designsystem.theme.Spacing
 
 enum class AppNavTab {
-    LISTS, CONTACTS, PROFILE
+    LISTS, CONTACTS, INVITE, PROFILE
 }
 
 @Composable
@@ -62,6 +63,12 @@ fun AppBottomBar(
                 icon = Icons.Default.Person,
                 isSelected = currentTab == AppNavTab.CONTACTS,
                 onClick = { onTabSelected(AppNavTab.CONTACTS) },
+            )
+            NavItem(
+                label = "Invite",
+                icon = Icons.Default.Share,
+                isSelected = currentTab == AppNavTab.INVITE,
+                onClick = { onTabSelected(AppNavTab.INVITE) },
             )
             NavItem(
                 label = "Profile",

@@ -12,6 +12,7 @@ fun ProfileScreen(
     onBack: () -> Unit,
     onNavigateToLists: () -> Unit = {},
     onNavigateToContacts: () -> Unit = {},
+    onNavigateToInvite: () -> Unit = {},
     viewModel: ProfileViewModel = koinViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -27,5 +28,6 @@ fun ProfileScreen(
         onBack = onBack,
         onNavigateToLists = onNavigateToLists,
         onNavigateToContacts = onNavigateToContacts,
+        onNavigateToInvite = onNavigateToInvite,
     )
 }

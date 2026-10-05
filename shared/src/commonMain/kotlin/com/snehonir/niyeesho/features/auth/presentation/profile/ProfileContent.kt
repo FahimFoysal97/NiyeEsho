@@ -71,6 +71,7 @@ fun ProfileContent(
     modifier: Modifier = Modifier,
     onNavigateToLists: () -> Unit = {},
     onNavigateToContacts: () -> Unit = {},
+    onNavigateToInvite: () -> Unit = {},
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
     var notificationsEnabled by remember { mutableStateOf(true) }
@@ -95,6 +96,7 @@ fun ProfileContent(
                     when (tab) {
                         AppNavTab.LISTS -> onNavigateToLists()
                         AppNavTab.CONTACTS -> onNavigateToContacts()
+                        AppNavTab.INVITE -> onNavigateToInvite()
                         AppNavTab.PROFILE -> Unit
                     }
                 },

@@ -14,6 +14,7 @@ data class NavGraphDestinations(
     val shoppingLists: @Composable () -> Unit,
     val listDetail: @Composable (listId: String) -> Unit,
     val contacts: @Composable () -> Unit,
+    val invite: @Composable () -> Unit,
     val profile: @Composable () -> Unit,
     val inviteAccept: @Composable (InviteDeepLink?) -> Unit,
 )
@@ -48,6 +49,9 @@ fun NiyeEshoNavGraph(
         }
         composable(NavRoute.Contacts.route) {
             destinations.contacts()
+        }
+        composable(NavRoute.Scan.route) {
+            destinations.invite()
         }
         composable(NavRoute.Profile.route) {
             destinations.profile()

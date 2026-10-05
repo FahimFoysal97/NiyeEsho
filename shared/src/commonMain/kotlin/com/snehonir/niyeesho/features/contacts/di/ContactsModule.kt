@@ -4,7 +4,6 @@ import com.snehonir.niyeesho.features.contacts.data.local.ContactsLocalDataSourc
 import com.snehonir.niyeesho.features.contacts.data.local.ContactsLocalDataSourceImpl
 import com.snehonir.niyeesho.features.contacts.data.repository.ContactsRepositoryImpl
 import com.snehonir.niyeesho.features.contacts.domain.repository.ContactsRepository
-import com.snehonir.niyeesho.features.contacts.domain.usecase.AddContactFromInviteUseCase
 import com.snehonir.niyeesho.features.contacts.domain.usecase.RefreshContactTokenUseCase
 import com.snehonir.niyeesho.features.contacts.domain.usecase.RemoveContactUseCase
 import com.snehonir.niyeesho.features.contacts.domain.usecase.SearchContactsUseCase
@@ -20,7 +19,6 @@ val contactsModule = module {
     singleOf(::ContactsLocalDataSourceImpl).bind<ContactsLocalDataSource>()
     singleOf(::ContactsRepositoryImpl).bind<ContactsRepository>()
     singleOf(::WatchContactsUseCase)
-    singleOf(::AddContactFromInviteUseCase)
     singleOf(::RemoveContactUseCase)
     singleOf(::SearchContactsUseCase)
     singleOf(::RefreshContactTokenUseCase)

@@ -59,6 +59,7 @@ fun DashboardContent(
     onNavigateToDetail: (String) -> Unit,
     onNavigateToContacts: () -> Unit,
     onNavigateToProfile: () -> Unit,
+    onNavigateToInvite: () -> Unit = {},
     onShareInvite: (String) -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
@@ -271,6 +272,7 @@ fun DashboardContent(
                 when (tab) {
                     AppNavTab.LISTS -> Unit
                     AppNavTab.CONTACTS -> onNavigateToContacts()
+                    AppNavTab.INVITE -> onNavigateToInvite()
                     AppNavTab.PROFILE -> onNavigateToProfile()
                 }
             },

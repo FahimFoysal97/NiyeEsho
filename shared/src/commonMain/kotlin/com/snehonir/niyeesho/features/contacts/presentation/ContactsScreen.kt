@@ -14,6 +14,7 @@ fun ContactsScreen(
     onBack: () -> Unit,
     onNavigateToLists: () -> Unit = {},
     onNavigateToProfile: () -> Unit = {},
+    onNavigateToInvite: () -> Unit = {},
     viewModel: ContactsViewModel = koinViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -31,6 +32,7 @@ fun ContactsScreen(
         onBack = onBack,
         onNavigateToLists = onNavigateToLists,
         onNavigateToProfile = onNavigateToProfile,
+        onNavigateToInvite = onNavigateToInvite,
     )
     if (uiState.isInviteBottomSheetVisible) {
         uiState.inviteLink?.let { link ->

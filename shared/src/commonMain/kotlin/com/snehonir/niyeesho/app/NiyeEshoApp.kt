@@ -23,6 +23,7 @@ import com.snehonir.niyeesho.features.auth.domain.usecase.IsSignedInUseCase
 import com.snehonir.niyeesho.features.auth.presentation.profile.ProfileScreen
 import com.snehonir.niyeesho.features.auth.presentation.signin.SignInScreen
 import com.snehonir.niyeesho.features.contacts.presentation.ContactsScreen
+import com.snehonir.niyeesho.features.invite.presentation.InviteScreen
 import com.snehonir.niyeesho.features.dashboard.presentation.DashboardScreen
 import com.snehonir.niyeesho.features.shopping_list.presentation.detail.ListDetailScreen
 import org.koin.compose.koinInject
@@ -85,6 +86,10 @@ fun NiyeEshoApp(
                                 logD("NiyeEshoApp", "Navigation: Dashboard -> Profile")
                                 navController.navigate(NavRoute.Profile.route)
                             },
+                            onNavigateToInvite = {
+                                logD("NiyeEshoApp", "Navigation: Dashboard -> Invite")
+                                navController.navigate(NavRoute.Scan.route)
+                            },
                             onShareInvite = onShareInvite,
                         )
                     },
@@ -121,6 +126,30 @@ fun NiyeEshoApp(
                                 logD("NiyeEshoApp", "Navigation: Contacts -> Profile")
                                 navController.navigate(NavRoute.Profile.route)
                             },
+                            onNavigateToInvite = {
+                                logD("NiyeEshoApp", "Navigation: Contacts -> Invite")
+                                navController.navigate(NavRoute.Scan.route)
+                            },
+                        )
+                    },
+                    invite = {
+                        InviteScreen(
+                            onShareInvite = onShareInvite,
+                            onNavigateToLists = {
+                                navController.navigate(NavRoute.ShoppingLists.route) {
+                                    popUpTo(NavRoute.ShoppingLists.route) { inclusive = true }
+                                }
+                            },
+                            onNavigateToContacts = {
+                                navController.navigate(NavRoute.Contacts.route) {
+                                    popUpTo(NavRoute.Contacts.route) { inclusive = true }
+                                }
+                            },
+                            onNavigateToProfile = {
+                                navController.navigate(NavRoute.Profile.route) {
+                                    popUpTo(NavRoute.Profile.route) { inclusive = true }
+                                }
+                            },
                         )
                     },
                     profile = {
@@ -142,6 +171,10 @@ fun NiyeEshoApp(
                             onNavigateToContacts = {
                                 logD("NiyeEshoApp", "Navigation: Profile -> Contacts")
                                 navController.navigate(NavRoute.Contacts.route)
+                            },
+                            onNavigateToInvite = {
+                                logD("NiyeEshoApp", "Navigation: Profile -> Invite")
+                                navController.navigate(NavRoute.Scan.route)
                             },
                         )
                     },

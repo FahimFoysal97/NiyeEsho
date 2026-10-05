@@ -12,6 +12,7 @@ fun DashboardScreen(
     onNavigateToDetail: (String) -> Unit,
     onNavigateToContacts: () -> Unit = {},
     onNavigateToProfile: () -> Unit = {},
+    onNavigateToInvite: () -> Unit = {},
     onShareInvite: (String) -> Unit = {},
     modifier: Modifier = Modifier,
     viewModel: DashboardViewModel = koinViewModel(),
@@ -33,6 +34,7 @@ fun DashboardScreen(
         onNavigateToDetail = onNavigateToDetail,
         onNavigateToContacts = onNavigateToContacts,
         onNavigateToProfile = onNavigateToProfile,
+        onNavigateToInvite = onNavigateToInvite,
         onShareInvite = onShareInvite,
         modifier = modifier,
     )

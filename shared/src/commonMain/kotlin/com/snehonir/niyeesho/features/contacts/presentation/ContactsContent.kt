@@ -9,11 +9,14 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
@@ -74,6 +77,10 @@ import com.snehonir.niyeesho.features.contacts.domain.entity.Contact
 import com.snehonir.niyeesho.features.contacts.presentation.component.QrCodeDisplay
 import com.snehonir.niyeesho.features.contacts.presentation.component.rememberQrImageHelper
 import com.snehonir.niyeesho.features.shopping_list.presentation.list.component.CreateGroupDialog
+import niyeesho.shared.generated.resources.Res
+import niyeesho.shared.generated.resources.content_copy
+import niyeesho.shared.generated.resources.download
+import org.jetbrains.compose.resources.painterResource
 
 private enum class InviteTab { QR, LINK }
 
@@ -207,34 +214,40 @@ fun ContactsContent(
                                 }
                             }
                             val link = uiState.inviteLink
-                            Box(
-                                modifier = Modifier.fillMaxWidth(),
-                                contentAlignment = Alignment.Center,
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(140.dp),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically,
                             ) {
                                 if (selectedTab == InviteTab.QR) {
-                                    // QR Tab Body
-                                    Column(
-                                        modifier = Modifier.fillMaxWidth(),
-                                        horizontalAlignment = Alignment.CenterHorizontally,
-                                        verticalArrangement = Arrangement.spacedBy(Spacing.sm),
+                                    // QR Tab (Start side: QR Code, End side: Vertical IconButtons)
+                                    Box(
+                                        modifier = Modifier
+                                            .size(130.dp)
+                                            .clip(RoundedCornerShape(16.dp))
+                                            .background(Color.White),
+                                        contentAlignment = Alignment.Center,
                                     ) {
-                                        Box(
+                                        QrCodeDisplay(
+                                            value = link ?: "",
                                             modifier = Modifier
-                                                .size(130.dp)
-                                                .clip(RoundedCornerShape(16.dp)),
-                                            contentAlignment = Alignment.Center,
-                                        ) {
-                                            QrCodeDisplay(
-                                                value = link ?: "",
-                                                modifier = Modifier
-                                                    .fillMaxSize()
-                                                    .clip(RoundedCornerShape(12.dp)),
-                                            )
-                                        }
+                                                .fillMaxSize()
+                                                .clip(RoundedCornerShape(12.dp)),
+                                        )
+                                    }
 
-                                        Row(
-                                            horizontalArrangement = Arrangement.spacedBy(16.dp),
-                                            verticalAlignment = Alignment.CenterVertically,
+                                    Spacer(modifier = Modifier.width(12.dp))
+
+                                    Column(
+                                        modifier = Modifier.fillMaxHeight(),
+                                        horizontalAlignment = Alignment.CenterHorizontally,
+                                        verticalArrangement = Arrangement.Center,
+                                    ) {
+                                        Column(
+                                            verticalArrangement = Arrangement.spacedBy(12.dp),
+                                            horizontalAlignment = Alignment.CenterHorizontally,
                                         ) {
                                             FilledTonalIconButton(
                                                 onClick = {
@@ -249,7 +262,7 @@ fun ContactsContent(
                                                 ),
                                             ) {
                                                 Icon(
-                                                    imageVector = Icons.Filled.ArrowDropDown,
+                                                    painter = painterResource(Res.drawable.download),
                                                     contentDescription = "Save Image",
                                                     modifier = Modifier.size(20.dp),
                                                 )
@@ -270,40 +283,44 @@ fun ContactsContent(
                                                 Icon(
                                                     imageVector = Icons.Default.Share,
                                                     contentDescription = "Share Image",
+                                                    tint = Color.White,
                                                     modifier = Modifier.size(20.dp),
                                                 )
                                             }
                                         }
                                     }
                                 } else {
-                                    // Link Tab Body
-                                    Column(
-                                        modifier = Modifier.fillMaxWidth(),
-                                        horizontalAlignment = Alignment.CenterHorizontally,
-                                        verticalArrangement = Arrangement.spacedBy(Spacing.sm),
+                                    // Link Tab (Start side: Link Box, End side: Vertical IconButtons)
+                                    val scrollState = rememberScrollState()
+                                    Box(
+                                        modifier = Modifier
+                                            .weight(1f)
+                                            .height(130.dp)
+                                            .clip(RoundedCornerShape(10.dp))
+                                            .background(NiyeEshoDarkBg)
+                                            .border(1.dp, Color(0xFF1F2D24), RoundedCornerShape(10.dp))
+                                            .padding(horizontal = 10.dp, vertical = 9.dp),
                                     ) {
-                                        val scrollState = rememberScrollState()
-                                        Box(
+                                        Text(
+                                            text = link ?: "",
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = Color(0xFFCFE3D8),
                                             modifier = Modifier
-                                                .fillMaxWidth()
-                                                .clip(RoundedCornerShape(10.dp))
-                                                .background(NiyeEshoDarkBg)
-                                                .border(1.dp, Color(0xFF1F2D24), RoundedCornerShape(10.dp))
-                                                .padding(horizontal = 10.dp, vertical = 9.dp),
-                                        ) {
-                                            Text(
-                                                text = link ?: "",
-                                                style = MaterialTheme.typography.bodySmall,
-                                                color = Color(0xFFCFE3D8),
-                                                modifier = Modifier
-                                                    .height(130.dp)
-                                                    .verticalScroll(scrollState),
-                                            )
-                                        }
+                                                .fillMaxSize()
+                                                .verticalScroll(scrollState),
+                                        )
+                                    }
 
-                                        Row(
-                                            horizontalArrangement = Arrangement.spacedBy(16.dp),
-                                            verticalAlignment = Alignment.CenterVertically,
+                                    Spacer(modifier = Modifier.width(12.dp))
+
+                                    Column(
+                                        modifier = Modifier.fillMaxHeight(),
+                                        horizontalAlignment = Alignment.CenterHorizontally,
+                                        verticalArrangement = Arrangement.Center,
+                                    ) {
+                                        Column(
+                                            verticalArrangement = Arrangement.spacedBy(12.dp),
+                                            horizontalAlignment = Alignment.CenterHorizontally,
                                         ) {
                                             FilledIconButton(
                                                 onClick = {
@@ -318,7 +335,7 @@ fun ContactsContent(
                                                 ),
                                             ) {
                                                 Icon(
-                                                    imageVector = Icons.Filled.Done,
+                                                    painter = painterResource(Res.drawable.content_copy),
                                                     contentDescription = "Copy Link",
                                                     tint = Color.White,
                                                     modifier = Modifier.size(20.dp),
@@ -328,7 +345,6 @@ fun ContactsContent(
                                             FilledIconButton(
                                                 onClick = { onAction(ContactsUiAction.InviteClicked) },
                                                 shape = CircleShape,
-                                                //border = BorderStroke(1.5.dp, NiyeEshoGreenPrimary),
                                                 colors = IconButtonDefaults.outlinedIconButtonColors(
                                                     containerColor = NiyeEshoGreenPrimary,
                                                     contentColor = Color.White,

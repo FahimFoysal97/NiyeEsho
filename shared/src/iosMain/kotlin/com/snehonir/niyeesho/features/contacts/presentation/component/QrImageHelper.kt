@@ -6,6 +6,7 @@ import androidx.compose.runtime.remember
 class IosQrImageHelper : QrImageHelper {
     override fun shareQrCodeImage(content: String) {}
     override fun saveQrCodeImage(content: String) {}
+    override fun pickAndDecodeQrImage(onResult: (String?) -> Unit) {}
 }
 
 @Composable

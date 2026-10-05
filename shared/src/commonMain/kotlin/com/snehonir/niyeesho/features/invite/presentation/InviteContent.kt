@@ -324,6 +324,13 @@ fun InviteContent(
                                 }
                                 // Pill badge inside camera view
                                 Surface(
+                                    onClick = {
+                                        qrImageHelper.pickAndDecodeQrImage { decodedLink ->
+                                            if (!decodedLink.isNullOrBlank()) {
+                                                onAction(InviteUiAction.PastedLinkClicked(decodedLink))
+                                            }
+                                        }
+                                    },
                                     shape = RoundedCornerShape(20.dp),
                                     color = Color(0xFF0F1A14).copy(alpha = 0.85f),
                                     border = BorderStroke(1.dp, Color(0xFF2A3D32)),

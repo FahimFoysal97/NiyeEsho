@@ -3,7 +3,7 @@ package com.snehonir.niyeesho.features.shopping_list.presentation.detail
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.snehonir.niyeesho.features.contacts.domain.entity.Contact
-import com.snehonir.niyeesho.features.contacts.domain.usecase.AddContactFromInviteUseCase
+import com.snehonir.niyeesho.features.invite.domain.usecase.AddContactFromInviteUseCase
 import com.snehonir.niyeesho.features.contacts.domain.usecase.WatchContactsUseCase
 import com.snehonir.niyeesho.features.messaging.domain.entity.InviteData
 import com.snehonir.niyeesho.features.messaging.domain.usecase.GenerateInviteLinkUseCase

@@ -1,6 +1,5 @@
 package com.snehonir.niyeesho.features.contacts.presentation
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -14,12 +13,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -30,6 +28,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -37,12 +36,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
 import com.snehonir.niyeesho.core.designsystem.component.AppBottomBar
 import com.snehonir.niyeesho.core.designsystem.component.AppNavTab
 import com.snehonir.niyeesho.core.designsystem.component.AvatarImage
@@ -57,8 +53,6 @@ import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoIndigoTertiary
 import com.snehonir.niyeesho.core.designsystem.theme.Spacing
 import com.snehonir.niyeesho.core.utils.UiText
 import com.snehonir.niyeesho.features.contacts.domain.entity.Contact
-import com.snehonir.niyeesho.features.contacts.presentation.component.QrCodeDisplay
-import com.snehonir.niyeesho.features.contacts.presentation.component.rememberQrImageHelper
 import com.snehonir.niyeesho.features.shopping_list.presentation.list.component.CreateGroupDialog
 
 @Composable
@@ -72,8 +66,7 @@ fun ContactsContent(
     onNavigateToInvite: () -> Unit = {},
 ) {
     val avatarColors = listOf(NiyeEshoGreenPrimary, NiyeEshoGoldSecondary, NiyeEshoIndigoTertiary)
-    var isQrEnlarged by remember { mutableStateOf(false) }
-    val qrImageHelper = rememberQrImageHelper()
+    var contactPendingDelete by remember { mutableStateOf<Contact?>(null) }
 
     Column(
         modifier = modifier
@@ -172,7 +165,7 @@ fun ContactsContent(
                             avatarBg = avatarBg,
                             subtitleText = subtitleText,
                             onClick = { onAction(ContactsUiAction.ContactSelected(contact)) },
-                            onDelete = { onAction(ContactsUiAction.RemoveContact(contact.uid)) },
+                            onDelete = { contactPendingDelete = contact },
                         )
                     }
                 }
@@ -205,100 +198,75 @@ fun ContactsContent(
         )
     }
 
-    val inviteLink = uiState.inviteLink
-    if (isQrEnlarged && !inviteLink.isNullOrBlank()) {
-        Dialog(onDismissRequest = { isQrEnlarged = false }) {
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(20.dp),
-                colors = CardDefaults.cardColors(containerColor = NiyeEshoDarkBg),
-                border = BorderStroke(1.dp, Color(0xFF1F2D24)),
-            ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(Spacing.lg),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(Spacing.sm),
-                ) {
-                    Box(modifier = Modifier.fillMaxWidth()) {
-                        IconButton(
-                            onClick = { isQrEnlarged = false },
-                            modifier = Modifier
-                                .size(28.dp)
-                                .background(NiyeEshoDarkSurface, CircleShape),
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Close,
-                                contentDescription = "Close",
-                                tint = Color.White,
-                                modifier = Modifier.size(16.dp),
-                            )
-                        }
-                    }
-
-                    Box(
-                        modifier = Modifier
-                            .size(180.dp)
-                            .clip(RoundedCornerShape(16.dp))
-                            .background(Color.White)
-                            .padding(12.dp),
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        QrCodeDisplay(
-                            value = inviteLink,
-                            modifier = Modifier.fillMaxSize(),
-                        )
-                    }
-
-                    Text(
-                        text = "Screen brightness raised for easy scanning",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = NiyeEshoGreenDarkMuted,
-                        textAlign = TextAlign.Center,
-                    )
-
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    ) {
-                        Button(
-                            onClick = { qrImageHelper.saveQrCodeImage(inviteLink) },
-                            modifier = Modifier.weight(1f),
-                            shape = RoundedCornerShape(11.dp),
-                            colors = ButtonDefaults.buttonColors(containerColor = NiyeEshoDarkSurface),
-                            contentPadding = PaddingValues(vertical = 9.dp),
-                        ) {
-                            Text("Save image", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold, color = Color(0xFFCFE3D8))
-                        }
-
-                        Button(
-                            onClick = { qrImageHelper.shareQrCodeImage(inviteLink) },
-                            modifier = Modifier.weight(1f),
-                            shape = RoundedCornerShape(11.dp),
-                            colors = ButtonDefaults.buttonColors(containerColor = NiyeEshoDarkSurface),
-                            contentPadding = PaddingValues(vertical = 9.dp),
-                        ) {
-                            Text("Share", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold, color = Color(0xFFCFE3D8))
-                        }
-                    }
-
-                    Button(
-                        onClick = {
-                            isQrEnlarged = false
-                            onAction(ContactsUiAction.ScanQrClicked)
-                        },
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(11.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = NiyeEshoGreenPrimary),
-                        contentPadding = PaddingValues(vertical = 9.dp),
-                    ) {
-                        Text("Scan a friend instead", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold, color = Color.White)
-                    }
-                }
-            }
-        }
+    contactPendingDelete?.let { contact ->
+        ConfirmDeleteContactDialog(
+            contactName = contact.displayName,
+            onConfirm = {
+                onAction(ContactsUiAction.RemoveContact(contact.uid))
+                contactPendingDelete = null
+            },
+            onDismiss = {
+                contactPendingDelete = null
+            },
+        )
     }
+}
+
+@Composable
+private fun ConfirmDeleteContactDialog(
+    contactName: String,
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit,
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        containerColor = NiyeEshoDarkSurface,
+        title = {
+            Text(
+                text = "Delete Contact",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                color = Color.White,
+            )
+        },
+        text = {
+            Text(
+                text = "Are you sure you want to remove $contactName from your contacts?",
+                style = MaterialTheme.typography.bodyMedium,
+                color = NiyeEshoGreenDarkMuted,
+            )
+        },
+        confirmButton = {
+            Button(
+                onClick = onConfirm,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFFE05252),
+                    contentColor = Color.White,
+                ),
+                shape = RoundedCornerShape(10.dp),
+            ) {
+                Text(
+                    text = "Delete",
+                    style = MaterialTheme.typography.labelMedium,
+                    fontWeight = FontWeight.Bold,
+                )
+            }
+        },
+        dismissButton = {
+            TextButton(
+                onClick = onDismiss,
+                colors = ButtonDefaults.textButtonColors(
+                    contentColor = Color(0xFFCFE3D8),
+                ),
+            ) {
+                Text(
+                    text = "Cancel",
+                    style = MaterialTheme.typography.labelMedium,
+                    fontWeight = FontWeight.SemiBold,
+                )
+            }
+        },
+    )
 }
 
 @Composable
@@ -319,12 +287,14 @@ private fun ContactCardRow(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .clickable(onClick = onClick)
                 .padding(horizontal = Spacing.md, vertical = Spacing.sm),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Row(
+                modifier = Modifier
+                    .weight(1f)
+                    .clickable(onClick = onClick),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(Spacing.md),
             ) {
@@ -349,15 +319,13 @@ private fun ContactCardRow(
                 }
             }
 
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                IconButton(onClick = onDelete) {
-                    Icon(
-                        imageVector = Icons.Default.Delete,
-                        contentDescription = "Remove contact",
-                        tint = NiyeEshoGreenDarkMuted,
-                        modifier = Modifier.size(18.dp),
-                    )
-                }
+            IconButton(onClick = onDelete) {
+                Icon(
+                    imageVector = Icons.Default.Delete,
+                    contentDescription = "Remove contact",
+                    tint = NiyeEshoGreenDarkMuted,
+                    modifier = Modifier.size(18.dp),
+                )
             }
         }
     }

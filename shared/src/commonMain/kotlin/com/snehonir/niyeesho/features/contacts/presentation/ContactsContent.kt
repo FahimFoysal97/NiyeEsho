@@ -323,7 +323,7 @@ private fun ContactCardRow(
                 Icon(
                     imageVector = Icons.Default.Delete,
                     contentDescription = "Remove contact",
-                    tint = NiyeEshoGreenDarkMuted,
+                    tint = Color(0xFFE05252),
                     modifier = Modifier.size(18.dp),
                 )
             }

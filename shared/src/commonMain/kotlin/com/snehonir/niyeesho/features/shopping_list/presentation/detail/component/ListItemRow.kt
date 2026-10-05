@@ -99,7 +99,7 @@ fun ListItemRow(
                     Icon(
                         imageVector = Icons.Default.Delete,
                         contentDescription = "Delete item",
-                        tint = NiyeEshoGreenDarkMuted,
+                        tint = Color(0xFFE05252),
                         modifier = Modifier.size(18.dp),
                     )
                 }

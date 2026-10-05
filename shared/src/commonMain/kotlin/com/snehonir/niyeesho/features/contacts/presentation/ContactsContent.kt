@@ -1,7 +1,5 @@
 package com.snehonir.niyeesho.features.contacts.presentation
 
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -11,7 +9,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -19,18 +16,27 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.FilledIconButton
+import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
@@ -49,6 +55,7 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import com.snehonir.niyeesho.core.designsystem.component.AppBottomBar
 import com.snehonir.niyeesho.core.designsystem.component.AppNavTab
 import com.snehonir.niyeesho.core.designsystem.component.AvatarImage
@@ -65,6 +72,7 @@ import com.snehonir.niyeesho.core.designsystem.theme.Spacing
 import com.snehonir.niyeesho.core.utils.UiText
 import com.snehonir.niyeesho.features.contacts.domain.entity.Contact
 import com.snehonir.niyeesho.features.contacts.presentation.component.QrCodeDisplay
+import com.snehonir.niyeesho.features.contacts.presentation.component.rememberQrImageHelper
 import com.snehonir.niyeesho.features.shopping_list.presentation.list.component.CreateGroupDialog
 
 private enum class InviteTab { QR, LINK }
@@ -82,6 +90,7 @@ fun ContactsContent(
     var selectedTab by remember { mutableStateOf(InviteTab.QR) }
     var isQrEnlarged by remember { mutableStateOf(false) }
     val clipboardManager = LocalClipboardManager.current
+    val qrImageHelper = rememberQrImageHelper()
 
     Column(
         modifier = modifier
@@ -199,43 +208,81 @@ fun ContactsContent(
                             }
                             val link = uiState.inviteLink
                             Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(200.dp),
+                                modifier = Modifier.fillMaxWidth(),
                                 contentAlignment = Alignment.Center,
                             ) {
                                 if (selectedTab == InviteTab.QR) {
                                     // QR Tab Body
                                     Column(
-                                        modifier = Modifier.fillMaxSize(),
+                                        modifier = Modifier.fillMaxWidth(),
                                         horizontalAlignment = Alignment.CenterHorizontally,
-                                        verticalArrangement = Arrangement.spacedBy(Spacing.xs),
+                                        verticalArrangement = Arrangement.spacedBy(Spacing.sm),
                                     ) {
                                         Box(
                                             modifier = Modifier
-                                                .weight(1f)
-                                                .clickable { if (!link.isNullOrBlank()) isQrEnlarged = true },
+                                                .size(130.dp)
+                                                .clip(RoundedCornerShape(16.dp))
+                                                .background(Color.White)
+                                                .padding(10.dp),
                                             contentAlignment = Alignment.Center,
                                         ) {
                                             QrCodeDisplay(
                                                 value = link ?: "",
-                                                modifier = Modifier.fillMaxHeight(),
+                                                modifier = Modifier
+                                                    .fillMaxSize()
+                                                    .clip(RoundedCornerShape(12.dp)),
                                             )
                                         }
 
-                                        Text(
-                                            text = "Scan to connect",
-                                            style = MaterialTheme.typography.bodySmall,
-                                            color = NiyeEshoGreenDarkMuted,
-                                            textAlign = TextAlign.Center,
-                                        )
+                                        Row(
+                                            horizontalArrangement = Arrangement.spacedBy(16.dp),
+                                            verticalAlignment = Alignment.CenterVertically,
+                                        ) {
+                                            FilledTonalIconButton(
+                                                onClick = {
+                                                    if (!link.isNullOrBlank()) {
+                                                        qrImageHelper.saveQrCodeImage(link)
+                                                    }
+                                                },
+                                                shape = CircleShape,
+                                                colors = IconButtonDefaults.filledTonalIconButtonColors(
+                                                    containerColor = NiyeEshoGreenPrimary,
+                                                    contentColor = Color.White,
+                                                ),
+                                            ) {
+                                                Icon(
+                                                    imageVector = Icons.Filled.ArrowDropDown,
+                                                    contentDescription = "Save Image",
+                                                    modifier = Modifier.size(20.dp),
+                                                )
+                                            }
+
+                                            FilledIconButton(
+                                                onClick = {
+                                                    if (!link.isNullOrBlank()) {
+                                                        qrImageHelper.shareQrCodeImage(link)
+                                                    }
+                                                },
+                                                shape = CircleShape,
+                                                colors = IconButtonDefaults.filledIconButtonColors(
+                                                    containerColor = NiyeEshoGreenPrimary,
+                                                    contentColor = Color.White,
+                                                ),
+                                            ) {
+                                                Icon(
+                                                    imageVector = Icons.Default.Share,
+                                                    contentDescription = "Share Image",
+                                                    modifier = Modifier.size(20.dp),
+                                                )
+                                            }
+                                        }
                                     }
                                 } else {
                                     // Link Tab Body
                                     Column(
-                                        modifier = Modifier.fillMaxSize(),
+                                        modifier = Modifier.fillMaxWidth(),
                                         horizontalAlignment = Alignment.CenterHorizontally,
-                                        verticalArrangement = Arrangement.spacedBy(Spacing.xs),
+                                        verticalArrangement = Arrangement.spacedBy(Spacing.sm),
                                     ) {
                                         val scrollState = rememberScrollState()
                                         Box(
@@ -257,41 +304,46 @@ fun ContactsContent(
                                         }
 
                                         Row(
-                                            modifier = Modifier.fillMaxWidth(),
-                                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                            horizontalArrangement = Arrangement.spacedBy(16.dp),
+                                            verticalAlignment = Alignment.CenterVertically,
                                         ) {
-                                            Button(
+                                            FilledIconButton(
                                                 onClick = {
                                                     if (!link.isNullOrBlank()) {
                                                         clipboardManager.setText(AnnotatedString(link))
                                                     }
                                                 },
-                                                modifier = Modifier.weight(1f),
-                                                shape = RoundedCornerShape(11.dp),
-                                                colors = ButtonDefaults.buttonColors(containerColor = NiyeEshoGreenPrimary),
-                                                contentPadding = PaddingValues(vertical = 9.dp),
+                                                shape = CircleShape,
+                                                colors = IconButtonDefaults.filledIconButtonColors(
+                                                    containerColor = NiyeEshoGreenPrimary,
+                                                    contentColor = Color.White,
+                                                ),
                                             ) {
-                                                Text("Copy link", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold, color = Color.White)
+                                                Icon(
+                                                    imageVector = Icons.Filled.Done,
+                                                    contentDescription = "Copy Link",
+                                                    tint = Color.White,
+                                                    modifier = Modifier.size(20.dp),
+                                                )
                                             }
 
-                                            OutlinedButton(
+                                            FilledIconButton(
                                                 onClick = { onAction(ContactsUiAction.InviteClicked) },
-                                                modifier = Modifier.weight(1f),
-                                                shape = RoundedCornerShape(11.dp),
-                                                border = BorderStroke(1.5.dp, NiyeEshoGreenPrimary),
-                                                colors = ButtonDefaults.outlinedButtonColors(contentColor = NiyeEshoGreenPrimary),
-                                                contentPadding = PaddingValues(vertical = 9.dp),
+                                                shape = CircleShape,
+                                                //border = BorderStroke(1.5.dp, NiyeEshoGreenPrimary),
+                                                colors = IconButtonDefaults.outlinedIconButtonColors(
+                                                    containerColor = NiyeEshoGreenPrimary,
+                                                    contentColor = Color.White,
+                                                ),
                                             ) {
-                                                Text("Share…", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold)
+                                                Icon(
+                                                    imageVector = Icons.Default.Share,
+                                                    contentDescription = "Share Link",
+                                                    tint = Color.White,
+                                                    modifier = Modifier.size(20.dp),
+                                                )
                                             }
                                         }
-
-                                        Text(
-                                            text = "Anyone with this link can send you a request. You approve each one.",
-                                            style = MaterialTheme.typography.bodySmall,
-                                            color = NiyeEshoGreenDarkMuted,
-                                            textAlign = TextAlign.Center,
-                                        )
                                     }
                                 }
                             }
@@ -394,6 +446,101 @@ fun ContactsContent(
             },
             onDismiss = { onAction(ContactsUiAction.DismissCreateGroup) },
         )
+    }
+
+    val inviteLink = uiState.inviteLink
+    if (isQrEnlarged && !inviteLink.isNullOrBlank()) {
+        Dialog(onDismissRequest = { isQrEnlarged = false }) {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(20.dp),
+                colors = CardDefaults.cardColors(containerColor = NiyeEshoDarkBg),
+                border = BorderStroke(1.dp, Color(0xFF1F2D24)),
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(Spacing.lg),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(Spacing.sm),
+                ) {
+                    Box(modifier = Modifier.fillMaxWidth()) {
+                        IconButton(
+                            onClick = { isQrEnlarged = false },
+                            modifier = Modifier
+                                .size(28.dp)
+                                .background(NiyeEshoDarkSurface, CircleShape),
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Close,
+                                contentDescription = "Close",
+                                tint = Color.White,
+                                modifier = Modifier.size(16.dp),
+                            )
+                        }
+                    }
+
+                    Box(
+                        modifier = Modifier
+                            .size(180.dp)
+                            .clip(RoundedCornerShape(16.dp))
+                            .background(Color.White)
+                            .padding(12.dp),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        QrCodeDisplay(
+                            value = inviteLink,
+                            modifier = Modifier.fillMaxSize(),
+                        )
+                    }
+
+                    Text(
+                        text = "Screen brightness raised for easy scanning",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = NiyeEshoGreenDarkMuted,
+                        textAlign = TextAlign.Center,
+                    )
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        Button(
+                            onClick = { qrImageHelper.saveQrCodeImage(inviteLink) },
+                            modifier = Modifier.weight(1f),
+                            shape = RoundedCornerShape(11.dp),
+                            colors = ButtonDefaults.buttonColors(containerColor = NiyeEshoDarkSurface),
+                            contentPadding = PaddingValues(vertical = 9.dp),
+                        ) {
+                            Text("Save image", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold, color = Color(0xFFCFE3D8))
+                        }
+
+                        Button(
+                            onClick = { qrImageHelper.shareQrCodeImage(inviteLink) },
+                            modifier = Modifier.weight(1f),
+                            shape = RoundedCornerShape(11.dp),
+                            colors = ButtonDefaults.buttonColors(containerColor = NiyeEshoDarkSurface),
+                            contentPadding = PaddingValues(vertical = 9.dp),
+                        ) {
+                            Text("Share", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold, color = Color(0xFFCFE3D8))
+                        }
+                    }
+
+                    Button(
+                        onClick = {
+                            isQrEnlarged = false
+                            onAction(ContactsUiAction.ScanQrClicked)
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(11.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = NiyeEshoGreenPrimary),
+                        contentPadding = PaddingValues(vertical = 9.dp),
+                    ) {
+                        Text("Scan a friend instead", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold, color = Color.White)
+                    }
+                }
+            }
+        }
     }
 }
 

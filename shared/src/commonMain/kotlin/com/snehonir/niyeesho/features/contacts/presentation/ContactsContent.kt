@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
@@ -225,10 +226,8 @@ fun ContactsContent(
                                     // QR Tab (Start side: QR Code, End side: Vertical IconButtons)
                                     Box(
                                         modifier = Modifier
-                                            .size(130.dp)
-                                            .clip(RoundedCornerShape(16.dp))
-                                            .background(Color.White),
-                                        contentAlignment = Alignment.Center,
+                                            .size(130.dp),
+                                        contentAlignment = Alignment.CenterStart,
                                     ) {
                                         QrCodeDisplay(
                                             value = link ?: "",

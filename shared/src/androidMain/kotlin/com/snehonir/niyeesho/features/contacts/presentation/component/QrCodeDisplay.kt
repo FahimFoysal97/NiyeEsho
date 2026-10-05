@@ -1,47 +1,77 @@
 package com.snehonir.niyeesho.features.contacts.presentation.component
 
 import android.graphics.Bitmap
-import android.graphics.Color
+import android.graphics.Canvas
+import android.graphics.Paint
+import android.graphics.Path
+import android.graphics.RectF
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.size
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.createBitmap
-import androidx.core.graphics.set
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.MultiFormatWriter
 import com.google.zxing.common.BitMatrix
 import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoDarkSurfaceInner
 import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoGreenPrimary
 
-fun generateQrCodeBitmap(content: String, sizePx: Int): Bitmap? {
+fun generateQrCodeBitmap(
+    content: String,
+    sizePx: Int,
+    cornerRadiusPx: Float = 32f,
+): Bitmap? {
     if (content.isBlank()) return null
     return try {
         val bitMatrix: BitMatrix = MultiFormatWriter().encode(
             content,
             BarcodeFormat.QR_CODE,
             sizePx,
-            sizePx
+            sizePx,
         )
         val width = bitMatrix.width
         val height = bitMatrix.height
-        val bitmap = createBitmap(width, height, Bitmap.Config.RGB_565)
-        val fgColor = NiyeEshoDarkSurfaceInner
-        val bgColor = NiyeEshoGreenPrimary
+        val bitmap = createBitmap(width, height, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(bitmap)
+
+        val paint = Paint(Paint.ANTI_ALIAS_FLAG)
+
+        // Clip outer canvas to rounded corners
+        val outerPath = Path().apply {
+            addRoundRect(
+                RectF(0f, 0f, sizePx.toFloat(), sizePx.toFloat()),
+                cornerRadiusPx,
+                cornerRadiusPx,
+                Path.Direction.CW,
+            )
+        }
+        canvas.clipPath(outerPath)
+
+        // Draw background color
+        paint.color = NiyeEshoGreenPrimary.toArgb()
+        canvas.drawRect(0f, 0f, sizePx.toFloat(), sizePx.toFloat(), paint)
+
+        // Draw QR modules (foreground color)
+        paint.color = NiyeEshoDarkSurfaceInner.toArgb()
+        val moduleWidth = sizePx.toFloat() / width
+        val moduleHeight = sizePx.toFloat() / height
+
         for (x in 0 until width) {
             for (y in 0 until height) {
-                val color = if (bitMatrix.get(x, y)) fgColor else bgColor
-                bitmap[x, y] = color.toArgb()
+                if (bitMatrix.get(x, y)) {
+                    val left = x * moduleWidth
+                    val top = y * moduleHeight
+                    val right = left + moduleWidth
+                    val bottom = top + moduleHeight
+                    canvas.drawRect(left, top, right, bottom, paint)
+                }
             }
         }
         bitmap
@@ -65,13 +95,13 @@ actual fun QrCodeDisplay(
 
     Box(
         modifier = modifier,
-        contentAlignment = Alignment.Center
+        contentAlignment = Alignment.Center,
     ) {
         qrBitmap?.let { bitmap ->
             Image(
                 bitmap = bitmap.asImageBitmap(),
                 contentDescription = "QR Code for $value",
-                modifier = Modifier.size(sizeDp.dp).clip(MaterialTheme.shapes.medium)
+                modifier = Modifier.fillMaxSize(),
             )
         }
     }

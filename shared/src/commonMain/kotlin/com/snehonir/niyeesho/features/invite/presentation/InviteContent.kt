@@ -512,14 +512,6 @@ fun InviteContent(
                                     color = Color(0xFF7F9D8E),
                                     textAlign = TextAlign.Center,
                                 )
-
-                                Spacer(modifier = Modifier.height(24.dp))
-
-                                Text(
-                                    text = "Returning to Contacts…",
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = Color(0xFF7F9D8E),
-                                )
                             }
                         }
                     }

@@ -239,6 +239,7 @@ class DashboardViewModel(
             val inviteData = InviteData(
                 uid = user?.uid ?: "user_demo",
                 name = user?.displayName ?: "User",
+                email = user?.email,
                 token = tokenManager.getFcmToken() ?: "fcm_token_placeholder",
                 driveUrl = user?.avatarUrl ?: "",
                 avatar = user?.avatarUrl,

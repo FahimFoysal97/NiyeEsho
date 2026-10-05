@@ -3,6 +3,7 @@ package com.snehonir.niyeesho.features.messaging.domain.entity
 data class InviteData(
     val uid: String,
     val name: String,
+    val email: String? = null,
     val token: String,
     val driveUrl: String,
     val avatar: String? = null,
@@ -13,6 +14,7 @@ data class InviteData(
         fun preview() = InviteData(
             uid = "user_demo",
             name = "Sneho Nir",
+            email = "sneho@example.com",
             token = "demo_fcm_token",
             driveUrl = "https://drive.google.com/uc?id=profile_demo&export=download",
         )

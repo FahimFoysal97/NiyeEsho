@@ -29,7 +29,7 @@ sealed interface NavRoute {
 
     data object InviteAccept : NavRoute {
         const val path = "invite_accept"
-        override val route: String = "$path?uid={uid}&name={name}&token={token}" +
+        override val route: String = "$path?uid={uid}&name={name}&email={email}&token={token}" +
             "&driveUrl={driveUrl}&avatar={avatar}&listId={listId}&listTitle={listTitle}"
     }
 

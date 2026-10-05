@@ -51,6 +51,7 @@ class MessagingRepositoryImpl(
         buildString {
             append("niyeesho://invite?uid=").append(data.uid)
             append("&name=").append(data.name)
+            data.email?.let { append("&email=").append(it) }
             append("&token=").append(data.token)
             append("&driveUrl=").append(data.driveUrl)
             data.avatar?.let { append("&avatar=").append(it) }

@@ -61,6 +61,7 @@ fun NiyeEshoNavGraph(
             arguments = listOf(
                 navArgument("uid") { type = NavType.StringType; defaultValue = "" },
                 navArgument("name") { type = NavType.StringType; defaultValue = "" },
+                navArgument("email") { type = NavType.StringType; nullable = true },
                 navArgument("token") { type = NavType.StringType; defaultValue = "" },
                 navArgument("driveUrl") { type = NavType.StringType; defaultValue = "" },
                 navArgument("avatar") { type = NavType.StringType; nullable = true },
@@ -71,6 +72,7 @@ fun NiyeEshoNavGraph(
             val arguments = entry.arguments
             val uid = arguments?.getString("uid").orEmpty()
             val name = arguments?.getString("name").orEmpty()
+            val email = arguments?.getString("email")
             val token = arguments?.getString("token").orEmpty()
             val driveUrl = arguments?.getString("driveUrl").orEmpty()
             val invite = if (uid.isBlank() || name.isBlank() || token.isBlank() || driveUrl.isBlank()) {
@@ -79,6 +81,7 @@ fun NiyeEshoNavGraph(
                 InviteDeepLink(
                     uid = uid,
                     name = name,
+                    email = email,
                     token = token,
                     driveUrl = driveUrl,
                     avatar = arguments?.getString("avatar"),

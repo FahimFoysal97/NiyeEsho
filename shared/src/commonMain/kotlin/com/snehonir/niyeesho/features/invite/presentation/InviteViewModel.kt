@@ -46,6 +46,7 @@ class InviteViewModel(
             val inviteData = InviteData(
                 uid = user?.uid ?: "user_demo",
                 name = user?.displayName ?: "User",
+                email = user?.email,
                 token = tokenManager.getFcmToken() ?: "fcm_token_placeholder",
                 driveUrl = user?.avatarUrl ?: "",
                 avatar = user?.avatarUrl,
@@ -80,10 +81,15 @@ class InviteViewModel(
 
                 if (invite != null) {
                     val now = Clock.System.now()
+                    val contactEmail = invite.email
+                        ?: if (invite.name.contains("@")) invite.name
+                        else if (invite.name.isNotBlank()) "${invite.name.lowercase().replace(" ", ".")}@gmail.com"
+                        else "${invite.uid}@gmail.com"
+
                     val contact = Contact(
                         uid = invite.uid,
                         displayName = invite.name,
-                        email = "${invite.uid}@niyeesho.com",
+                        email = contactEmail,
                         avatarUrl = invite.avatar ?: invite.driveUrl,
                         profileDriveUrl = invite.driveUrl,
                         cachedFcmToken = invite.token,

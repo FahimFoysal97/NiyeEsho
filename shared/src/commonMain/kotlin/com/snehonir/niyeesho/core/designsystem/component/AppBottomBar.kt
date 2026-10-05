@@ -29,6 +29,7 @@ import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoGreenDarkMuted
 import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoGreenPrimary
 import com.snehonir.niyeesho.core.designsystem.theme.Spacing
 import niyeesho.shared.generated.resources.Res
+import niyeesho.shared.generated.resources.contacts
 import niyeesho.shared.generated.resources.person_add
 import org.jetbrains.compose.resources.painterResource
 
@@ -63,7 +64,7 @@ fun AppBottomBar(
             )
             NavItem(
                 label = "Contacts",
-                icon = rememberVectorPainter(Icons.Default.Person),
+                icon = painterResource(Res.drawable.contacts),
                 isSelected = currentTab == AppNavTab.CONTACTS,
                 onClick = { onTabSelected(AppNavTab.CONTACTS) },
             )
@@ -75,7 +76,7 @@ fun AppBottomBar(
             )
             NavItem(
                 label = "Profile",
-                icon = rememberVectorPainter(Icons.Default.AccountCircle),
+                icon = rememberVectorPainter(Icons.Default.Person),
                 isSelected = currentTab == AppNavTab.PROFILE,
                 onClick = { onTabSelected(AppNavTab.PROFILE) },
             )

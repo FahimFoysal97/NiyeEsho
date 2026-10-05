@@ -237,7 +237,7 @@ fun InviteContent(
                             ) {
                                 Text(
                                     text = buildAnnotatedString {
-                                        pushStyle(SpanStyle(color = Color.White, fontWeight = FontWeight.Bold))
+                                        pushStyle(SpanStyle(color = Color(0xFF7F9D8E), fontWeight = FontWeight.Bold))
                                         append(uiState.inviteLink)
                                         pop()
                                     },

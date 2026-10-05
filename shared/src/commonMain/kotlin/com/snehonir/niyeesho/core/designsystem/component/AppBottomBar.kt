@@ -19,7 +19,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -57,13 +57,13 @@ fun AppBottomBar(
         ) {
             NavItem(
                 label = "Lists",
-                icon = Icons.AutoMirrored.Filled.List,
+                icon = rememberVectorPainter(Icons.AutoMirrored.Filled.List),
                 isSelected = currentTab == AppNavTab.LISTS,
                 onClick = { onTabSelected(AppNavTab.LISTS) },
             )
             NavItem(
                 label = "Contacts",
-                icon = Icons.Default.Person,
+                icon = rememberVectorPainter(Icons.Default.Person),
                 isSelected = currentTab == AppNavTab.CONTACTS,
                 onClick = { onTabSelected(AppNavTab.CONTACTS) },
             )
@@ -75,7 +75,7 @@ fun AppBottomBar(
             )
             NavItem(
                 label = "Profile",
-                icon = Icons.Default.AccountCircle,
+                icon = rememberVectorPainter(Icons.Default.AccountCircle),
                 isSelected = currentTab == AppNavTab.PROFILE,
                 onClick = { onTabSelected(AppNavTab.PROFILE) },
             )
@@ -86,7 +86,7 @@ fun AppBottomBar(
 @Composable
 private fun NavItem(
     label: String,
-    icon: Any,
+    icon: Painter,
     isSelected: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -101,24 +101,12 @@ private fun NavItem(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(2.dp),
     ) {
-        when (icon) {
-            is ImageVector -> {
-                Icon(
-                    imageVector = icon,
-                    contentDescription = label,
-                    tint = if (isSelected) activeColor else inactiveColor,
-                    modifier = Modifier.size(22.dp),
-                )
-            }
-            is Painter -> {
-                Icon(
-                    painter = icon,
-                    contentDescription = label,
-                    tint = if (isSelected) activeColor else inactiveColor,
-                    modifier = Modifier.size(22.dp),
-                )
-            }
-        }
+        Icon(
+            painter = icon,
+            contentDescription = label,
+            tint = if (isSelected) activeColor else inactiveColor,
+            modifier = Modifier.size(22.dp),
+        )
         Text(
             text = label,
             fontSize = 10.sp,

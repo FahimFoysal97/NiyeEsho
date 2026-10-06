@@ -1,17 +1,13 @@
 package com.snehonir.niyeesho.app
 
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.safeDrawingPadding
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
 import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoTheme
@@ -28,6 +24,10 @@ import com.snehonir.niyeesho.features.dashboard.presentation.DashboardScreen
 import com.snehonir.niyeesho.features.shopping_list.presentation.detail.ListDetailScreen
 import org.koin.compose.koinInject
 
+import com.snehonir.niyeesho.features.splash.presentation.SplashScreen
+import kotlinx.coroutines.delay
+import kotlin.time.Duration.Companion.milliseconds
+
 @Composable
 fun NiyeEshoApp(
     modifier: Modifier = Modifier,
@@ -42,19 +42,16 @@ fun NiyeEshoApp(
         logD("NiyeEshoApp", "LaunchedEffect checking auth status via IsSignedInUseCase")
         val signedIn = isSignedIn().getOrDefault(false)
         logD("NiyeEshoApp", "Auth check result signedIn = $signedIn")
+        // Allow user to see the animated splash screen
+        delay(1600L.milliseconds)
         startDestination = if (signedIn) NavRoute.ShoppingLists.route else NavRoute.SignIn.route
         logD("NiyeEshoApp", "Determined startDestination = $startDestination")
     }
 
     NiyeEshoTheme {
         if (startDestination == null) {
-            logD("NiyeEshoApp", "Showing loading progress indicator while startDestination is loading")
-            Box(
-                modifier = modifier.fillMaxSize().safeDrawingPadding(),
-                contentAlignment = Alignment.Center,
-            ) {
-                CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
-            }
+            logD("NiyeEshoApp", "Showing animated SplashScreen while startDestination is loading")
+            SplashScreen(modifier = modifier.fillMaxSize())
         } else {
             logD("NiyeEshoApp", "Navigating to NiyeEshoNavGraph with startDestination = $startDestination")
             NiyeEshoNavGraph(

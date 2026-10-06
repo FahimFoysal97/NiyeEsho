@@ -30,7 +30,10 @@ import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoGreenPrimary
 import com.snehonir.niyeesho.core.designsystem.theme.Spacing
 import niyeesho.shared.generated.resources.Res
 import niyeesho.shared.generated.resources.contacts
+import niyeesho.shared.generated.resources.lists
 import niyeesho.shared.generated.resources.person_add
+import niyeesho.shared.generated.resources.profile
+import niyeesho.shared.generated.resources.scan
 import org.jetbrains.compose.resources.painterResource
 
 enum class AppNavTab {
@@ -58,7 +61,7 @@ fun AppBottomBar(
         ) {
             NavItem(
                 label = "Lists",
-                icon = rememberVectorPainter(Icons.AutoMirrored.Filled.List),
+                icon = painterResource(Res.drawable.lists),
                 isSelected = currentTab == AppNavTab.LISTS,
                 onClick = { onTabSelected(AppNavTab.LISTS) },
             )
@@ -70,13 +73,13 @@ fun AppBottomBar(
             )
             NavItem(
                 label = "Invite",
-                icon = painterResource(Res.drawable.person_add),
+                icon = painterResource(Res.drawable.scan),
                 isSelected = currentTab == AppNavTab.INVITE,
                 onClick = { onTabSelected(AppNavTab.INVITE) },
             )
             NavItem(
                 label = "Profile",
-                icon = rememberVectorPainter(Icons.Default.Person),
+                icon = painterResource(Res.drawable.profile),
                 isSelected = currentTab == AppNavTab.PROFILE,
                 onClick = { onTabSelected(AppNavTab.PROFILE) },
             )

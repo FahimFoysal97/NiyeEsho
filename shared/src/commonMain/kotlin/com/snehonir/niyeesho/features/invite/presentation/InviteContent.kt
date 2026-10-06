@@ -1,6 +1,13 @@
 package com.snehonir.niyeesho.features.invite.presentation
 
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -18,14 +25,20 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.snehonir.niyeesho.core.designsystem.component.AppBottomBar
 import com.snehonir.niyeesho.core.designsystem.component.AppNavTab
@@ -326,12 +339,9 @@ fun InviteContent(
                                     modifier = Modifier.fillMaxSize(),
                                 )
 
-                                Box(modifier = Modifier.size(180.dp)) {
-                                    Box(modifier = Modifier.size(30.dp).align(Alignment.TopStart).border(3.5.dp, NiyeEshoGreenPrimary, RoundedCornerShape(topStart = 10.dp)))
-                                    Box(modifier = Modifier.size(30.dp).align(Alignment.TopEnd).border(3.5.dp, NiyeEshoGreenPrimary, RoundedCornerShape(topEnd = 10.dp)))
-                                    Box(modifier = Modifier.size(30.dp).align(Alignment.BottomStart).border(3.5.dp, NiyeEshoGreenPrimary, RoundedCornerShape(bottomStart = 10.dp)))
-                                    Box(modifier = Modifier.size(30.dp).align(Alignment.BottomEnd).border(3.5.dp, NiyeEshoGreenPrimary, RoundedCornerShape(bottomEnd = 10.dp)))
-                                }
+                                QrScannerOverlay(
+                                    modifier = Modifier.size(240.dp),
+                                )
                                 // Pill badge inside camera view
                                 Surface(
                                     onClick = {
@@ -530,6 +540,101 @@ fun InviteContent(
                     AppNavTab.INVITE -> Unit
                 }
             },
+        )
+    }
+}
+
+@Composable
+fun QrScannerOverlay(
+    modifier: Modifier = Modifier,
+    cornerLength: Dp = 34.dp,
+    cornerRadius: Dp = 14.dp,
+    strokeWidth: Dp = 3.5.dp,
+    color: Color = Color(0xFF34D399),
+) {
+    val infiniteTransition = rememberInfiniteTransition(label = "ScannerLineAnimation")
+    val scanProgress by infiniteTransition.animateFloat(
+        initialValue = 0.08f,
+        targetValue = 0.92f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = 1800, easing = LinearEasing),
+            repeatMode = RepeatMode.Reverse,
+        ),
+        label = "ScanProgress",
+    )
+
+    Canvas(modifier = modifier) {
+        val width = size.width
+        val height = size.height
+        val armLen = cornerLength.toPx()
+        val radius = cornerRadius.toPx()
+        val stroke = strokeWidth.toPx()
+
+        // 1. Top-Left Corner
+        val topLeftPath = Path().apply {
+            moveTo(0f, armLen)
+            lineTo(0f, radius)
+            quadraticTo(0f, 0f, radius, 0f)
+            lineTo(armLen, 0f)
+        }
+        drawPath(topLeftPath, color = color, style = Stroke(width = stroke, cap = StrokeCap.Round))
+
+        // 2. Top-Right Corner
+        val topRightPath = Path().apply {
+            moveTo(width - armLen, 0f)
+            lineTo(width - radius, 0f)
+            quadraticTo(width, 0f, width, radius)
+            lineTo(width, armLen)
+        }
+        drawPath(topRightPath, color = color, style = Stroke(width = stroke, cap = StrokeCap.Round))
+
+        // 3. Bottom-Left Corner
+        val bottomLeftPath = Path().apply {
+            moveTo(0f, height - armLen)
+            lineTo(0f, height - radius)
+            quadraticTo(0f, height, radius, height)
+            lineTo(armLen, height)
+        }
+        drawPath(bottomLeftPath, color = color, style = Stroke(width = stroke, cap = StrokeCap.Round))
+
+        // 4. Bottom-Right Corner
+        val bottomRightPath = Path().apply {
+            moveTo(width - armLen, height)
+            lineTo(width - radius, height)
+            quadraticTo(width, height, width, height - radius)
+            lineTo(width, height - armLen)
+        }
+        drawPath(bottomRightPath, color = color, style = Stroke(width = stroke, cap = StrokeCap.Round))
+
+        // 5. Moving Laser Line
+        val yPos = height * scanProgress
+        val lineMargin = 10.dp.toPx()
+        val lineLeft = lineMargin
+        val lineRight = width - lineMargin
+        val glowHeight = 16.dp.toPx()
+
+        // Symmetric laser glow effect (top & bottom shadow)
+        drawRect(
+            brush = Brush.verticalGradient(
+                colors = listOf(
+                    color.copy(alpha = 0.0f),
+                    color.copy(alpha = 0.35f),
+                    color.copy(alpha = 0.0f),
+                ),
+                startY = yPos - glowHeight,
+                endY = yPos + glowHeight,
+            ),
+            topLeft = Offset(lineLeft, yPos - glowHeight),
+            size = Size(lineRight - lineLeft, glowHeight * 2f),
+        )
+
+        // Laser line
+        drawLine(
+            color = color,
+            start = Offset(lineLeft, yPos),
+            end = Offset(lineRight, yPos),
+            strokeWidth = 2.5.dp.toPx(),
+            cap = StrokeCap.Round,
         )
     }
 }

@@ -1,6 +1,6 @@
 package com.snehonir.niyeesho.features.invite.presentation
 
-enum class ScannerStep { SCAN, CONNECTED }
+enum class ScannerStep { SCAN, CONNECTED, FAILED }
 
 data class InviteUiState(
     val inviteLink: String = "niyeesho.app/invite?uid=user_demo&token=demo_token",
@@ -12,4 +12,5 @@ data class InviteUiState(
     val myAvatarUrl: String? = null,
     val connectedFriendName: String = "Nadia",
     val connectedFriendAvatarUrl: String? = null,
+    val errorMessage: String? = null,
 )

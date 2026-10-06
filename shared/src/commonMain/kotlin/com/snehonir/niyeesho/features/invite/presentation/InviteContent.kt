@@ -17,17 +17,43 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Share
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -52,7 +78,12 @@ import androidx.compose.ui.unit.sp
 import com.snehonir.niyeesho.core.designsystem.component.AppBottomBar
 import com.snehonir.niyeesho.core.designsystem.component.AppNavTab
 import com.snehonir.niyeesho.core.designsystem.component.AvatarImage
-import com.snehonir.niyeesho.core.designsystem.theme.*
+import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoDarkBg
+import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoDarkSurface
+import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoDarkSurfaceInner
+import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoGreenPrimary
+import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoIndigoTertiary
+import com.snehonir.niyeesho.core.designsystem.theme.Spacing
 import com.snehonir.niyeesho.features.contacts.presentation.component.QrCodeDisplay
 import com.snehonir.niyeesho.features.contacts.presentation.component.rememberQrImageHelper
 import com.snehonir.niyeesho.features.invite.presentation.component.CameraQrScannerView
@@ -473,6 +504,13 @@ fun InviteContent(
                         ScannerStep.CONNECTED -> {
                             ConnectedSuccessView(uiState = uiState)
                         }
+
+                        ScannerStep.FAILED -> {
+                            ConnectionFailedView(
+                                uiState = uiState,
+                                onTryAgain = { onAction(InviteUiAction.SwitchToScan) },
+                            )
+                        }
                     }
                 }
             }
@@ -801,6 +839,197 @@ fun ConnectedSuccessView(
                     .height(4.dp)
                     .clip(RoundedCornerShape(2.dp)),
                 color = NiyeEshoGreenPrimary,
+                trackColor = Color(0xFF16241C),
+            )
+        }
+    }
+}
+
+@Composable
+fun ConnectionFailedView(
+    uiState: InviteUiState,
+    onTryAgain: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    var visible by remember { mutableStateOf(false) }
+    val returnProgress = remember { Animatable(0f) }
+
+    LaunchedEffect(Unit) {
+        visible = true
+        returnProgress.animateTo(
+            targetValue = 1f,
+            animationSpec = tween(
+                durationMillis = 4000,
+                easing = LinearEasing,
+            ),
+        )
+    }
+
+    val iconScale by animateFloatAsState(
+        targetValue = if (visible) 1f else 0f,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessLow,
+        ),
+        label = "ErrorIconScale",
+    )
+
+    val contentAlpha by animateFloatAsState(
+        targetValue = if (visible) 1f else 0f,
+        animationSpec = tween(durationMillis = 600, delayMillis = 150),
+        label = "ContentAlpha",
+    )
+
+    val contentOffsetY by animateDpAsState(
+        targetValue = if (visible) 0.dp else 24.dp,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioNoBouncy,
+            stiffness = Spring.StiffnessMediumLow,
+        ),
+        label = "ContentOffsetY",
+    )
+
+    val infiniteTransition = rememberInfiniteTransition(label = "FailedPulse")
+    val ringPulseScale by infiniteTransition.animateFloat(
+        initialValue = 0.95f,
+        targetValue = 1.08f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = 1400, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse,
+        ),
+        label = "RingPulseScale",
+    )
+    val ringPulseAlpha by infiniteTransition.animateFloat(
+        initialValue = 0.7f,
+        targetValue = 1.0f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = 1400, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse,
+        ),
+        label = "RingPulseAlpha",
+    )
+
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(horizontal = Spacing.lg),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f),
+            contentAlignment = Alignment.Center,
+        ) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
+            ) {
+                // Concentric Glowing Red Error Circles
+                Box(
+                    modifier = Modifier
+                        .size(170.dp)
+                        .graphicsLayer {
+                            scaleX = iconScale
+                            scaleY = iconScale
+                        },
+                    contentAlignment = Alignment.Center,
+                ) {
+                    // Outer Red Ring 2
+                    Box(
+                        modifier = Modifier
+                            .size(164.dp * ringPulseScale)
+                            .clip(CircleShape)
+                            .background(Color(0xFFEF4444).copy(alpha = 0.12f * ringPulseAlpha)),
+                    )
+                    // Inner Red Ring 1
+                    Box(
+                        modifier = Modifier
+                            .size(128.dp * ringPulseScale)
+                            .clip(CircleShape)
+                            .background(Color(0xFFEF4444).copy(alpha = 0.28f * ringPulseAlpha)),
+                    )
+                    // Solid Center Red Circle
+                    Box(
+                        modifier = Modifier
+                            .size(92.dp)
+                            .clip(CircleShape)
+                            .background(Color(0xFFEF4444)),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            contentDescription = "Failed",
+                            tint = Color.White,
+                            modifier = Modifier.size(46.dp),
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(28.dp))
+
+                // Text + Try Again Button
+                Column(
+                    modifier = Modifier
+                        .offset(y = contentOffsetY)
+                        .graphicsLayer { alpha = contentAlpha },
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        Text(
+                            text = "Connection Failed",
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White,
+                            fontSize = 26.sp,
+                        )
+
+                        Text(
+                            text = uiState.errorMessage ?: "Invalid invite link or connection error. Please try again.",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = Color(0xFF7F9D8E),
+                            textAlign = TextAlign.Center,
+                            fontSize = 15.sp,
+                        )
+                    }
+
+                    Button(
+                        onClick = onTryAgain,
+                        shape = RoundedCornerShape(12.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFF1F2D24),
+                            contentColor = Color(0xFFCFE3D8),
+                        ),
+                    ) {
+                        Text(
+                            text = "Try Again",
+                            style = MaterialTheme.typography.labelLarge,
+                            fontWeight = FontWeight.Bold,
+                        )
+                    }
+                }
+            }
+        }
+
+        // Bottom Progress Bar (Red/Dark track)
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = Spacing.lg),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            LinearProgressIndicator(
+                progress = { returnProgress.value },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(4.dp)
+                    .clip(RoundedCornerShape(2.dp)),
+                color = Color(0xFFEF4444),
                 trackColor = Color(0xFF16241C),
             )
         }

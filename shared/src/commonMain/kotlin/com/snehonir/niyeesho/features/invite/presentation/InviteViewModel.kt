@@ -71,8 +71,8 @@ class InviteViewModel(
 
     fun onAction(action: InviteUiAction) {
         when (action) {
-            is InviteUiAction.SubTabSelected -> _uiState.update { it.copy(selectedSubTab = action.index) }
-            InviteUiAction.SwitchToScan -> _uiState.update { it.copy(scannerStep = ScannerStep.SCAN, pastedLink = "") }
+            is InviteUiAction.SubTabSelected -> _uiState.update { it.copy(selectedSubTab = action.index, scannerStep = ScannerStep.SCAN, errorMessage = null) }
+            InviteUiAction.SwitchToScan -> _uiState.update { it.copy(scannerStep = ScannerStep.SCAN, pastedLink = "", errorMessage = null) }
             is InviteUiAction.PastedLinkClicked -> _uiState.update { it.copy(pastedLink = action.link) }
             InviteUiAction.ConnectInviteClicked -> handleConnectInvite()
             InviteUiAction.SaveQrImage -> viewModelScope.launch { _uiEvent.send(InviteUiEvent.ShowToast("QR code saved")) }
@@ -85,41 +85,65 @@ class InviteViewModel(
     private fun handleConnectInvite() {
         viewModelScope.launch {
             val link = _uiState.value.pastedLink.trim()
-            if (link.isNotBlank()) {
-                val invite = DeepLinkHandler.parse(link)
-                val friendName = invite?.name?.ifBlank { null } ?: "Friend"
-                val friendAvatar = invite?.avatar?.ifBlank { null } ?: invite?.driveUrl?.ifBlank { null }
+            if (link.isBlank()) return@launch
 
-                if (invite != null) {
-                    val now = Clock.System.now()
-                    val contactEmail = invite.email
-                        ?: if (invite.name.contains("@")) invite.name
-                        else if (invite.name.isNotBlank()) "${invite.name.lowercase().replace(" ", ".")}@gmail.com"
-                        else "${invite.uid}@gmail.com"
-
-                    val contact = Contact(
-                        uid = invite.uid,
-                        displayName = friendName,
-                        email = contactEmail,
-                        avatarUrl = friendAvatar,
-                        profileDriveUrl = invite.driveUrl,
-                        cachedFcmToken = invite.token,
-                        tokenCachedAt = now,
-                        connectedAt = now,
-                    )
-                    addContactFromInvite(contact)
-                }
-
+            val invite = DeepLinkHandler.parse(link)
+            if (invite == null) {
                 _uiState.update {
                     it.copy(
-                        scannerStep = ScannerStep.CONNECTED,
-                        connectedFriendName = friendName,
-                        connectedFriendAvatarUrl = friendAvatar,
+                        scannerStep = ScannerStep.FAILED,
+                        errorMessage = "Invalid or unrecognized invite link.",
                     )
                 }
                 kotlinx.coroutines.delay(4.seconds)
-                _uiState.update { it.copy(scannerStep = ScannerStep.SCAN, pastedLink = "") }
+                _uiState.update { it.copy(scannerStep = ScannerStep.SCAN, errorMessage = null) }
+                return@launch
             }
+
+            val friendName = invite.name.ifBlank { "Friend" }
+            val friendAvatar = invite.avatar?.ifBlank { null } ?: invite.driveUrl.ifBlank { null }
+            val now = Clock.System.now()
+            val contactEmail = invite.email
+                ?: if (invite.name.contains("@")) invite.name
+                else if (invite.name.isNotBlank()) "${invite.name.lowercase().replace(" ", ".")}@gmail.com"
+                else "${invite.uid}@gmail.com"
+
+            val contact = Contact(
+                uid = invite.uid,
+                displayName = friendName,
+                email = contactEmail,
+                avatarUrl = friendAvatar,
+                profileDriveUrl = invite.driveUrl,
+                cachedFcmToken = invite.token,
+                tokenCachedAt = now,
+                connectedAt = now,
+            )
+
+            val result = addContactFromInvite(contact)
+            result.fold(
+                onSuccess = {
+                    _uiState.update {
+                        it.copy(
+                            scannerStep = ScannerStep.CONNECTED,
+                            connectedFriendName = friendName,
+                            connectedFriendAvatarUrl = friendAvatar,
+                            errorMessage = null,
+                        )
+                    }
+                    kotlinx.coroutines.delay(4.seconds)
+                    _uiState.update { it.copy(scannerStep = ScannerStep.SCAN, pastedLink = "") }
+                },
+                onFailure = { error ->
+                    _uiState.update {
+                        it.copy(
+                            scannerStep = ScannerStep.FAILED,
+                            errorMessage = error.message ?: "Failed to save connection.",
+                        )
+                    }
+                    kotlinx.coroutines.delay(4.seconds)
+                    _uiState.update { it.copy(scannerStep = ScannerStep.SCAN, errorMessage = null) }
+                },
+            )
         }
     }
 }

@@ -43,18 +43,28 @@ class InviteViewModel(
     private fun loadInviteLink() {
         viewModelScope.launch {
             val user = getCurrentUser().getOrNull()
+            val myName = user?.displayName?.ifBlank { null } ?: "Me"
+            val myAvatar = user?.avatarUrl
+
             val inviteData = InviteData(
                 uid = user?.uid ?: "user_demo",
-                name = user?.displayName ?: "User",
+                name = myName,
                 email = user?.email,
                 token = tokenManager.getFcmToken() ?: "fcm_token_placeholder",
-                driveUrl = user?.avatarUrl ?: "",
-                avatar = user?.avatarUrl,
+                driveUrl = myAvatar ?: "",
+                avatar = myAvatar,
             )
             generateInviteLink(inviteData)
                 .onSuccess { link ->
-                    val shortCode = "${(user?.displayName ?: "user").lowercase().take(4)}-${(user?.uid ?: "demo").take(4)}"
-                    _uiState.update { it.copy(inviteLink = link, displayInviteCode = shortCode) }
+                    val shortCode = "${myName.lowercase().take(4)}-${(user?.uid ?: "demo").take(4)}"
+                    _uiState.update {
+                        it.copy(
+                            inviteLink = link,
+                            displayInviteCode = shortCode,
+                            myName = myName,
+                            myAvatarUrl = myAvatar,
+                        )
+                    }
                 }
         }
     }
@@ -77,7 +87,8 @@ class InviteViewModel(
             val link = _uiState.value.pastedLink.trim()
             if (link.isNotBlank()) {
                 val invite = DeepLinkHandler.parse(link)
-                val friendName = invite?.name ?: "Friend"
+                val friendName = invite?.name?.ifBlank { null } ?: "Friend"
+                val friendAvatar = invite?.avatar?.ifBlank { null } ?: invite?.driveUrl?.ifBlank { null }
 
                 if (invite != null) {
                     val now = Clock.System.now()
@@ -88,9 +99,9 @@ class InviteViewModel(
 
                     val contact = Contact(
                         uid = invite.uid,
-                        displayName = invite.name,
+                        displayName = friendName,
                         email = contactEmail,
-                        avatarUrl = invite.avatar ?: invite.driveUrl,
+                        avatarUrl = friendAvatar,
                         profileDriveUrl = invite.driveUrl,
                         cachedFcmToken = invite.token,
                         tokenCachedAt = now,
@@ -99,9 +110,15 @@ class InviteViewModel(
                     addContactFromInvite(contact)
                 }
 
-                _uiState.update { it.copy(scannerStep = ScannerStep.CONNECTED, connectedFriendName = friendName) }
-                kotlinx.coroutines.delay(2.seconds)
-                _uiState.update { it.copy(scannerStep = ScannerStep.SCAN, pastedLink = "", connectedFriendName = "Nadia") }
+                _uiState.update {
+                    it.copy(
+                        scannerStep = ScannerStep.CONNECTED,
+                        connectedFriendName = friendName,
+                        connectedFriendAvatarUrl = friendAvatar,
+                    )
+                }
+                kotlinx.coroutines.delay(4.seconds)
+                _uiState.update { it.copy(scannerStep = ScannerStep.SCAN, pastedLink = "") }
             }
         }
     }

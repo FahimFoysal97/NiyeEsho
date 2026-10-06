@@ -1,10 +1,16 @@
 package com.snehonir.niyeesho.features.invite.presentation
 
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
@@ -32,16 +38,20 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.snehonir.niyeesho.core.designsystem.component.AppBottomBar
 import com.snehonir.niyeesho.core.designsystem.component.AppNavTab
+import com.snehonir.niyeesho.core.designsystem.component.AvatarImage
 import com.snehonir.niyeesho.core.designsystem.theme.*
 import com.snehonir.niyeesho.features.contacts.presentation.component.QrCodeDisplay
 import com.snehonir.niyeesho.features.contacts.presentation.component.rememberQrImageHelper
@@ -461,68 +471,7 @@ fun InviteContent(
                         }
 
                         ScannerStep.CONNECTED -> {
-                            Column(
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .padding(vertical = Spacing.xxl),
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.Center,
-                            ) {
-                                Box(
-                                    modifier = Modifier
-                                        .size(84.dp)
-                                        .clip(CircleShape)
-                                        .background(NiyeEshoGreenPrimary),
-                                    contentAlignment = Alignment.Center,
-                                ) {
-                                    Icon(Icons.Default.Check, contentDescription = "Connected", tint = Color.White, modifier = Modifier.size(40.dp))
-                                }
-
-                                Row(
-                                    modifier = Modifier.padding(vertical = 16.dp),
-                                    horizontalArrangement = Arrangement.spacedBy(12.dp),
-                                    verticalAlignment = Alignment.CenterVertically,
-                                ) {
-                                    Box(
-                                        modifier = Modifier
-                                            .size(52.dp)
-                                            .clip(CircleShape)
-                                            .background(NiyeEshoGreenPrimary),
-                                        contentAlignment = Alignment.Center,
-                                    ) {
-                                        Text("M", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = Color.White)
-                                    }
-                                    Icon(
-                                        imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-                                        contentDescription = "Connected",
-                                        tint = Color(0xFF34D399),
-                                        modifier = Modifier.size(24.dp),
-                                    )
-                                    Box(
-                                        modifier = Modifier
-                                            .size(52.dp)
-                                            .clip(CircleShape)
-                                            .background(NiyeEshoIndigoTertiary),
-                                        contentAlignment = Alignment.Center,
-                                    ) {
-                                        Text("N", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = Color.White)
-                                    }
-                                }
-
-                                Text(
-                                    text = "You're connected!",
-                                    style = MaterialTheme.typography.titleLarge,
-                                    fontWeight = FontWeight.Bold,
-                                    color = Color.White,
-                                )
-
-                                Text(
-                                    text = "You and ${uiState.connectedFriendName} can now share lists.",
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = Color(0xFF7F9D8E),
-                                    textAlign = TextAlign.Center,
-                                )
-                            }
+                            ConnectedSuccessView(uiState = uiState)
                         }
                     }
                 }
@@ -636,5 +585,224 @@ fun QrScannerOverlay(
             strokeWidth = 2.5.dp.toPx(),
             cap = StrokeCap.Round,
         )
+    }
+}
+
+@Composable
+fun ConnectedSuccessView(
+    uiState: InviteUiState,
+    modifier: Modifier = Modifier,
+) {
+    var visible by remember { mutableStateOf(false) }
+    val returnProgress = remember { Animatable(0f) }
+
+    LaunchedEffect(Unit) {
+        visible = true
+        returnProgress.animateTo(
+            targetValue = 1f,
+            animationSpec = tween(
+                durationMillis = 4000,
+                easing = LinearEasing,
+            ),
+        )
+    }
+
+    val checkScale by animateFloatAsState(
+        targetValue = if (visible) 1f else 0f,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessLow,
+        ),
+        label = "CheckScale",
+    )
+
+    val contentAlpha by animateFloatAsState(
+        targetValue = if (visible) 1f else 0f,
+        animationSpec = tween(durationMillis = 600, delayMillis = 150),
+        label = "ContentAlpha",
+    )
+
+    val contentOffsetY by animateDpAsState(
+        targetValue = if (visible) 0.dp else 24.dp,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioNoBouncy,
+            stiffness = Spring.StiffnessMediumLow,
+        ),
+        label = "ContentOffsetY",
+    )
+
+    val infiniteTransition = rememberInfiniteTransition(label = "ConnectedPulse")
+    val ringPulseScale by infiniteTransition.animateFloat(
+        initialValue = 0.95f,
+        targetValue = 1.08f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = 1400, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse,
+        ),
+        label = "RingPulseScale",
+    )
+    val ringPulseAlpha by infiniteTransition.animateFloat(
+        initialValue = 0.7f,
+        targetValue = 1.0f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = 1400, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse,
+        ),
+        label = "RingPulseAlpha",
+    )
+
+    val arrowShift by infiniteTransition.animateFloat(
+        initialValue = -2.5f,
+        targetValue = 2.5f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = 800, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse,
+        ),
+        label = "ArrowShift",
+    )
+
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(horizontal = Spacing.lg),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f),
+            contentAlignment = Alignment.Center,
+        ) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
+            ) {
+                // Concentric Glowing Checkmark Circles
+                Box(
+                    modifier = Modifier
+                        .size(170.dp)
+                        .graphicsLayer {
+                            scaleX = checkScale
+                            scaleY = checkScale
+                        },
+                    contentAlignment = Alignment.Center,
+                ) {
+                    // Outer Ring 2
+                    Box(
+                        modifier = Modifier
+                            .size(164.dp * ringPulseScale)
+                            .clip(CircleShape)
+                            .background(Color(0xFF1B8A6B).copy(alpha = 0.12f * ringPulseAlpha)),
+                    )
+                    // Inner Ring 1
+                    Box(
+                        modifier = Modifier
+                            .size(128.dp * ringPulseScale)
+                            .clip(CircleShape)
+                            .background(Color(0xFF1B8A6B).copy(alpha = 0.28f * ringPulseAlpha)),
+                    )
+                    // Solid Center Circle
+                    Box(
+                        modifier = Modifier
+                            .size(92.dp)
+                            .clip(CircleShape)
+                            .background(NiyeEshoGreenPrimary),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Check,
+                            contentDescription = "Connected",
+                            tint = Color.White,
+                            modifier = Modifier.size(46.dp),
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(28.dp))
+
+                // Avatars Row + Text (Animated Entrance)
+                Column(
+                    modifier = Modifier
+                        .offset(y = contentOffsetY)
+                        .graphicsLayer { alpha = contentAlpha },
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(20.dp),
+                ) {
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(16.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        // My Avatar
+                        AvatarImage(
+                            avatarUrl = uiState.myAvatarUrl,
+                            contentDescription = uiState.myName,
+                            size = 58.dp,
+                            backgroundColor = NiyeEshoGreenPrimary,
+                            textColor = Color.White,
+                        )
+
+                        // Bidirectional Exchange Arrows
+                        Text(
+                            text = "⇄",
+                            style = TextStyle(
+                                fontSize = 24.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = Color(0xFF34D399),
+                            ),
+                            modifier = Modifier.offset(x = arrowShift.dp),
+                        )
+
+                        // Friend Avatar
+                        AvatarImage(
+                            avatarUrl = uiState.connectedFriendAvatarUrl,
+                            contentDescription = uiState.connectedFriendName,
+                            size = 58.dp,
+                            backgroundColor = NiyeEshoIndigoTertiary,
+                            textColor = Color.White,
+                        )
+                    }
+
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        Text(
+                            text = "You're connected!",
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White,
+                            fontSize = 26.sp,
+                        )
+
+                        Text(
+                            text = "You and ${uiState.connectedFriendName} can now share lists.",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = Color(0xFF7F9D8E),
+                            textAlign = TextAlign.Center,
+                            fontSize = 15.sp,
+                        )
+                    }
+                }
+            }
+        }
+
+        // Bottom Progress Bar
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = Spacing.lg),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            LinearProgressIndicator(
+                progress = { returnProgress.value },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(4.dp)
+                    .clip(RoundedCornerShape(2.dp)),
+                color = NiyeEshoGreenPrimary,
+                trackColor = Color(0xFF16241C),
+            )
+        }
     }
 }

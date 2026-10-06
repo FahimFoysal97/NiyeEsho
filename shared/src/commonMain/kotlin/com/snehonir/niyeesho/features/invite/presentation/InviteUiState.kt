@@ -8,5 +8,8 @@ data class InviteUiState(
     val selectedSubTab: Int = 0, // 0 = My code, 1 = Scan
     val scannerStep: ScannerStep = ScannerStep.SCAN,
     val pastedLink: String = "",
+    val myName: String = "User",
+    val myAvatarUrl: String? = null,
     val connectedFriendName: String = "Nadia",
+    val connectedFriendAvatarUrl: String? = null,
 )

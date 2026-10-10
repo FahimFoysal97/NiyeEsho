@@ -40,9 +40,17 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.snehonir.niyeesho.core.designsystem.component.ErrorView
+import com.snehonir.niyeesho.core.designsystem.theme.AppShapes
+import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoButtonGradientEnd
+import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoButtonGradientStart
 import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoDarkBg
 import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoDarkSurface
+import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoEmeraldAccent
 import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoGreenLight
+import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoLightTeal
+import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoSoftGreen
+import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoTextMuted
+import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoTextSubtle
 
 @Composable
 fun SignInContent(
@@ -51,7 +59,7 @@ fun SignInContent(
     modifier: Modifier = Modifier,
 ) {
     val gradientBrush = Brush.horizontalGradient(
-        colors = listOf(NiyeEshoGreenLight, Color(0xFF34D399)),
+        colors = listOf(NiyeEshoGreenLight, NiyeEshoEmeraldAccent),
     )
 
     Box(
@@ -80,10 +88,10 @@ fun SignInContent(
                 Box(
                     modifier = Modifier
                         .size(60.dp)
-                        .clip(RoundedCornerShape(20.dp))
+                        .clip(AppShapes.surfaceLarge)
                         .background(
                             Brush.linearGradient(
-                                colors = listOf(Color(0xFF22A07E), Color(0xFF146B52)),
+                                colors = listOf(NiyeEshoButtonGradientStart, NiyeEshoButtonGradientEnd),
                             ),
                         ),
                     contentAlignment = Alignment.Center,
@@ -91,7 +99,7 @@ fun SignInContent(
                     Icon(
                         imageVector = Icons.Default.ShoppingCart,
                         contentDescription = "Niye Esho Logo",
-                        tint = Color(0xFFD1FAE5),
+                        tint = NiyeEshoLightTeal,
                         modifier = Modifier.size(30.dp),
                     )
                 }
@@ -131,7 +139,7 @@ fun SignInContent(
                 Text(
                     text = tagText,
                     fontSize = 15.sp,
-                    color = Color(0xFFB9D8C9),
+                    color = NiyeEshoSoftGreen,
                     textAlign = TextAlign.Center,
                     lineHeight = 22.sp,
                 )
@@ -198,7 +206,7 @@ fun SignInContent(
                     Text(
                         text = "No account needed beyond Google. We store nothing about you.",
                         fontSize = 11.5.sp,
-                        color = Color(0xFF6F8F7F),
+                        color = NiyeEshoTextMuted,
                         textAlign = TextAlign.Center,
                         lineHeight = 16.sp,
                     )
@@ -217,7 +225,7 @@ private fun RefinedFeatureCard(
 ) {
     Surface(
         modifier = modifier,
-        shape = RoundedCornerShape(14.dp),
+        shape = AppShapes.card,
         color = NiyeEshoDarkSurface.copy(alpha = 0.6f),
         border = androidx.compose.foundation.BorderStroke(1.dp, Color.White.copy(alpha = 0.07f)),
     ) {
@@ -231,13 +239,13 @@ private fun RefinedFeatureCard(
             Icon(
                 imageVector = icon,
                 contentDescription = null,
-                tint = Color(0xFF34D399),
+                tint = NiyeEshoEmeraldAccent,
                 modifier = Modifier.size(20.dp),
             )
             Text(
                 text = "$title\n$subtitle",
                 style = MaterialTheme.typography.labelSmall,
-                color = Color(0xFF7F9D8E),
+                color = NiyeEshoTextSubtle,
                 textAlign = TextAlign.Center,
                 fontSize = 10.5.sp,
                 lineHeight = 14.sp,

@@ -23,6 +23,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import com.snehonir.niyeesho.core.designsystem.theme.ErrorDark
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoCheckboxBorder
@@ -99,7 +100,7 @@ fun ListItemRow(
                     Icon(
                         imageVector = Icons.Default.Delete,
                         contentDescription = "Delete item",
-                        tint = Color(0xFFE05252),
+                        tint = ErrorDark,
                         modifier = Modifier.size(18.dp),
                     )
                 }

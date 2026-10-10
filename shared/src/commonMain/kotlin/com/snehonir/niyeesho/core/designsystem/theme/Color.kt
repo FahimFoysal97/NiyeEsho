@@ -78,6 +78,23 @@ val OnErrorDark = Color.White
 val ErrorContainerDark = Color(0xFF7F1D1D)
 val OnErrorContainerDark = Color(0xFFFEE2E2)
 
+// UI Accent Colors
+val NiyeEshoMutedGreenText = Color(0xFFCFE3D8)
+val NiyeEshoBrightRed = Color(0xFFEF4444)
+val NiyeEshoEmeraldAccent = Color(0xFF34D399)
+val NiyeEshoDarkSurfaceVariant = Color(0xFF16241C)
+val NiyeEshoBorderSubtle = Color(0xFF2A3D32)
+val NiyeEshoTextSubtle = Color(0xFF7F9D8E)
+val NiyeEshoTextMuted = Color(0xFF6F8A7C)
+val NiyeEshoLightTeal = Color(0xFFD1FAE5)
+val NiyeEshoSoftGreen = Color(0xFFB9D8C9)
+val NiyeEshoSageGreen = Color(0xFF9FC4B2)
+val NiyeEshoButtonGradientStart = Color(0xFF22A07E)
+val NiyeEshoButtonGradientEnd = Color(0xFF146B52)
+val InviteGradientTop = Color(0xFF1C2A22)
+val InviteGradientBottom = Color(0xFF0A120D)
+val NiyeEshoSoftRed = Color(0xFFFF8083)
+
 // Brand Gradients & Accents
 val NiyeEshoGradientTop = NiyeEshoDarkBg
 val NiyeEshoGradientBottom = Color(0xFF08120D)

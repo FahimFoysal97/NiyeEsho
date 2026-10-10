@@ -43,6 +43,10 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.TextStyle
+import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoEmeraldAccent
+import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoGreenLight
+import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoGreenPrimary
+import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoSageGreen
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -150,7 +154,7 @@ fun SplashScreen(
             // Glow A (Top-Right)
             drawCircle(
                 brush = Brush.radialGradient(
-                    colors = listOf(Color(0x801B8A6B), Color.Transparent),
+                    colors = listOf(NiyeEshoGreenPrimary.copy(alpha = 0.5f), Color.Transparent),
                     center = Offset(width + 110.dp.toPx(), -120.dp.toPx()),
                     radius = 340.dp.toPx()
                 ),
@@ -161,7 +165,7 @@ fun SplashScreen(
             // Glow B (Bottom-Left)
             drawCircle(
                 brush = Brush.radialGradient(
-                    colors = listOf(Color(0x2934D399), Color.Transparent),
+                    colors = listOf(NiyeEshoEmeraldAccent.copy(alpha = 0.16f), Color.Transparent),
                     center = Offset(-120.dp.toPx(), height + 110.dp.toPx()),
                     radius = 300.dp.toPx()
                 ),
@@ -171,7 +175,7 @@ fun SplashScreen(
 
             // Glow C (Center Breathing)
             val breathingRadius = 280.dp.toPx() * breatheScale
-            val breathingColor = Color(0x731B8A6B).copy(alpha = 0.45f * breatheOpacity)
+            val breathingColor = NiyeEshoGreenPrimary.copy(alpha = 0.45f * breatheOpacity)
             drawCircle(
                 brush = Brush.radialGradient(
                     colors = listOf(breathingColor, Color.Transparent),
@@ -199,7 +203,7 @@ fun SplashScreen(
                         val factor = (1f - (dist / maxDistance)).coerceIn(0f, 1f)
                         val dotAlpha = 0.12f * factor
                         drawCircle(
-                            color = Color(0xFFA7F3D0).copy(alpha = dotAlpha),
+                            color = NiyeEshoGreenLight.copy(alpha = dotAlpha),
                             radius = dotRadius,
                             center = Offset(x, y)
                         )
@@ -228,8 +232,8 @@ fun SplashScreen(
                     .shadow(
                         elevation = 28.dp,
                         shape = RoundedCornerShape(30.dp),
-                        spotColor = Color(0x801B8A6B),
-                        ambientColor = Color(0x801B8A6B)
+                        spotColor = NiyeEshoGreenPrimary.copy(alpha = 0.5f),
+                        ambientColor = NiyeEshoGreenPrimary.copy(alpha = 0.5f)
                     )
                     .clip(RoundedCornerShape(30.dp))
                     .size(132.dp)
@@ -250,7 +254,7 @@ fun SplashScreen(
                     fontSize = 52.sp,
                     fontWeight = FontWeight.Bold,
                     brush = Brush.horizontalGradient(
-                        colors = listOf(Color(0xFFA7F3D0), Color(0xFF34D399))
+                        colors = listOf(NiyeEshoGreenLight, NiyeEshoEmeraldAccent)
                     )
                 ),
                 modifier = Modifier
@@ -265,7 +269,7 @@ fun SplashScreen(
                 text = "Shared lists, made easy",
                 style = TextStyle(
                     fontSize = 14.sp,
-                    color = Color(0xFF9FC4B2)
+                    color = NiyeEshoSageGreen
                 ),
                 modifier = Modifier
                     .offset(y = tagOffsetY)
@@ -302,7 +306,7 @@ fun SplashScreen(
 @Composable
 private fun BouncingDotsLoader(
     modifier: Modifier = Modifier,
-    dotColor: Color = Color(0xFF34D399)
+    dotColor: Color = NiyeEshoEmeraldAccent
 ) {
     val infiniteTransition = rememberInfiniteTransition(label = "BouncingDots")
     val delays = listOf(0, 180, 360)

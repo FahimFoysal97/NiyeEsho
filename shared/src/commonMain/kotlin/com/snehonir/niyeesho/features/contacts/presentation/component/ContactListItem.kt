@@ -19,6 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import com.snehonir.niyeesho.core.designsystem.component.AvatarImage
+import com.snehonir.niyeesho.core.designsystem.theme.ErrorDark
 import com.snehonir.niyeesho.core.designsystem.theme.Spacing
 import com.snehonir.niyeesho.features.contacts.domain.entity.Contact
 
@@ -55,7 +56,7 @@ fun ContactListItem(
                 Icon(
                     imageVector = Icons.Default.Delete,
                     contentDescription = "Remove contact",
-                    tint = Color(0xFFE05252),
+                    tint = ErrorDark,
                 )
             }
         }

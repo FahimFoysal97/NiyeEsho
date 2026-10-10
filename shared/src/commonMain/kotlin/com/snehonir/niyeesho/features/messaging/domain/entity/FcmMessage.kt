@@ -8,7 +8,7 @@ data class FcmMessage(
     val senderName: String,
     val listId: String?,
     val timestamp: Instant,
-    val data: String,
+    val data: FcmMessageData = FcmMessageData.Generic(),
 ) {
     companion object {
         fun preview() = FcmMessage(
@@ -17,7 +17,7 @@ data class FcmMessage(
             senderName = "Sneho Nir",
             listId = "list_001",
             timestamp = Instant.parse("2026-06-15T10:00:00Z"),
-            data = "{\"itemId\":\"item_001\",\"name\":\"Milk\"}",
+            data = FcmMessageData.ShoppingListItem(action = ShoppingListItemAction.ADD, itemId = "item_001", name = "Milk"),
         )
     }
 }

@@ -4,11 +4,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.snehonir.niyeesho.core.navigation.DeepLinkHandler
 import com.snehonir.niyeesho.core.utils.TokenManager
+import com.snehonir.niyeesho.core.utils.logD
 import com.snehonir.niyeesho.features.auth.domain.usecase.GetCurrentUserUseCase
 import com.snehonir.niyeesho.features.contacts.domain.entity.Contact
+import com.snehonir.niyeesho.features.contacts.domain.entity.ContactStatus
 import com.snehonir.niyeesho.features.invite.domain.usecase.AddContactFromInviteUseCase
 import com.snehonir.niyeesho.features.messaging.domain.entity.InviteData
 import com.snehonir.niyeesho.features.messaging.domain.usecase.GenerateInviteLinkUseCase
+import com.snehonir.niyeesho.features.messaging.domain.usecase.SendContactRequestUseCase
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -29,6 +32,7 @@ class InviteViewModel(
     private val getCurrentUser: GetCurrentUserUseCase,
     private val tokenManager: TokenManager,
     private val addContactFromInvite: AddContactFromInviteUseCase,
+    private val sendContactRequest: SendContactRequestUseCase,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(InviteUiState())
     val uiState = _uiState.asStateFlow()
@@ -40,23 +44,34 @@ class InviteViewModel(
         loadInviteLink()
     }
 
+    private fun getValidFcmToken(): String {
+        val cached = tokenManager.getFcmToken()
+        if (!cached.isNullOrBlank() && cached != "fcm_token_placeholder") {
+            logD("InviteVM", "getValidFcmToken() -> using cached token: ${cached.take(15)}...")
+            return cached
+        }
+        return cached ?: "fcm_token_placeholder"
+    }
+
     private fun loadInviteLink() {
         viewModelScope.launch {
             val user = getCurrentUser().getOrNull()
             val myName = user?.displayName?.ifBlank { null } ?: "Me"
             val myAvatar = user?.avatarUrl
+            val fcmToken = getValidFcmToken()
 
             val inviteData = InviteData(
                 uid = user?.uid ?: "user_demo",
                 name = myName,
                 email = user?.email,
-                token = tokenManager.getFcmToken() ?: "fcm_token_placeholder",
+                token = fcmToken,
                 driveUrl = myAvatar ?: "",
                 avatar = myAvatar,
             )
             generateInviteLink(inviteData)
                 .onSuccess { link ->
                     val shortCode = "${myName.lowercase().take(4)}-${(user?.uid ?: "demo").take(4)}"
+                    logD("InviteVM", "Generated invite link for $myName (token: ${fcmToken.take(15)}...): $link")
                     _uiState.update {
                         it.copy(
                             inviteLink = link,
@@ -89,6 +104,7 @@ class InviteViewModel(
 
             val invite = DeepLinkHandler.parse(link)
             if (invite == null) {
+                logD("InviteVM", "handleConnectInvite() -> failed to parse invite link: $link")
                 _uiState.update {
                     it.copy(
                         scannerStep = ScannerStep.FAILED,
@@ -108,7 +124,21 @@ class InviteViewModel(
                 else if (invite.name.isNotBlank()) "${invite.name.lowercase().replace(" ", ".")}@gmail.com"
                 else "${invite.uid}@gmail.com"
 
-            val contact = Contact(
+            val myUser = getCurrentUser().getOrNull()
+            val myToken = getValidFcmToken()
+            val myInviteData = InviteData(
+                uid = myUser?.uid ?: "user_me",
+                name = myUser?.displayName ?: "User B",
+                email = myUser?.email,
+                token = myToken,
+                driveUrl = myUser?.avatarUrl ?: "",
+                avatar = myUser?.avatarUrl,
+            )
+
+            logD("InviteVM", "handleConnectInvite() -> User B (${myInviteData.name}, token: ${myToken.take(15)}...) connecting to User A (${invite.uid}, name: $friendName, token: ${invite.token.take(15)}...)")
+
+            // Save User A as PENDING_OUTGOING locally for User B
+            val pendingContact = Contact(
                 uid = invite.uid,
                 displayName = friendName,
                 email = contactEmail,
@@ -117,33 +147,34 @@ class InviteViewModel(
                 cachedFcmToken = invite.token,
                 tokenCachedAt = now,
                 connectedAt = now,
+                status = ContactStatus.PENDING_OUTGOING,
             )
 
-            val result = addContactFromInvite(contact)
-            result.fold(
-                onSuccess = {
-                    _uiState.update {
-                        it.copy(
-                            scannerStep = ScannerStep.CONNECTED,
-                            connectedFriendName = friendName,
-                            connectedFriendAvatarUrl = friendAvatar,
-                            errorMessage = null,
-                        )
-                    }
-                    kotlinx.coroutines.delay(4.seconds)
-                    _uiState.update { it.copy(scannerStep = ScannerStep.SCAN, pastedLink = "") }
-                },
-                onFailure = { error ->
-                    _uiState.update {
-                        it.copy(
-                            scannerStep = ScannerStep.FAILED,
-                            errorMessage = error.message ?: "Failed to save connection.",
-                        )
-                    }
-                    kotlinx.coroutines.delay(4.seconds)
-                    _uiState.update { it.copy(scannerStep = ScannerStep.SCAN, errorMessage = null) }
-                },
-            )
+            // Save outgoing request locally for User B
+            addContactFromInvite(pendingContact).onSuccess {
+                logD("InviteVM", "Successfully saved ${invite.uid} ($friendName) as PENDING_OUTGOING for User B")
+            }.onFailure {
+                logD("InviteVM", "Failed to save PENDING_OUTGOING contact: ${it.message}")
+            }
+
+            // Send FCM CONTACT_REQUEST message to User A (recipientUid = invite.uid, recipientToken = invite.token)
+            logD("InviteVM", "Dispatching CONTACT_REQUEST via FCM to recipientUid: ${invite.uid}, recipientToken: ${invite.token.take(15)}... from senderUid: ${myInviteData.uid}")
+            sendContactRequest(recipientUid = invite.uid, recipientToken = invite.token, senderData = myInviteData).onSuccess {
+                logD("InviteVM", "sendContactRequest() -> FCM dispatch returned SUCCESS for recipientUid: ${invite.uid}")
+            }.onFailure {
+                logD("InviteVM", "sendContactRequest() -> FCM dispatch returned FAILURE: ${it.message}")
+            }
+
+            _uiState.update {
+                it.copy(
+                    scannerStep = ScannerStep.CONNECTED,
+                    connectedFriendName = friendName,
+                    connectedFriendAvatarUrl = friendAvatar,
+                    errorMessage = null,
+                )
+            }
+            kotlinx.coroutines.delay(4.seconds)
+            _uiState.update { it.copy(scannerStep = ScannerStep.SCAN, pastedLink = "") }
         }
     }
 }

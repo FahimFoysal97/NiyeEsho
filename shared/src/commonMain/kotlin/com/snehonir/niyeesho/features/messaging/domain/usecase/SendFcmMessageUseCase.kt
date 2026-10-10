@@ -5,6 +5,6 @@ import com.snehonir.niyeesho.features.messaging.domain.repository.MessagingRepos
 
 /** Sends a data-only FCM message or queues it for retry when offline. */
 class SendFcmMessageUseCase(private val repository: MessagingRepository) {
-    suspend operator fun invoke(recipientUid: String, message: FcmMessage): Result<Unit> =
-        repository.send(recipientUid, message)
+    suspend operator fun invoke(recipientUid: String, recipientToken: String = "", message: FcmMessage): Result<Unit> =
+        repository.send(recipientUid, recipientToken, message)
 }

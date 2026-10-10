@@ -3,14 +3,22 @@ package com.snehonir.niyeesho.features.contacts.presentation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.snehonir.niyeesho.core.utils.TokenManager
+import com.snehonir.niyeesho.core.utils.logD
 import com.snehonir.niyeesho.features.auth.domain.usecase.GetCurrentUserUseCase
 import com.snehonir.niyeesho.features.contacts.domain.entity.Contact
+import com.snehonir.niyeesho.features.contacts.domain.entity.ContactStatus
+import com.snehonir.niyeesho.features.contacts.domain.repository.ContactsRepository
 import com.snehonir.niyeesho.features.contacts.domain.usecase.RefreshContactTokenUseCase
 import com.snehonir.niyeesho.features.contacts.domain.usecase.RemoveContactUseCase
 import com.snehonir.niyeesho.features.contacts.domain.usecase.SearchContactsUseCase
-import com.snehonir.niyeesho.features.contacts.domain.usecase.WatchContactsUseCase
+import com.snehonir.niyeesho.features.messaging.domain.entity.ContactHandshakeAction
+import com.snehonir.niyeesho.features.messaging.domain.entity.FcmMessage
+import com.snehonir.niyeesho.features.messaging.domain.entity.FcmMessageData
+import com.snehonir.niyeesho.features.messaging.domain.entity.FcmMessageType
+import com.snehonir.niyeesho.features.messaging.domain.repository.MessagingRepository
 import com.snehonir.niyeesho.features.messaging.domain.entity.InviteData
 import com.snehonir.niyeesho.features.messaging.domain.usecase.GenerateInviteLinkUseCase
+import com.snehonir.niyeesho.features.messaging.domain.usecase.SendFcmMessageUseCase
 import com.snehonir.niyeesho.features.shopping_list.domain.entity.ListMember
 import com.snehonir.niyeesho.features.shopping_list.domain.usecase.CreateShoppingListUseCase
 import kotlinx.collections.immutable.toImmutableList
@@ -21,9 +29,10 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.datetime.Clock
 
 class ContactsViewModel(
-    private val watchLists: WatchContactsUseCase,
+    private val contactsRepository: ContactsRepository,
     private val removeContact: RemoveContactUseCase,
     private val searchContacts: SearchContactsUseCase,
     private val refreshToken: RefreshContactTokenUseCase,
@@ -31,6 +40,8 @@ class ContactsViewModel(
     private val createList: CreateShoppingListUseCase,
     private val getCurrentUser: GetCurrentUserUseCase,
     private val tokenManager: TokenManager,
+    private val sendFcmMessage: SendFcmMessageUseCase,
+    private val messagingRepository: MessagingRepository,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(ContactsUiState())
     val uiState = _uiState.asStateFlow()
@@ -38,12 +49,35 @@ class ContactsViewModel(
     val uiEvent: Flow<ContactsUiEvent> = _uiEvent.receiveAsFlow()
 
     init {
+        // Watch active contacts
         viewModelScope.launch {
-            watchLists().collect { result ->
+            contactsRepository.watchActiveContacts().collect { result ->
                 result.onSuccess { contacts ->
-                    _uiState.update { it.copy(contacts = contacts.distinctBy { contact -> contact.uid }.toImmutableList(), isLoading = false) }
+                    _uiState.update { it.copy(contacts = contacts.distinctBy { c -> c.uid }.toImmutableList(), isLoading = false) }
                 }.onFailure { fail(it) }
             }
+        }
+        // Watch incoming pending requests
+        viewModelScope.launch {
+            contactsRepository.watchPendingIncomingContacts().collect { result ->
+                result.onSuccess { pending ->
+                    _uiState.update { it.copy(pendingIncomingContacts = pending.distinctBy { c -> c.uid }.toImmutableList()) }
+                }
+            }
+        }
+        // Watch outgoing pending requests
+        viewModelScope.launch {
+            contactsRepository.watchPendingOutgoingContacts().collect { result ->
+                result.onSuccess { pending ->
+                    _uiState.update { it.copy(pendingOutgoingContacts = pending.distinctBy { c -> c.uid }.toImmutableList()) }
+                }
+            }
+        }
+        // Fetch network handshakes from Realtime Sync Node
+        viewModelScope.launch {
+            val user = getCurrentUser().getOrNull()
+            val myUid = user?.uid ?: "user_me"
+            messagingRepository.fetchPendingHandshakes(myUid)
         }
         generateInviteLinkOnLoad()
     }
@@ -64,12 +98,61 @@ class ContactsViewModel(
             is ContactsUiAction.CreateGroupConfirmed -> createGroupList(action.title, action.members)
             ContactsUiAction.DismissCreateGroup -> _uiState.update { it.copy(isCreateGroupDialogVisible = false, selectedContactForGroup = null) }
             is ContactsUiAction.RemoveContact -> remove(action.uid)
+            is ContactsUiAction.AcceptContactRequest -> acceptRequest(action.contact)
+            is ContactsUiAction.DeclineContactRequest -> declineRequest(action.contact)
+            is ContactsUiAction.BlockContact -> block(action.contact)
             is ContactsUiAction.RefreshToken -> refresh(action.uid)
             ContactsUiAction.InviteClicked -> generateInvite()
             ContactsUiAction.ScanQrClicked -> Unit
             ContactsUiAction.DismissInvite -> _uiState.update { it.copy(isInviteBottomSheetVisible = false) }
             ContactsUiAction.DismissScanner -> Unit
             ContactsUiAction.ErrorDismissed -> _uiState.update { it.copy(error = null) }
+        }
+    }
+
+    private fun acceptRequest(contact: Contact) {
+        viewModelScope.launch {
+            logD("ContactsVM", "acceptRequest() -> User A accepting request from ${contact.displayName} (uid: ${contact.uid}, token: ${contact.cachedFcmToken.take(15)}...)")
+            // Update User A's local status to ACTIVE
+            contactsRepository.updateStatus(contact.uid, ContactStatus.ACTIVE).onSuccess {
+                // Send CONTACT_ACCEPTED message to User B
+                val user = getCurrentUser().getOrNull()
+                val message = FcmMessage(
+                    type = FcmMessageType.CONTACT_ACCEPTED,
+                    senderId = user?.uid ?: "user_me",
+                    senderName = user?.displayName ?: "User",
+                    listId = null,
+                    timestamp = Clock.System.now(),
+                    data = FcmMessageData.ContactHandshake(action = ContactHandshakeAction.ACCEPT),
+                )
+                sendFcmMessage(contact.uid, contact.cachedFcmToken, message)
+            }.onFailure { fail(it) }
+        }
+    }
+
+    private fun declineRequest(contact: Contact) {
+        viewModelScope.launch {
+            logD("ContactsVM", "declineRequest() -> User A declining request from ${contact.displayName} (uid: ${contact.uid})")
+            // Update User A's local status to DECLINED
+            contactsRepository.updateStatus(contact.uid, ContactStatus.DECLINED).onSuccess {
+                // Send CONTACT_DECLINED message to User B
+                val user = getCurrentUser().getOrNull()
+                val message = FcmMessage(
+                    type = FcmMessageType.CONTACT_DECLINED,
+                    senderId = user?.uid ?: "user_me",
+                    senderName = user?.displayName ?: "User",
+                    listId = null,
+                    timestamp = Clock.System.now(),
+                    data = FcmMessageData.ContactHandshake(action = ContactHandshakeAction.DECLINE),
+                )
+                sendFcmMessage(contact.uid, contact.cachedFcmToken, message)
+            }.onFailure { fail(it) }
+        }
+    }
+
+    private fun block(contact: Contact) {
+        viewModelScope.launch {
+            contactsRepository.removeContact(contact.uid).onFailure { fail(it) }
         }
     }
 
@@ -117,7 +200,7 @@ class ContactsViewModel(
         _uiState.update { it.copy(query = query) }
         viewModelScope.launch {
             searchContacts(query).onSuccess { contacts ->
-                _uiState.update { it.copy(contacts = contacts.distinctBy { contact -> contact.uid }.toImmutableList()) }
+                _uiState.update { it.copy(contacts = contacts.distinctBy { c -> c.uid }.toImmutableList()) }
             }.onFailure { fail(it) }
         }
     }

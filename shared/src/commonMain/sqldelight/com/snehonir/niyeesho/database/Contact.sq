@@ -7,5 +7,41 @@ CREATE TABLE ContactEntity (
     cached_fcm_token  TEXT    NOT NULL,
     token_cached_at   INTEGER NOT NULL,
     connected_at      INTEGER NOT NULL,
-    is_blocked        INTEGER NOT NULL DEFAULT 0
+    is_blocked        INTEGER NOT NULL DEFAULT 0,
+    status            TEXT    NOT NULL DEFAULT 'ACTIVE'
 );
+
+-- Queries --
+
+watchActiveContacts:
+SELECT * FROM ContactEntity WHERE status = 'ACTIVE' AND is_blocked = 0 ORDER BY display_name ASC;
+
+watchPendingIncomingContacts:
+SELECT * FROM ContactEntity WHERE status = 'PENDING_INCOMING' ORDER BY connected_at DESC;
+
+watchPendingOutgoingContacts:
+SELECT * FROM ContactEntity WHERE status = 'PENDING_OUTGOING' ORDER BY connected_at DESC;
+
+getAllContacts:
+SELECT * FROM ContactEntity;
+
+getActiveContacts:
+SELECT * FROM ContactEntity WHERE status = 'ACTIVE' AND is_blocked = 0;
+
+getContactById:
+SELECT * FROM ContactEntity WHERE uid = :uid;
+
+upsertContact:
+INSERT OR REPLACE INTO ContactEntity (
+    uid, display_name, email, avatar_url, profile_drive_url,
+    cached_fcm_token, token_cached_at, connected_at, is_blocked, status
+) VALUES (
+    :uid, :displayName, :email, :avatarUrl, :profileDriveUrl,
+    :cachedFcmToken, :tokenCachedAt, :connectedAt, :isBlocked, :status
+);
+
+updateContactStatus:
+UPDATE ContactEntity SET status = :status WHERE uid = :uid;
+
+deleteContact:
+DELETE FROM ContactEntity WHERE uid = :uid;

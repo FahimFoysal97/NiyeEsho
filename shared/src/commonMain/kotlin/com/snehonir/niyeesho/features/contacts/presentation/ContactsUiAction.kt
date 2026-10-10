@@ -11,6 +11,9 @@ sealed interface ContactsUiAction {
     data class CreateGroupConfirmed(val title: String, val members: List<ListMember>) : ContactsUiAction
     data object DismissCreateGroup : ContactsUiAction
     data class RemoveContact(val uid: String) : ContactsUiAction
+    data class AcceptContactRequest(val contact: Contact) : ContactsUiAction
+    data class DeclineContactRequest(val contact: Contact) : ContactsUiAction
+    data class BlockContact(val contact: Contact) : ContactsUiAction
     data class RefreshToken(val uid: String) : ContactsUiAction
     data object InviteClicked : ContactsUiAction
     data object ScanQrClicked : ContactsUiAction

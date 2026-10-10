@@ -7,7 +7,9 @@ import com.snehonir.niyeesho.features.drive.domain.entity.DriveListMember
 import com.snehonir.niyeesho.features.drive.domain.entity.DriveShoppingList
 import com.snehonir.niyeesho.features.drive.domain.repository.DriveRepository
 import com.snehonir.niyeesho.features.messaging.domain.entity.FcmMessage
+import com.snehonir.niyeesho.features.messaging.domain.entity.FcmMessageData
 import com.snehonir.niyeesho.features.messaging.domain.entity.FcmMessageType
+import com.snehonir.niyeesho.features.messaging.domain.entity.ShoppingListItemAction
 import com.snehonir.niyeesho.features.messaging.domain.repository.MessagingRepository
 import com.snehonir.niyeesho.features.shopping_list.data.local.ListItemLocalDataSource
 import com.snehonir.niyeesho.features.shopping_list.domain.entity.ListItem
@@ -143,11 +145,11 @@ class ListItemRepositoryImpl(
                 senderName = "Sneho Nir",
                 listId = listId,
                 timestamp = Clock.System.now(),
-                data = itemName,
+                data = FcmMessageData.ShoppingListItem(action = ShoppingListItemAction.UPDATE, listId = listId, name = itemName),
             )
             for (memberId in list.memberIds) {
                 if (memberId != "user_demo") {
-                    messagingRepository.send(memberId, message)
+                    messagingRepository.send(recipientUid = memberId, recipientToken = "", message = message)
                 }
             }
         }.onFailure {

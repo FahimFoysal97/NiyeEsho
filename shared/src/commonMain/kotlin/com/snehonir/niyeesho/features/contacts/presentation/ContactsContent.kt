@@ -1,5 +1,6 @@
 package com.snehonir.niyeesho.features.contacts.presentation
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -9,12 +10,14 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.AlertDialog
@@ -130,7 +133,68 @@ fun ContactsContent(
                     item { ErrorView(UiText.Plain(err), modifier = Modifier.fillMaxWidth()) }
                 }
 
-                // ON NIYE ESHO Section Header
+                // Pending Incoming Requests Section (User A view)
+                if (uiState.pendingIncomingContacts.isNotEmpty()) {
+                    item {
+                        Column(
+                            verticalArrangement = Arrangement.spacedBy(8.dp),
+                            modifier = Modifier.fillMaxWidth(),
+                        ) {
+                            Text(
+                                text = "PENDING REQUESTS (${uiState.pendingIncomingContacts.size})",
+                                style = MaterialTheme.typography.labelSmall,
+                                fontWeight = FontWeight.Bold,
+                                color = NiyeEshoGreenPrimary,
+                            )
+
+                            LazyColumn(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .heightIn(max = 240.dp),
+                                verticalArrangement = Arrangement.spacedBy(8.dp),
+                            ) {
+                                itemsIndexed(uiState.pendingIncomingContacts, key = { _, item -> "pending_inc_${item.uid}" }) { _, contact ->
+                                    PendingRequestCardRow(
+                                        contact = contact,
+                                        onAccept = { onAction(ContactsUiAction.AcceptContactRequest(contact)) },
+                                        onDecline = { onAction(ContactsUiAction.DeclineContactRequest(contact)) },
+                                        onBlock = { onAction(ContactsUiAction.BlockContact(contact)) },
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // Pending Outgoing Requests Section (User B view)
+                if (uiState.pendingOutgoingContacts.isNotEmpty()) {
+                    item {
+                        Column(
+                            verticalArrangement = Arrangement.spacedBy(8.dp),
+                            modifier = Modifier.fillMaxWidth(),
+                        ) {
+                            Text(
+                                text = "AWAITING APPROVAL (${uiState.pendingOutgoingContacts.size})",
+                                style = MaterialTheme.typography.labelSmall,
+                                fontWeight = FontWeight.Bold,
+                                color = NiyeEshoGoldSecondary,
+                            )
+
+                            LazyColumn(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .heightIn(max = 160.dp),
+                                verticalArrangement = Arrangement.spacedBy(8.dp),
+                            ) {
+                                itemsIndexed(uiState.pendingOutgoingContacts, key = { _, item -> "pending_out_${item.uid}" }) { _, contact ->
+                                    PendingOutgoingCardRow(contact = contact)
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // Active Contacts Section Header
                 item {
                     Text(
                         text = "ON NIYE ESHO",
@@ -148,7 +212,7 @@ fun ContactsContent(
                             colors = CardDefaults.cardColors(containerColor = NiyeEshoDarkSurface),
                         ) {
                             Text(
-                                text = "No contacts yet. Share your invite link to connect!",
+                                text = "No active contacts yet. Share your invite link to connect!",
                                 modifier = Modifier.padding(Spacing.lg),
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = NiyeEshoGreenMuted,
@@ -209,6 +273,126 @@ fun ContactsContent(
                 contactPendingDelete = null
             },
         )
+    }
+}
+
+@Composable
+private fun PendingRequestCardRow(
+    contact: Contact,
+    onAccept: () -> Unit,
+    onDecline: () -> Unit,
+    onBlock: () -> Unit,
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(14.dp),
+        colors = CardDefaults.cardColors(containerColor = NiyeEshoDarkSurface),
+        border = BorderStroke(1.dp, NiyeEshoGreenPrimary),
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                modifier = Modifier.weight(1f),
+            ) {
+                AvatarImage(
+                    avatarUrl = contact.avatarUrl,
+                    contentDescription = contact.displayName,
+                    size = 44.dp,
+                    backgroundColor = NiyeEshoGreenPrimary,
+                )
+                Column {
+                    Text(
+                        text = contact.displayName,
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White,
+                    )
+                    Text(
+                        text = "Wants to connect",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = NiyeEshoGreenMuted,
+                    )
+                }
+            }
+
+            Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                Button(
+                    onClick = onAccept,
+                    shape = RoundedCornerShape(8.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = NiyeEshoGreenPrimary),
+                    contentPadding = PaddingValues(horizontal = 10.dp, vertical = 6.dp),
+                ) {
+                    Text("Accept", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
+                }
+
+                TextButton(
+                    onClick = onDecline,
+                    shape = RoundedCornerShape(8.dp),
+                    contentPadding = PaddingValues(horizontal = 8.dp, vertical = 6.dp),
+                ) {
+                    Text("Decline", style = MaterialTheme.typography.labelSmall, color = Color(0xFFCFE3D8))
+                }
+
+                IconButton(onClick = onBlock, modifier = Modifier.size(32.dp)) {
+                    Icon(
+                        imageVector = Icons.Default.Clear,
+                        contentDescription = "Block",
+                        tint = Color(0xFFEF4444),
+                        modifier = Modifier.size(18.dp),
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun PendingOutgoingCardRow(contact: Contact) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(containerColor = NiyeEshoDarkSurface),
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                modifier = Modifier.weight(1f),
+            ) {
+                AvatarImage(
+                    avatarUrl = contact.avatarUrl,
+                    contentDescription = contact.displayName,
+                    size = 36.dp,
+                    backgroundColor = NiyeEshoGoldSecondary,
+                )
+                Column {
+                    Text(
+                        text = contact.displayName,
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White,
+                    )
+                    Text(
+                        text = "Awaiting approval...",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = NiyeEshoGoldSecondary,
+                    )
+                }
+            }
+        }
     }
 }
 

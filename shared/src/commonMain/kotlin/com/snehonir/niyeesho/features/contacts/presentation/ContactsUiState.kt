@@ -6,6 +6,8 @@ import kotlinx.collections.immutable.persistentListOf
 
 data class ContactsUiState(
     val contacts: ImmutableList<Contact> = persistentListOf(),
+    val pendingIncomingContacts: ImmutableList<Contact> = persistentListOf(),
+    val pendingOutgoingContacts: ImmutableList<Contact> = persistentListOf(),
     val query: String = "",
     val isLoading: Boolean = true,
     val isRefreshing: Boolean = false,

@@ -7,4 +7,5 @@ object NetworkConstants {
     val driveBaseUrl: String = BuildKonfig.BASE_URL
     val fcmBaseUrl: String = BuildKonfig.FCM_BASE_URL
     val fcmProjectId: String = BuildKonfig.FCM_PROJECT_ID
+    val rtdbBaseUrl: String = "https://${BuildKonfig.FCM_PROJECT_ID}-default-rtdb.asia-southeast1.firebasedatabase.app"
 }

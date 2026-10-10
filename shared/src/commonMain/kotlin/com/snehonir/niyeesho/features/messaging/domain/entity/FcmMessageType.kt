@@ -1,7 +1,9 @@
 package com.snehonir.niyeesho.features.messaging.domain.entity
 
 enum class FcmMessageType {
+    CONTACT_REQUEST,
     CONTACT_ACCEPTED,
+    CONTACT_DECLINED,
     CONTACT_REMOVED,
     TOKEN_UPDATE,
     LIST_SHARED,

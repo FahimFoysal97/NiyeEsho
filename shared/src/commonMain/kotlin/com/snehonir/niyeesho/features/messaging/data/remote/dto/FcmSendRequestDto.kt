@@ -11,4 +11,10 @@ data class FcmSendRequestDto(
 data class FcmMessageRequestDto(
     val token: String,
     val data: Map<String, String>,
+    val android: FcmAndroidConfigDto? = FcmAndroidConfigDto(),
+)
+
+@Serializable
+data class FcmAndroidConfigDto(
+    val priority: String = "HIGH",
 )

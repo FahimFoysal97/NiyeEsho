@@ -1,7 +1,9 @@
 package com.snehonir.niyeesho.features.messaging.domain.usecase
 
 import com.snehonir.niyeesho.features.messaging.domain.entity.FcmMessage
+import com.snehonir.niyeesho.features.messaging.domain.entity.FcmMessageData
 import com.snehonir.niyeesho.features.messaging.domain.entity.FcmMessageType
+import com.snehonir.niyeesho.features.messaging.domain.entity.TokenUpdateAction
 import com.snehonir.niyeesho.features.messaging.domain.repository.MessagingRepository
 import kotlinx.datetime.Clock
 
@@ -19,10 +21,10 @@ class BroadcastTokenUpdateUseCase(private val repository: MessagingRepository) {
             senderName = senderName,
             listId = null,
             timestamp = Clock.System.now(),
-            data = "{\"token\":\"$token\"}",
+            data = FcmMessageData.TokenUpdate(action = TokenUpdateAction.REFRESH, fcmToken = token),
         )
         recipients.forEach { recipient ->
-            repository.send(recipient, message).getOrElse { return Result.failure(it) }
+            repository.send(recipientUid = recipient, recipientToken = "", message = message).getOrElse { return Result.failure(it) }
         }
         return Result.success(Unit)
     }

@@ -17,6 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.snehonir.niyeesho.core.designsystem.theme.AppShapes
 import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoDarkSurface
 import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoGreenDarkMuted
 import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoGreenMuted
@@ -67,7 +68,7 @@ fun InviteBottomSheet(
             Button(
                 onClick = onShare,
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp),
+                shape = AppShapes.button,
                 colors = ButtonDefaults.buttonColors(
                     containerColor = NiyeEshoGreenPrimary,
                     contentColor = Color.White,
@@ -78,7 +79,7 @@ fun InviteBottomSheet(
             OutlinedButton(
                 onClick = onDismiss,
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp),
+                shape = AppShapes.button,
             ) {
                 Text("Close", style = MaterialTheme.typography.bodyMedium, color = NiyeEshoGreenDarkMuted)
             }

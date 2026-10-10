@@ -61,6 +61,21 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import com.snehonir.niyeesho.core.designsystem.theme.InviteGradientBottom
+import com.snehonir.niyeesho.core.designsystem.theme.InviteGradientTop
+import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoBorderSubtle
+import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoBrightRed
+import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoDarkBg
+import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoDarkSurface
+import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoDarkSurfaceInner
+import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoDarkSurfaceVariant
+import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoEmeraldAccent
+import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoGreenDarkMuted
+import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoGreenPrimary
+import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoMutedGreenText
+import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoSoftRed
+import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoTextMuted
+import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoTextSubtle
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
@@ -128,7 +143,7 @@ fun InviteContent(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(Color(0xFF16241C), RoundedCornerShape(13.dp))
+                    .background(NiyeEshoDarkSurfaceVariant, RoundedCornerShape(13.dp))
                     .padding(3.dp),
                 horizontalArrangement = Arrangement.spacedBy(3.dp),
             ) {
@@ -145,7 +160,7 @@ fun InviteContent(
                         text = "My code",
                         style = MaterialTheme.typography.labelMedium,
                         fontWeight = FontWeight.Bold,
-                        color = if (uiState.selectedSubTab == 0) Color.White else Color(0xFF6F8A7C),
+                        color = if (uiState.selectedSubTab == 0) Color.White else NiyeEshoTextMuted,
                     )
                 }
 
@@ -162,7 +177,7 @@ fun InviteContent(
                         text = "Scan",
                         style = MaterialTheme.typography.labelMedium,
                         fontWeight = FontWeight.Bold,
-                        color = if (uiState.selectedSubTab == 1) Color.White else Color(0xFF6F8A7C),
+                        color = if (uiState.selectedSubTab == 1) Color.White else NiyeEshoTextMuted,
                     )
                 }
             }
@@ -223,7 +238,7 @@ fun InviteContent(
                                 Surface(
                                     onClick = { qrImageHelper.saveQrCodeImage(uiState.inviteLink) },
                                     shape = RoundedCornerShape(11.dp),
-                                    color = Color(0xFF1F2D24),
+                                    color = NiyeEshoDarkSurface,
                                     modifier = Modifier.weight(1f),
                                 ) {
                                     Row(
@@ -233,16 +248,16 @@ fun InviteContent(
                                         horizontalArrangement = Arrangement.Center,
                                         verticalAlignment = Alignment.CenterVertically,
                                     ) {
-                                        Icon(painterResource(Res.drawable.download), contentDescription = "Save", tint = Color(0xFF34D399), modifier = Modifier.size(15.dp))
+                                        Icon(painterResource(Res.drawable.download), contentDescription = "Save", tint = NiyeEshoEmeraldAccent, modifier = Modifier.size(15.dp))
                                         Spacer(modifier = Modifier.width(6.dp))
-                                        Text("Save", style = MaterialTheme.typography.labelMedium, color = Color(0xFFCFE3D8), fontWeight = FontWeight.Bold)
+                                        Text("Save", style = MaterialTheme.typography.labelMedium, color = NiyeEshoMutedGreenText, fontWeight = FontWeight.Bold)
                                     }
                                 }
 
                                 Surface(
                                     onClick = { qrImageHelper.shareQrCodeImage(uiState.inviteLink) },
                                     shape = RoundedCornerShape(11.dp),
-                                    color = Color(0xFF1F2D24),
+                                    color = NiyeEshoDarkSurface,
                                     modifier = Modifier.weight(1f),
                                 ) {
                                     Row(
@@ -252,9 +267,9 @@ fun InviteContent(
                                         horizontalArrangement = Arrangement.Center,
                                         verticalAlignment = Alignment.CenterVertically,
                                     ) {
-                                        Icon(Icons.Default.Share, contentDescription = "Share", tint = Color(0xFF34D399), modifier = Modifier.size(15.dp))
+                                        Icon(Icons.Default.Share, contentDescription = "Share", tint = NiyeEshoEmeraldAccent, modifier = Modifier.size(15.dp))
                                         Spacer(modifier = Modifier.width(6.dp))
-                                        Text("Share", style = MaterialTheme.typography.labelMedium, color = Color(0xFFCFE3D8), fontWeight = FontWeight.Bold)
+                                        Text("Share", style = MaterialTheme.typography.labelMedium, color = NiyeEshoMutedGreenText, fontWeight = FontWeight.Bold)
                                     }
                                 }
                             }
@@ -285,19 +300,19 @@ fun InviteContent(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .clip(RoundedCornerShape(11.dp))
-                                    .background(Color(0xFF0F1A14))
+                                    .background(NiyeEshoDarkBg)
                                     .border(1.dp, NiyeEshoDarkSurface, RoundedCornerShape(11.dp))
                                     .padding(horizontal = 12.dp, vertical = 10.dp),
                                 contentAlignment = Alignment.Center,
                             ) {
                                 Text(
                                     text = buildAnnotatedString {
-                                        pushStyle(SpanStyle(color = Color(0xFF7F9D8E), fontWeight = FontWeight.Bold))
+                                        pushStyle(SpanStyle(color = NiyeEshoTextSubtle, fontWeight = FontWeight.Bold))
                                         append(uiState.inviteLink)
                                         pop()
                                     },
                                     style = MaterialTheme.typography.bodyMedium,
-                                    color = Color(0xFFCFE3D8),
+                                    color = NiyeEshoMutedGreenText,
                                 )
                             }
 
@@ -310,7 +325,7 @@ fun InviteContent(
                                 Surface(
                                     onClick = { clipboardManager.setText(AnnotatedString(uiState.inviteLink)) },
                                     shape = RoundedCornerShape(11.dp),
-                                    color = Color(0xFF1F2D24),
+                                    color = NiyeEshoDarkSurface,
                                     modifier = Modifier.weight(1f),
                                 ) {
                                     Row(
@@ -320,16 +335,16 @@ fun InviteContent(
                                         horizontalArrangement = Arrangement.Center,
                                         verticalAlignment = Alignment.CenterVertically,
                                     ) {
-                                        Icon(painterResource(Res.drawable.content_copy), contentDescription = "Copy", tint = Color(0xFF34D399), modifier = Modifier.size(15.dp))
+                                        Icon(painterResource(Res.drawable.content_copy), contentDescription = "Copy", tint = NiyeEshoEmeraldAccent, modifier = Modifier.size(15.dp))
                                         Spacer(modifier = Modifier.width(6.dp))
-                                        Text("Copy", style = MaterialTheme.typography.labelMedium, color = Color(0xFFCFE3D8), fontWeight = FontWeight.Bold)
+                                        Text("Copy", style = MaterialTheme.typography.labelMedium, color = NiyeEshoMutedGreenText, fontWeight = FontWeight.Bold)
                                     }
                                 }
 
                                 Surface(
                                     onClick = { onAction(InviteUiAction.ShareLink) },
                                     shape = RoundedCornerShape(11.dp),
-                                    color = Color(0xFF1F2D24),
+                                    color = NiyeEshoDarkSurface,
                                     modifier = Modifier.weight(1f),
                                 ) {
                                     Row(
@@ -339,9 +354,9 @@ fun InviteContent(
                                         horizontalArrangement = Arrangement.Center,
                                         verticalAlignment = Alignment.CenterVertically,
                                     ) {
-                                        Icon(Icons.Default.Share, contentDescription = "Share", tint = Color(0xFF34D399), modifier = Modifier.size(15.dp))
+                                        Icon(Icons.Default.Share, contentDescription = "Share", tint = NiyeEshoEmeraldAccent, modifier = Modifier.size(15.dp))
                                         Spacer(modifier = Modifier.width(6.dp))
-                                        Text("Share", style = MaterialTheme.typography.labelMedium, color = Color(0xFFCFE3D8), fontWeight = FontWeight.Bold)
+                                        Text("Share", style = MaterialTheme.typography.labelMedium, color = NiyeEshoMutedGreenText, fontWeight = FontWeight.Bold)
                                     }
                                 }
                             }
@@ -366,7 +381,7 @@ fun InviteContent(
                                     .clip(RoundedCornerShape(22.dp))
                                     .background(
                                         Brush.linearGradient(
-                                            listOf(Color(0xFF1C2A22), Color(0xFF0A120D))
+                                            listOf(InviteGradientTop, InviteGradientBottom)
                                         )
                                     ),
                                 contentAlignment = Alignment.Center,
@@ -393,8 +408,8 @@ fun InviteContent(
                                         }
                                     },
                                     shape = RoundedCornerShape(20.dp),
-                                    color = Color(0xFF0F1A14).copy(alpha = 0.85f),
-                                    border = BorderStroke(1.dp, Color(0xFF2A3D32)),
+                                    color = NiyeEshoDarkBg.copy(alpha = 0.85f),
+                                    border = BorderStroke(1.dp, NiyeEshoBorderSubtle),
                                     modifier = Modifier
                                         .align(Alignment.BottomCenter)
                                         .padding(bottom = 16.dp),
@@ -403,7 +418,7 @@ fun InviteContent(
                                         text = "Choose from photos",
                                         style = MaterialTheme.typography.labelMedium,
                                         fontWeight = FontWeight.Bold,
-                                        color = Color(0xFFCFE3D8),
+                                        color = NiyeEshoMutedGreenText,
                                         modifier = Modifier.padding(horizontal = 12.dp, vertical = 7.dp),
                                     )
                                 }
@@ -412,7 +427,7 @@ fun InviteContent(
                             Text(
                                 text = "Point your camera at your friend's QR code",
                                 style = MaterialTheme.typography.bodySmall,
-                                color = Color(0xFF7F9D8E),
+                                color = NiyeEshoTextSubtle,
                                 textAlign = TextAlign.Center,
                             )
 
@@ -425,7 +440,7 @@ fun InviteContent(
                                 horizontalArrangement = Arrangement.spacedBy(10.dp),
                             ) {
                                 HorizontalDivider(modifier = Modifier.weight(1f), color = NiyeEshoDarkSurface)
-                                Text("or paste invite link", style = MaterialTheme.typography.labelSmall, color = Color(0xFF6F8A7C))
+                                Text("or paste invite link", style = MaterialTheme.typography.labelSmall, color = NiyeEshoTextMuted)
                                 HorizontalDivider(modifier = Modifier.weight(1f), color = NiyeEshoDarkSurface)
                             }
 
@@ -434,8 +449,8 @@ fun InviteContent(
                             Surface(
                                 modifier = Modifier.fillMaxWidth(),
                                 shape = RoundedCornerShape(14.dp),
-                                color = Color(0xFF111F18),
-                                border = BorderStroke(1.5.dp, if (hasLink) NiyeEshoGreenPrimary else Color(0xFF2A3D32)),
+                                color = NiyeEshoDarkSurfaceInner,
+                                border = BorderStroke(1.5.dp, if (hasLink) NiyeEshoGreenPrimary else NiyeEshoBorderSubtle),
                             ) {
                                 Row(
                                     modifier = Modifier
@@ -446,7 +461,7 @@ fun InviteContent(
                                 ) {
                                     Text(
                                         text = if (hasLink) uiState.pastedLink else "niyeesho.app/i/...",
-                                        color = if (hasLink) Color.White else Color(0xFF4A6358),
+                                        color = if (hasLink) Color.White else NiyeEshoGreenDarkMuted,
                                         style = MaterialTheme.typography.bodyMedium,
                                         maxLines = 1,
                                         modifier = Modifier.weight(1f),
@@ -458,13 +473,13 @@ fun InviteContent(
                                             onAction(InviteUiAction.PastedLinkClicked(clipboardText))
                                         },
                                         shape = RoundedCornerShape(9.dp),
-                                        color = Color(0xFF1F2D24),
+                                        color = NiyeEshoDarkSurface,
                                     ) {
                                         Box(
                                             modifier = Modifier.padding(8.dp),
                                             contentAlignment = Alignment.Center,
                                         ) {
-                                            Icon(painterResource(Res.drawable.content_paste), contentDescription = "Paste", modifier = Modifier.size(18.dp), tint = Color(0xFF34D399))
+                                            Icon(painterResource(Res.drawable.content_paste), contentDescription = "Paste", modifier = Modifier.size(18.dp), tint = NiyeEshoEmeraldAccent)
                                         }
                                     }
                                 }
@@ -481,7 +496,7 @@ fun InviteContent(
                                 Text(
                                     text = if (isValidLink) "Link looks good" else "That doesn't look like a Niye Esho invite link",
                                     style = MaterialTheme.typography.bodySmall,
-                                    color = if (isValidLink) Color(0xFF34D399) else Color(0xFFFF8083),
+                                    color = if (isValidLink) NiyeEshoEmeraldAccent else NiyeEshoSoftRed,
                                     textAlign = TextAlign.Center,
                                     fontWeight = FontWeight.SemiBold,
                                 )
@@ -493,7 +508,7 @@ fun InviteContent(
                                 shape = RoundedCornerShape(13.dp),
                                 colors = ButtonDefaults.buttonColors(
                                     containerColor = if (isValidLink) NiyeEshoGreenPrimary else NiyeEshoDarkSurface,
-                                    contentColor = if (isValidLink) Color.White else Color(0xFF4A6358),
+                                    contentColor = if (isValidLink) Color.White else NiyeEshoGreenDarkMuted,
                                 ),
                                 contentPadding = PaddingValues(12.dp),
                             ) {
@@ -537,7 +552,7 @@ fun QrScannerOverlay(
     cornerLength: Dp = 34.dp,
     cornerRadius: Dp = 14.dp,
     strokeWidth: Dp = 3.5.dp,
-    color: Color = Color(0xFF34D399),
+    color: Color = NiyeEshoEmeraldAccent,
 ) {
     val infiniteTransition = rememberInfiniteTransition(label = "ScannerLineAnimation")
     val scanProgress by infiniteTransition.animateFloat(
@@ -730,14 +745,14 @@ fun ConnectedSuccessView(
                         modifier = Modifier
                             .size(164.dp * ringPulseScale)
                             .clip(CircleShape)
-                            .background(Color(0xFF1B8A6B).copy(alpha = 0.12f * ringPulseAlpha)),
+                            .background(NiyeEshoGreenPrimary.copy(alpha = 0.12f * ringPulseAlpha)),
                     )
                     // Inner Ring 1
                     Box(
                         modifier = Modifier
                             .size(128.dp * ringPulseScale)
                             .clip(CircleShape)
-                            .background(Color(0xFF1B8A6B).copy(alpha = 0.28f * ringPulseAlpha)),
+                            .background(NiyeEshoGreenPrimary.copy(alpha = 0.28f * ringPulseAlpha)),
                     )
                     // Solid Center Circle
                     Box(
@@ -785,7 +800,7 @@ fun ConnectedSuccessView(
                             style = TextStyle(
                                 fontSize = 24.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = Color(0xFF34D399),
+                                color = NiyeEshoEmeraldAccent,
                             ),
                             modifier = Modifier.offset(x = arrowShift.dp),
                         )
@@ -815,7 +830,7 @@ fun ConnectedSuccessView(
                         Text(
                             text = "You and ${uiState.connectedFriendName} can now share lists.",
                             style = MaterialTheme.typography.bodyMedium,
-                            color = Color(0xFF7F9D8E),
+                            color = NiyeEshoTextSubtle,
                             textAlign = TextAlign.Center,
                             fontSize = 15.sp,
                         )
@@ -839,7 +854,7 @@ fun ConnectedSuccessView(
                     .height(4.dp)
                     .clip(RoundedCornerShape(2.dp)),
                 color = NiyeEshoGreenPrimary,
-                trackColor = Color(0xFF16241C),
+                trackColor = NiyeEshoDarkSurfaceVariant,
             )
         }
     }
@@ -940,21 +955,21 @@ fun ConnectionFailedView(
                         modifier = Modifier
                             .size(164.dp * ringPulseScale)
                             .clip(CircleShape)
-                            .background(Color(0xFFEF4444).copy(alpha = 0.12f * ringPulseAlpha)),
+                            .background(NiyeEshoBrightRed.copy(alpha = 0.12f * ringPulseAlpha)),
                     )
                     // Inner Red Ring 1
                     Box(
                         modifier = Modifier
                             .size(128.dp * ringPulseScale)
                             .clip(CircleShape)
-                            .background(Color(0xFFEF4444).copy(alpha = 0.28f * ringPulseAlpha)),
+                            .background(NiyeEshoBrightRed.copy(alpha = 0.28f * ringPulseAlpha)),
                     )
                     // Solid Center Red Circle
                     Box(
                         modifier = Modifier
                             .size(92.dp)
                             .clip(CircleShape)
-                            .background(Color(0xFFEF4444)),
+                            .background(NiyeEshoBrightRed),
                         contentAlignment = Alignment.Center,
                     ) {
                         Icon(
@@ -991,7 +1006,7 @@ fun ConnectionFailedView(
                         Text(
                             text = uiState.errorMessage ?: "Invalid invite link or connection error. Please try again.",
                             style = MaterialTheme.typography.bodyMedium,
-                            color = Color(0xFF7F9D8E),
+                            color = NiyeEshoTextSubtle,
                             textAlign = TextAlign.Center,
                             fontSize = 15.sp,
                         )
@@ -1001,8 +1016,8 @@ fun ConnectionFailedView(
                         onClick = onTryAgain,
                         shape = RoundedCornerShape(12.dp),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFF1F2D24),
-                            contentColor = Color(0xFFCFE3D8),
+                            containerColor = NiyeEshoDarkSurface,
+                            contentColor = NiyeEshoMutedGreenText,
                         ),
                     ) {
                         Text(
@@ -1029,8 +1044,8 @@ fun ConnectionFailedView(
                     .fillMaxWidth()
                     .height(4.dp)
                     .clip(RoundedCornerShape(2.dp)),
-                color = Color(0xFFEF4444),
-                trackColor = Color(0xFF16241C),
+                color = NiyeEshoBrightRed,
+                trackColor = NiyeEshoDarkSurfaceVariant,
             )
         }
     }

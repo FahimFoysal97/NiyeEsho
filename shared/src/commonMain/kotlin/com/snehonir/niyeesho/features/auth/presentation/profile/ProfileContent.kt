@@ -48,6 +48,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import com.snehonir.niyeesho.core.designsystem.theme.ErrorDark
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.snehonir.niyeesho.BuildKonfig
@@ -410,14 +411,14 @@ fun ProfileContent(
                                         Icon(
                                             imageVector = Icons.AutoMirrored.Filled.ExitToApp,
                                             contentDescription = "Sign out",
-                                            tint = Color(0xFFE05252),
+                                            tint = ErrorDark,
                                             modifier = Modifier.size(20.dp),
                                         )
                                         Text(
                                             text = "Sign out",
                                             style = MaterialTheme.typography.titleMedium,
                                             fontWeight = FontWeight.SemiBold,
-                                            color = Color(0xFFE05252),
+                                            color = ErrorDark,
                                         )
                                     }
                                 }

@@ -43,6 +43,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import com.snehonir.niyeesho.core.designsystem.theme.ErrorDark
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoCheckboxBorder
@@ -94,7 +95,7 @@ fun GroupSettingsDialog(
                         onDeleteList()
                     },
                     shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE05252), contentColor = Color.White),
+                    colors = ButtonDefaults.buttonColors(containerColor = ErrorDark, contentColor = Color.White),
                 ) { Text("Delete", fontWeight = FontWeight.Bold) }
             },
             dismissButton = {
@@ -221,7 +222,7 @@ fun GroupSettingsDialog(
                                 Text(
                                     text = if (isInContacts) member.uid else "${member.uid} (Not in contacts)",
                                     style = MaterialTheme.typography.bodySmall,
-                                    color = if (isInContacts) NiyeEshoGreenDarkMuted else Color(0xFFE05252),
+                                    color = if (isInContacts) NiyeEshoGreenDarkMuted else ErrorDark,
                                 )
                             }
                         }
@@ -244,7 +245,7 @@ fun GroupSettingsDialog(
                                     Icon(
                                         imageVector = Icons.Default.Delete,
                                         contentDescription = "Remove member",
-                                        tint = Color(0xFFE05252),
+                                        tint = ErrorDark,
                                     )
                                 }
                             }
@@ -312,7 +313,7 @@ fun GroupSettingsDialog(
                 item {
                     TextButton(
                         onClick = { showDeleteConfirm = true },
-                        colors = ButtonDefaults.textButtonColors(contentColor = Color(0xFFE05252)),
+                        colors = ButtonDefaults.textButtonColors(contentColor = ErrorDark),
                         modifier = Modifier.fillMaxWidth(),
                     ) {
                         Icon(

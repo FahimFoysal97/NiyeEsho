@@ -17,6 +17,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.snehonir.niyeesho.core.designsystem.theme.AppShapes
+import com.snehonir.niyeesho.core.designsystem.theme.ErrorDark
 import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoDarkSurface
 import com.snehonir.niyeesho.core.designsystem.theme.Spacing
 import com.snehonir.niyeesho.core.utils.UiText
@@ -29,9 +31,9 @@ fun ErrorView(
 ) {
     Card(
         modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
+        shape = AppShapes.card,
         colors = CardDefaults.cardColors(containerColor = NiyeEshoDarkSurface),
-        border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFE05252)),
+        border = androidx.compose.foundation.BorderStroke(1.dp, ErrorDark),
     ) {
         Column(
             modifier = Modifier
@@ -43,7 +45,7 @@ fun ErrorView(
             Text(
                 text = message.resolve(),
                 style = MaterialTheme.typography.bodyMedium,
-                color = Color(0xFFE05252),
+                color = ErrorDark,
                 textAlign = TextAlign.Center,
             )
             if (action != null) {

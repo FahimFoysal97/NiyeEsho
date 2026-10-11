@@ -200,7 +200,7 @@ fun ContactsContent(
                                     colors = CardDefaults.cardColors(containerColor = NiyeEshoDarkSurface),
                                 ) {
                                     Text(
-                                        text = "No active contacts yet. Share your invite link to connect!",
+                                        text = AppStrings.EMPTY_CONTACTS_MSG,
                                         modifier = Modifier.padding(Spacing.lg),
                                         style = MaterialTheme.typography.bodyMedium,
                                         color = NiyeEshoGreenMuted,
@@ -232,7 +232,7 @@ fun ContactsContent(
                                     colors = CardDefaults.cardColors(containerColor = NiyeEshoDarkSurface),
                                 ) {
                                     Text(
-                                        text = "No incoming contact requests.",
+                                        text = AppStrings.EMPTY_INCOMING_REQUESTS_MSG,
                                         modifier = Modifier.padding(Spacing.lg),
                                         style = MaterialTheme.typography.bodyMedium,
                                         color = NiyeEshoGreenMuted,
@@ -260,7 +260,7 @@ fun ContactsContent(
                                     colors = CardDefaults.cardColors(containerColor = NiyeEshoDarkSurface),
                                 ) {
                                     Text(
-                                        text = "No pending outgoing requests awaiting approval.",
+                                        text = AppStrings.EMPTY_OUTGOING_REQUESTS_MSG,
                                         modifier = Modifier.padding(Spacing.lg),
                                         style = MaterialTheme.typography.bodyMedium,
                                         color = NiyeEshoGreenMuted,
@@ -370,7 +370,7 @@ private fun ContactCardRow(
             IconButton(onClick = onDelete) {
                 Icon(
                     imageVector = Icons.Default.Delete,
-                    contentDescription = "Remove contact",
+                    contentDescription = AppStrings.ACTION_DELETE,
                     tint = ErrorDark,
                     modifier = Modifier.size(18.dp),
                 )

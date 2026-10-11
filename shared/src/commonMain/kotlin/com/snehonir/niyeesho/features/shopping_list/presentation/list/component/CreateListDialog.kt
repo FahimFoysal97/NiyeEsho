@@ -13,6 +13,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import com.snehonir.niyeesho.core.designsystem.component.AppTextField
+import com.snehonir.niyeesho.core.designsystem.theme.AppStrings
 import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoDarkSurface
 import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoGreenDarkMuted
 import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoGreenPrimary
@@ -40,7 +41,7 @@ fun CreateListDialog(
             AppTextField(
                 value = title,
                 onValueChange = { title = it },
-                label = UiText.Plain("List name"),
+                label = UiText.Plain(AppStrings.HINT_LIST_NAME),
             )
         },
         confirmButton = {
@@ -48,13 +49,13 @@ fun CreateListDialog(
                 onClick = { if (title.isNotBlank()) onConfirm(title.trim()) },
                 enabled = title.isNotBlank(),
                 colors = ButtonDefaults.textButtonColors(contentColor = NiyeEshoGreenPrimary),
-            ) { Text("Create") }
+            ) { Text(AppStrings.ACTION_CREATE) }
         },
         dismissButton = {
             TextButton(
                 onClick = onDismiss,
                 colors = ButtonDefaults.textButtonColors(contentColor = NiyeEshoGreenDarkMuted),
-            ) { Text("Cancel") }
+            ) { Text(AppStrings.ACTION_CANCEL) }
         },
     )
 }

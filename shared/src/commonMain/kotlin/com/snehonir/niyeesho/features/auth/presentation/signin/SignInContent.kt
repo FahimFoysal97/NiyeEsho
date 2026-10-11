@@ -41,6 +41,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.snehonir.niyeesho.core.designsystem.component.ErrorView
 import com.snehonir.niyeesho.core.designsystem.theme.AppShapes
+import com.snehonir.niyeesho.core.designsystem.theme.AppStrings
 import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoButtonGradientEnd
 import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoButtonGradientStart
 import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoDarkBg
@@ -98,7 +99,7 @@ fun SignInContent(
                 ) {
                     Icon(
                         imageVector = Icons.Default.ShoppingCart,
-                        contentDescription = "Niye Esho Logo",
+                        contentDescription = AppStrings.DESC_LOGO,
                         tint = NiyeEshoLightTeal,
                         modifier = Modifier.size(30.dp),
                     )

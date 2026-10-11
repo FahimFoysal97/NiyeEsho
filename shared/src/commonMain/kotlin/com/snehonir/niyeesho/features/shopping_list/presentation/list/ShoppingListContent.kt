@@ -23,6 +23,7 @@ import androidx.compose.ui.Modifier
 import com.snehonir.niyeesho.core.designsystem.component.AppTopBar
 import com.snehonir.niyeesho.core.designsystem.component.BrandPageHeader
 import com.snehonir.niyeesho.core.designsystem.component.ErrorView
+import com.snehonir.niyeesho.core.designsystem.theme.AppStrings
 import com.snehonir.niyeesho.core.designsystem.theme.Spacing
 import com.snehonir.niyeesho.core.utils.UiText
 import com.snehonir.niyeesho.features.shopping_list.presentation.list.component.CreateListDialog
@@ -38,10 +39,10 @@ fun ShoppingListContent(
 ) {
     Column(modifier = modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
         AppTopBar(
-            title = UiText.Plain("Niye Esho"),
+            title = UiText.Plain(AppStrings.APP_NAME),
             actions = {
-                TextButton(onClick = onNavigateToContacts) { Text("Contacts") }
-                TextButton(onClick = onNavigateToProfile) { Text("Profile") }
+                TextButton(onClick = onNavigateToContacts) { Text(AppStrings.TITLE_CONTACTS) }
+                TextButton(onClick = onNavigateToProfile) { Text(AppStrings.TITLE_PROFILE) }
             },
         )
         Box(modifier = Modifier.weight(1f)) {
@@ -51,8 +52,8 @@ fun ShoppingListContent(
             ) {
                 BrandPageHeader(
                     modifier = Modifier.padding(top = Spacing.sm),
-                    title = "My shopping lists",
-                    subtitle = "Keep every family request in one place.",
+                    title = AppStrings.TITLE_MY_SHOPPING_LISTS,
+                    subtitle = AppStrings.SUBTITLE_SHOPPING_LISTS,
                 )
                 uiState.error?.let { ErrorView(UiText.Plain(it), modifier = Modifier.fillMaxWidth()) }
                 if (uiState.lists.isEmpty()) {
@@ -61,7 +62,7 @@ fun ShoppingListContent(
                         contentAlignment = Alignment.Center,
                     ) {
                         Text(
-                            text = "No lists yet. Create one for your next trip.",
+                            text = AppStrings.EMPTY_LISTS_MSG,
                             style = MaterialTheme.typography.bodyLarge,
                             color = MaterialTheme.colorScheme.onSurface,
                         )
@@ -84,7 +85,7 @@ fun ShoppingListContent(
                 containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = MaterialTheme.colorScheme.onPrimary,
             ) {
-                Icon(Icons.Default.Add, contentDescription = "Create new list")
+                Icon(Icons.Default.Add, contentDescription = AppStrings.ACTION_CREATE_NEW_LIST)
             }
         }
     }

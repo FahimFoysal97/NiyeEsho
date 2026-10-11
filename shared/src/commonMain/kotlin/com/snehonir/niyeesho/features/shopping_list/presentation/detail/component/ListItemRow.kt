@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Card
@@ -23,6 +22,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import com.snehonir.niyeesho.core.designsystem.theme.AppShapes
+import com.snehonir.niyeesho.core.designsystem.theme.AppStrings
 import com.snehonir.niyeesho.core.designsystem.theme.ErrorDark
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
@@ -46,7 +47,7 @@ fun ListItemRow(
 
     Card(
         modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
+        shape = AppShapes.card,
         colors = CardDefaults.cardColors(containerColor = cardColor),
         elevation = CardDefaults.cardElevation(defaultElevation = Spacing.xs),
     ) {
@@ -99,7 +100,7 @@ fun ListItemRow(
                 IconButton(onClick = onDelete, modifier = Modifier.size(32.dp)) {
                     Icon(
                         imageVector = Icons.Default.Delete,
-                        contentDescription = "Delete item",
+                        contentDescription = AppStrings.ACTION_DELETE,
                         tint = ErrorDark,
                         modifier = Modifier.size(18.dp),
                     )

@@ -49,6 +49,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import com.snehonir.niyeesho.core.designsystem.theme.AppShapes
+import com.snehonir.niyeesho.core.designsystem.theme.AppStrings
 import com.snehonir.niyeesho.core.designsystem.theme.ErrorDark
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -171,7 +172,7 @@ fun ProfileContent(
                                             Box(contentAlignment = Alignment.Center) {
                                                 Icon(
                                                     imageVector = Icons.Default.Edit,
-                                                    contentDescription = "Edit",
+                                                    contentDescription = AppStrings.ACTION_EDIT,
                                                     tint = NiyeEshoGreenPrimary,
                                                     modifier = Modifier.size(12.dp),
                                                 )
@@ -247,12 +248,12 @@ fun ProfileContent(
                                         ) {
                                             Icon(
                                                 imageVector = Icons.Default.CheckCircle,
-                                                contentDescription = "Sync",
+                                                contentDescription = AppStrings.DESC_SYNC,
                                                 tint = NiyeEshoGreenDarkMuted,
                                                 modifier = Modifier.size(20.dp),
                                             )
                                             Column {
-                                                Text("Last synced", style = MaterialTheme.typography.bodyMedium, color = Color.White)
+                                                Text(AppStrings.LABEL_LAST_SYNCED, style = MaterialTheme.typography.bodyMedium, color = Color.White)
                                                 val syncedText = uiState.lastSyncedAt?.let {
                                                     "${it.toDisplayTime()} (${it.toDisplayDate()})"
                                                 } ?: "Just now"
@@ -274,7 +275,7 @@ fun ProfileContent(
                                             } else {
                                                 Icon(
                                                     imageVector = Icons.Default.Refresh,
-                                                    contentDescription = "Refresh",
+                                                    contentDescription = AppStrings.DESC_REFRESH,
                                                     tint = NiyeEshoGreenPrimary,
                                                     modifier = Modifier.size(24.dp),
                                                 )
@@ -297,7 +298,7 @@ fun ProfileContent(
                                         ) {
                                             Icon(
                                                 imageVector = Icons.Default.Info,
-                                                contentDescription = "Folder",
+                                                contentDescription = AppStrings.DESC_FOLDER,
                                                 tint = NiyeEshoGreenPrimary,
                                                 modifier = Modifier.size(20.dp),
                                             )
@@ -346,11 +347,11 @@ fun ProfileContent(
                                         ) {
                                             Icon(
                                                 imageVector = Icons.Default.Notifications,
-                                                contentDescription = "Notifications",
+                                                contentDescription = AppStrings.LABEL_NOTIFICATIONS,
                                                 tint = NiyeEshoGreenMuted,
                                                 modifier = Modifier.size(20.dp),
                                             )
-                                            Text("Notifications", style = MaterialTheme.typography.bodyMedium, color = Color.White)
+                                            Text(AppStrings.LABEL_NOTIFICATIONS, style = MaterialTheme.typography.bodyMedium, color = Color.White)
                                         }
                                         Switch(
                                             checked = notificationsEnabled,
@@ -380,11 +381,11 @@ fun ProfileContent(
                                         ) {
                                             Icon(
                                                 imageVector = Icons.Default.Search,
-                                                contentDescription = "Searchable",
+                                                contentDescription = AppStrings.DESC_SEARCHABLE,
                                                 tint = NiyeEshoGreenMuted,
                                                 modifier = Modifier.size(20.dp),
                                             )
-                                            Text("Searchable by email", style = MaterialTheme.typography.bodyMedium, color = Color.White)
+                                            Text(AppStrings.LABEL_SEARCHABLE_BY_EMAIL, style = MaterialTheme.typography.bodyMedium, color = Color.White)
                                         }
                                         Switch(
                                             checked = searchableEnabled,
@@ -411,12 +412,12 @@ fun ProfileContent(
                                     ) {
                                         Icon(
                                             imageVector = Icons.AutoMirrored.Filled.ExitToApp,
-                                            contentDescription = "Sign out",
+                                            contentDescription = AppStrings.ACTION_SIGN_OUT,
                                             tint = ErrorDark,
                                             modifier = Modifier.size(20.dp),
                                         )
                                         Text(
-                                            text = "Sign out",
+                                            text = AppStrings.ACTION_SIGN_OUT,
                                             style = MaterialTheme.typography.titleMedium,
                                             fontWeight = FontWeight.SemiBold,
                                             color = ErrorDark,

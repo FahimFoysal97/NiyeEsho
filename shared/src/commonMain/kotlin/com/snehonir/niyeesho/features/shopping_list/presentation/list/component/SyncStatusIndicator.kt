@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.snehonir.niyeesho.core.designsystem.theme.AppStrings
 import com.snehonir.niyeesho.core.utils.SyncStatus
 
 @Composable
@@ -35,21 +36,21 @@ fun SyncStatusIndicator(status: SyncStatus, modifier: Modifier = Modifier) {
         if (isFailed) {
             Icon(
                 imageVector = Icons.Default.Warning,
-                contentDescription = "Sync failed",
+                contentDescription = AppStrings.DESC_SYNC_FAILED,
                 modifier = Modifier.size(16.dp),
                 tint = tint,
             )
         } else {
             Icon(
                 imageVector = Icons.Default.Check,
-                contentDescription = "Status check",
+                contentDescription = AppStrings.DESC_STATUS_CHECK,
                 modifier = Modifier.size(16.dp),
                 tint = tint,
             )
             if (isDoubleCheck) {
                 Icon(
                     imageVector = Icons.Default.Check,
-                    contentDescription = "Status double check",
+                    contentDescription = AppStrings.DESC_STATUS_DOUBLE_CHECK,
                     modifier = Modifier.size(16.dp),
                     tint = tint,
                 )

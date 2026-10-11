@@ -44,6 +44,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import com.snehonir.niyeesho.core.designsystem.theme.AppStrings
 import com.snehonir.niyeesho.core.designsystem.theme.ErrorDark
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -87,8 +88,8 @@ fun GroupSettingsDialog(
             onDismissRequest = { showDeleteConfirm = false },
             shape = AppShapes.dialog,
             containerColor = NiyeEshoDarkSurface,
-            title = { Text("Delete Shopping List?", color = Color.White, style = MaterialTheme.typography.titleMedium) },
-            text = { Text("Are you sure you want to delete this list? This action cannot be undone.", color = NiyeEshoGreenMuted) },
+            title = { Text(AppStrings.TITLE_DELETE_LIST_CONFIRM, color = Color.White, style = MaterialTheme.typography.titleMedium) },
+            text = { Text(AppStrings.MESSAGE_DELETE_LIST_CONFIRM, color = NiyeEshoGreenMuted) },
             confirmButton = {
                 Button(
                     onClick = {
@@ -97,13 +98,13 @@ fun GroupSettingsDialog(
                     },
                     shape = AppShapes.button,
                     colors = ButtonDefaults.buttonColors(containerColor = ErrorDark, contentColor = Color.White),
-                ) { Text("Delete", fontWeight = FontWeight.Bold) }
+                ) { Text(AppStrings.ACTION_DELETE, fontWeight = FontWeight.Bold) }
             },
             dismissButton = {
                 TextButton(
                     onClick = { showDeleteConfirm = false },
                     colors = ButtonDefaults.textButtonColors(contentColor = NiyeEshoGreenDarkMuted),
-                ) { Text("Cancel") }
+                ) { Text(AppStrings.ACTION_CANCEL) }
             },
         )
     }
@@ -167,7 +168,7 @@ fun GroupSettingsDialog(
                             ) {
                                 Icon(
                                     imageVector = Icons.Default.Edit,
-                                    contentDescription = "Update title",
+                                    contentDescription = AppStrings.ACTION_UPDATE,
                                     tint = if (titleInput.isNotBlank() && titleInput != listTitle) Color.White else NiyeEshoGreenDarkMuted,
                                 )
                             }
@@ -236,7 +237,7 @@ fun GroupSettingsDialog(
                                 IconButton(onClick = { onAddContact(member) }) {
                                     Icon(
                                         imageVector = Icons.Default.Add,
-                                        contentDescription = "Add to contacts",
+                                        contentDescription = AppStrings.DESC_ADD_CONTACT,
                                         tint = NiyeEshoGreenPrimary,
                                     )
                                 }
@@ -245,7 +246,7 @@ fun GroupSettingsDialog(
                                 IconButton(onClick = { onRemoveMember(member.uid) }) {
                                     Icon(
                                         imageVector = Icons.Default.Delete,
-                                        contentDescription = "Remove member",
+                                        contentDescription = AppStrings.DESC_REMOVE_MEMBER,
                                         tint = ErrorDark,
                                     )
                                 }
@@ -323,7 +324,7 @@ fun GroupSettingsDialog(
                             modifier = Modifier.size(Spacing.md),
                         )
                         Spacer(Modifier.width(Spacing.xs))
-                        Text("Delete Shopping List", fontWeight = FontWeight.Bold)
+                        Text(AppStrings.ACTION_DELETE_SHOPPING_LIST, fontWeight = FontWeight.Bold)
                     }
                 }
             }
@@ -348,7 +349,7 @@ fun GroupSettingsDialog(
                         disabledContainerColor = NiyeEshoGreenDarkMuted,
                         disabledContentColor = Color.White.copy(alpha = 0.5f),
                     ),
-                ) { Text("Add Selected Contacts", fontWeight = FontWeight.Bold) }
+                ) { Text(AppStrings.ACTION_ADD_SELECTED_CONTACTS, fontWeight = FontWeight.Bold) }
             }
         },
         dismissButton = {
@@ -357,7 +358,7 @@ fun GroupSettingsDialog(
                 colors = ButtonDefaults.textButtonColors(contentColor = NiyeEshoGreenLight),
             ) {
                 Text(
-                    text = "Close",
+                    text = AppStrings.ACTION_CLOSE,
                     style = MaterialTheme.typography.titleMedium,
                 )
             }

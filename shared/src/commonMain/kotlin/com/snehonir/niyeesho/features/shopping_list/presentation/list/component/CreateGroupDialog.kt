@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -31,6 +30,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.snehonir.niyeesho.core.designsystem.component.AppTextField
 import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoCheckboxBorder
+import com.snehonir.niyeesho.core.designsystem.theme.AppShapes
+import com.snehonir.niyeesho.core.designsystem.theme.AppStrings
 import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoDarkSurface
 import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoGreenDarkMuted
 import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoGreenLight
@@ -57,7 +58,7 @@ fun CreateGroupDialog(
     AlertDialog(
         onDismissRequest = onDismiss,
         modifier = modifier,
-        shape = RoundedCornerShape(20.dp),
+        shape = AppShapes.dialog,
         containerColor = NiyeEshoDarkSurface,
         title = {
             Text(
@@ -75,7 +76,7 @@ fun CreateGroupDialog(
                 AppTextField(
                     value = title,
                     onValueChange = { title = it },
-                    label = UiText.Plain("Group Name"),
+                    label = UiText.Plain(AppStrings.HINT_GROUP_NAME),
                     modifier = Modifier.fillMaxWidth(),
                 )
 

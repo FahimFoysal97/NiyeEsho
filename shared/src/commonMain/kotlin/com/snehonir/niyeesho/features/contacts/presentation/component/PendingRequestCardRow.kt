@@ -103,7 +103,7 @@ fun PendingRequestCardRow(
                 IconButton(onClick = onBlock, modifier = Modifier.size(32.dp)) {
                     Icon(
                         imageVector = Icons.Default.Clear,
-                        contentDescription = "Block",
+                        contentDescription = AppStrings.ACTION_BLOCK,
                         tint = NiyeEshoBrightRed,
                         modifier = Modifier.size(18.dp),
                     )

@@ -131,7 +131,7 @@ fun InviteContent(
             verticalArrangement = Arrangement.spacedBy(Spacing.md),
         ) {
             Text(
-                text = "Invite",
+                text = AppStrings.TITLE_INVITE,
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
                 color = Color.White,
@@ -155,7 +155,7 @@ fun InviteContent(
                     contentAlignment = Alignment.Center,
                 ) {
                     Text(
-                        text = "My code",
+                        text = AppStrings.TAB_MY_CODE,
                         style = MaterialTheme.typography.labelMedium,
                         fontWeight = FontWeight.Bold,
                         color = if (uiState.selectedSubTab == 0) Color.White else NiyeEshoTextMuted,
@@ -172,7 +172,7 @@ fun InviteContent(
                     contentAlignment = Alignment.Center,
                 ) {
                     Text(
-                        text = "Scan",
+                        text = AppStrings.TAB_SCAN,
                         style = MaterialTheme.typography.labelMedium,
                         fontWeight = FontWeight.Bold,
                         color = if (uiState.selectedSubTab == 1) Color.White else NiyeEshoTextMuted,
@@ -205,7 +205,7 @@ fun InviteContent(
                             horizontalAlignment = Alignment.CenterHorizontally,
                         ) {
                             Text(
-                                text = "YOUR QR CODE",
+                                text = AppStrings.TITLE_YOUR_QR_CODE,
                                 style = MaterialTheme.typography.labelSmall,
                                 fontWeight = FontWeight.Bold,
                                 color = NiyeEshoGreenPrimary,
@@ -247,7 +247,7 @@ fun InviteContent(
                                         horizontalArrangement = Arrangement.Center,
                                         verticalAlignment = Alignment.CenterVertically,
                                     ) {
-                                        Icon(painterResource(Res.drawable.download), contentDescription = "Save", tint = NiyeEshoEmeraldAccent, modifier = Modifier.size(15.dp))
+                                        Icon(painterResource(Res.drawable.download), contentDescription = AppStrings.ACTION_SAVE, tint = NiyeEshoEmeraldAccent, modifier = Modifier.size(15.dp))
                                         Spacer(modifier = Modifier.width(6.dp))
                                         Text(AppStrings.ACTION_SAVE, style = MaterialTheme.typography.labelMedium, color = NiyeEshoMutedGreenText, fontWeight = FontWeight.Bold)
                                     }
@@ -266,7 +266,7 @@ fun InviteContent(
                                         horizontalArrangement = Arrangement.Center,
                                         verticalAlignment = Alignment.CenterVertically,
                                     ) {
-                                        Icon(Icons.Default.Share, contentDescription = "Share", tint = NiyeEshoEmeraldAccent, modifier = Modifier.size(15.dp))
+                                        Icon(Icons.Default.Share, contentDescription = AppStrings.ACTION_SHARE, tint = NiyeEshoEmeraldAccent, modifier = Modifier.size(15.dp))
                                         Spacer(modifier = Modifier.width(6.dp))
                                         Text(AppStrings.ACTION_SHARE, style = MaterialTheme.typography.labelMedium, color = NiyeEshoMutedGreenText, fontWeight = FontWeight.Bold)
                                     }
@@ -288,7 +288,7 @@ fun InviteContent(
                                 .padding(14.dp),
                         ) {
                             Text(
-                                text = "YOUR INVITE LINK",
+                                text = AppStrings.TITLE_YOUR_INVITE_LINK,
                                 style = MaterialTheme.typography.labelSmall,
                                 fontWeight = FontWeight.Bold,
                                 color = NiyeEshoGreenPrimary,
@@ -334,7 +334,7 @@ fun InviteContent(
                                         horizontalArrangement = Arrangement.Center,
                                         verticalAlignment = Alignment.CenterVertically,
                                     ) {
-                                        Icon(painterResource(Res.drawable.content_copy), contentDescription = "Copy", tint = NiyeEshoEmeraldAccent, modifier = Modifier.size(15.dp))
+                                        Icon(painterResource(Res.drawable.content_copy), contentDescription = AppStrings.ACTION_COPY, tint = NiyeEshoEmeraldAccent, modifier = Modifier.size(15.dp))
                                         Spacer(modifier = Modifier.width(6.dp))
                                         Text(AppStrings.ACTION_COPY, style = MaterialTheme.typography.labelMedium, color = NiyeEshoMutedGreenText, fontWeight = FontWeight.Bold)
                                     }
@@ -353,7 +353,7 @@ fun InviteContent(
                                         horizontalArrangement = Arrangement.Center,
                                         verticalAlignment = Alignment.CenterVertically,
                                     ) {
-                                        Icon(Icons.Default.Share, contentDescription = "Share", tint = NiyeEshoEmeraldAccent, modifier = Modifier.size(15.dp))
+                                        Icon(Icons.Default.Share, contentDescription = AppStrings.ACTION_SHARE, tint = NiyeEshoEmeraldAccent, modifier = Modifier.size(15.dp))
                                         Spacer(modifier = Modifier.width(6.dp))
                                         Text(AppStrings.ACTION_SHARE, style = MaterialTheme.typography.labelMedium, color = NiyeEshoMutedGreenText, fontWeight = FontWeight.Bold)
                                     }
@@ -414,7 +414,7 @@ fun InviteContent(
                                         .padding(bottom = 16.dp),
                                 ) {
                                     Text(
-                                        text = "Choose from photos",
+                                        text = AppStrings.ACTION_CHOOSE_PHOTOS,
                                         style = MaterialTheme.typography.labelMedium,
                                         fontWeight = FontWeight.Bold,
                                         color = NiyeEshoMutedGreenText,
@@ -424,7 +424,7 @@ fun InviteContent(
                             }
 
                             Text(
-                                text = "Point your camera at your friend's QR code",
+                                text = AppStrings.HINT_POINT_CAMERA,
                                 style = MaterialTheme.typography.bodySmall,
                                 color = NiyeEshoTextSubtle,
                                 textAlign = TextAlign.Center,
@@ -478,7 +478,7 @@ fun InviteContent(
                                             modifier = Modifier.padding(8.dp),
                                             contentAlignment = Alignment.Center,
                                         ) {
-                                            Icon(painterResource(Res.drawable.content_paste), contentDescription = "Paste", modifier = Modifier.size(18.dp), tint = NiyeEshoEmeraldAccent)
+                                            Icon(painterResource(Res.drawable.content_paste), contentDescription = AppStrings.ACTION_PASTE, modifier = Modifier.size(18.dp), tint = NiyeEshoEmeraldAccent)
                                         }
                                     }
                                 }
@@ -493,7 +493,7 @@ fun InviteContent(
                                 )
                             } else {
                                 Text(
-                                    text = if (isValidLink) "Link looks good" else "That doesn't look like a Niye Esho invite link",
+                                    text = if (isValidLink) AppStrings.MSG_LINK_VALID else AppStrings.MSG_LINK_INVALID,
                                     style = MaterialTheme.typography.bodySmall,
                                     color = if (isValidLink) NiyeEshoEmeraldAccent else NiyeEshoSoftRed,
                                     textAlign = TextAlign.Center,
@@ -763,7 +763,7 @@ fun ConnectedSuccessView(
                     ) {
                         Icon(
                             imageVector = Icons.Default.Check,
-                            contentDescription = "Connected",
+                            contentDescription = AppStrings.DESC_CONNECTED,
                             tint = Color.White,
                             modifier = Modifier.size(46.dp),
                         )
@@ -819,7 +819,7 @@ fun ConnectedSuccessView(
                         verticalArrangement = Arrangement.spacedBy(8.dp),
                     ) {
                         Text(
-                            text = "You're connected!",
+                            text = AppStrings.TITLE_CONNECTED,
                             style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.Bold,
                             color = Color.White,
@@ -973,7 +973,7 @@ fun ConnectionFailedView(
                     ) {
                         Icon(
                             imageVector = Icons.Default.Close,
-                            contentDescription = "Failed",
+                            contentDescription = AppStrings.DESC_FAILED,
                             tint = Color.White,
                             modifier = Modifier.size(46.dp),
                         )
@@ -995,7 +995,7 @@ fun ConnectionFailedView(
                         verticalArrangement = Arrangement.spacedBy(8.dp),
                     ) {
                         Text(
-                            text = "Connection Failed",
+                            text = AppStrings.TITLE_CONNECTION_FAILED,
                             style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.Bold,
                             color = Color.White,
@@ -1003,7 +1003,7 @@ fun ConnectionFailedView(
                         )
 
                         Text(
-                            text = uiState.errorMessage ?: "Invalid invite link or connection error. Please try again.",
+                            text = uiState.errorMessage ?: AppStrings.ERROR_INVALID_INVITE_LINK,
                             style = MaterialTheme.typography.bodyMedium,
                             color = NiyeEshoTextSubtle,
                             textAlign = TextAlign.Center,
@@ -1020,7 +1020,7 @@ fun ConnectionFailedView(
                         ),
                     ) {
                         Text(
-                            text = "Try Again",
+                            text = AppStrings.ACTION_TRY_AGAIN,
                             style = MaterialTheme.typography.labelLarge,
                             fontWeight = FontWeight.Bold,
                         )

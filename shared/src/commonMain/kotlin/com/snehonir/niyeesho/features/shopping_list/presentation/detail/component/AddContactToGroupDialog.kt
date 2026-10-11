@@ -21,6 +21,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import com.snehonir.niyeesho.core.designsystem.theme.AppStrings
 import com.snehonir.niyeesho.core.designsystem.theme.Spacing
 import com.snehonir.niyeesho.features.contacts.domain.entity.Contact
 import com.snehonir.niyeesho.features.shopping_list.domain.entity.ListMember
@@ -38,7 +39,7 @@ fun AddContactToGroupDialog(
     AlertDialog(
         onDismissRequest = onDismiss,
         modifier = modifier,
-        title = { Text("Add from Contacts") },
+        title = { Text(AppStrings.TITLE_ADD_FROM_CONTACTS) },
         text = {
             Column(
                 modifier = Modifier.fillMaxWidth(),
@@ -109,11 +110,11 @@ fun AddContactToGroupDialog(
                         onConfirm(selectedMembers)
                     },
                     enabled = selectedUids.isNotEmpty(),
-                ) { Text("Add to Group") }
+                ) { Text(AppStrings.ACTION_ADD_TO_GROUP) }
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) { Text("Cancel") }
+            TextButton(onClick = onDismiss) { Text(AppStrings.ACTION_CANCEL) }
         },
     )
 }

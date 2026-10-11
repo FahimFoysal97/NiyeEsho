@@ -1,8 +1,8 @@
 package com.snehonir.niyeesho.core.designsystem.theme
 
 /**
- * Centralized app-wide UI and domain string constants for common actions, hints, labels, and error messages,
- * complying with Section 14 (Zero Hardcoded Values).
+ * Centralized app-wide UI and domain string constants for common actions, hints, labels, error messages,
+ * and accessibility content descriptions, complying with Section 14 (Zero Hardcoded Values).
  */
 object AppStrings {
     const val APP_NAME = "Niye Esho"
@@ -24,18 +24,68 @@ object AppStrings {
     const val ACTION_PASTE = "Paste"
     const val ACTION_CREATE_GROUP = "Create Group"
     const val ACTION_CONNECT = "Connect"
+    const val ACTION_ADD = "Add"
+    const val ACTION_CREATE = "Create"
+    const val ACTION_ADD_TO_GROUP = "Add to Group"
+    const val ACTION_DELETE_SHOPPING_LIST = "Delete Shopping List"
+    const val ACTION_ADD_SELECTED_CONTACTS = "Add Selected Contacts"
+    const val ACTION_SHARE_INVITE_LINK = "Share Invite Link"
+    const val ACTION_ADD_ITEM = "Add new item"
+    const val ACTION_CREATE_NEW_LIST = "Create new list"
+    const val ACTION_SIGN_OUT = "Sign out"
+    const val ACTION_CHOOSE_PHOTOS = "Choose from photos"
+    const val ACTION_TRY_AGAIN = "Try Again"
+
+    const val TAB_MY_CODE = "My code"
+    const val TAB_SCAN = "Scan"
 
     const val HINT_SEARCH_CONTACTS = "Search contacts..."
     const val HINT_SEARCH_LISTS = "Search lists..."
     const val HINT_PASTE_INVITE_LINK = "or paste invite link"
+    const val HINT_ITEM_NAME = "Item name (e.g. Milk)"
+    const val HINT_QUANTITY = "Quantity (optional, e.g. 2 ltr)"
+    const val HINT_GROUP_NAME = "Group Name"
+    const val HINT_LIST_NAME = "List name"
+    const val HINT_POINT_CAMERA = "Point your camera at your friend's QR code"
+    const val HINT_ADD_CONTACTS_TO_GROUP = "Add contacts to this group:"
 
     const val TITLE_LISTS = "Lists"
     const val TITLE_CONTACTS = "Contacts"
     const val TITLE_INVITE = "Invite"
     const val TITLE_PROFILE = "Profile"
     const val TITLE_SETTINGS = "Settings"
+    const val TITLE_SETTINGS_SECTION = "SETTINGS"
+    const val TITLE_GOOGLE_DRIVE = "GOOGLE DRIVE"
     const val TITLE_DELETE_CONTACT = "Delete Contact"
     const val TITLE_LAST_ACTIVE_LIST = "LAST ACTIVE LIST"
+    const val TITLE_ADD_FROM_CONTACTS = "Add from Contacts"
+    const val TITLE_DELETE_LIST_CONFIRM = "Delete Shopping List?"
+    const val TITLE_SHOPPING_LIST = "Shopping list"
+    const val TITLE_MY_SHOPPING_LISTS = "My shopping lists"
+    const val TITLE_YOUR_QR_CODE = "YOUR QR CODE"
+    const val TITLE_YOUR_INVITE_LINK = "YOUR INVITE LINK"
+    const val TITLE_CONNECTED = "You're connected!"
+    const val TITLE_CONNECTION_FAILED = "Connection Failed"
+    const val TITLE_CONTACT_DETAILS = "Contact Details"
+    const val TITLE_GROUP_SETTINGS = "Group Settings & Details"
+    const val TITLE_CREATE_GROUP_LIST = "Create Group List"
+    const val TITLE_CREATE_SHOPPING_LIST = "Create a shopping list"
+    const val TITLE_INVITE_SOMEONE = "Invite Someone"
+    const val TITLE_SCAN_QR = "Scan QR Code"
+
+    const val SUBTITLE_SHOPPING_LISTS = "Keep every family request in one place."
+    const val SUBTITLE_INVITE_LINK = "Share this link or scan the QR code to connect and sync shopping lists."
+    const val SUBTITLE_SCAN_QR = "Point your camera at a Niye Esho invite QR code to automatically connect."
+
+    const val EMPTY_LISTS_MSG = "No lists yet. Create one for your next trip."
+    const val EMPTY_CONTACTS_MSG = "No active contacts yet. Share your invite link to connect!"
+    const val EMPTY_INCOMING_REQUESTS_MSG = "No incoming contact requests."
+    const val EMPTY_OUTGOING_REQUESTS_MSG = "No pending outgoing requests awaiting approval."
+    const val EMPTY_ITEMS_MSG = "No items in this list yet. Tap '+' to add one!"
+
+    const val MESSAGE_DELETE_LIST_CONFIRM = "Are you sure you want to delete this list? This action cannot be undone."
+    const val MSG_LINK_VALID = "Link looks good"
+    const val MSG_LINK_INVALID = "That doesn't look like a Niye Esho invite link"
 
     const val GREETING_MORNING = "Good morning"
     const val LABEL_DEFAULT_USER = "Sneho"
@@ -47,6 +97,27 @@ object AppStrings {
     const val LABEL_AWAITING_APPROVAL = "Awaiting approval..."
     const val LABEL_COMPLETED = "Completed"
     const val LABEL_EMPTY_SHOPPING_LISTS = "No shopping lists yet. Tap '+' to create one!"
+    const val LABEL_LAST_SYNCED = "Last synced"
+    const val LABEL_NOTIFICATIONS = "Notifications"
+    const val LABEL_SEARCHABLE_BY_EMAIL = "Searchable by email"
+    const val LABEL_SYNCED = "Synced"
+    const val LABEL_ITEMS = "Items"
+    const val LABEL_CONNECTED = "Connected"
+    const val LABEL_CONTACT_UNAVAILABLE = "Contact details unavailable."
+    const val LABEL_LIST_TITLE = "List Title"
+
+    const val DESC_SYNC = "Sync"
+    const val DESC_REFRESH = "Refresh"
+    const val DESC_FOLDER = "Folder"
+    const val DESC_SEARCHABLE = "Searchable"
+    const val DESC_LOGO = "Niye Esho Logo"
+    const val DESC_CONNECTED = "Connected"
+    const val DESC_FAILED = "Failed"
+    const val DESC_ADD_CONTACT = "Add to contacts"
+    const val DESC_REMOVE_MEMBER = "Remove member"
+    const val DESC_SYNC_FAILED = "Sync failed"
+    const val DESC_STATUS_CHECK = "Status check"
+    const val DESC_STATUS_DOUBLE_CHECK = "Status double check"
 
     const val ERROR_SIGN_IN_GOOGLE = "Unable to sign in with Google."
     const val ERROR_SIGN_IN = "Unable to sign in."
@@ -54,4 +125,5 @@ object AppStrings {
     const val ERROR_CONTACT_NOT_FOUND = "Contact not found."
     const val ERROR_FIREBASE_NO_USER = "Firebase returned no authenticated user."
     const val ERROR_LIST_NOT_FOUND = "Shopping list not found."
+    const val ERROR_INVALID_INVITE_LINK = "Invalid invite link or connection error. Please try again."
 }

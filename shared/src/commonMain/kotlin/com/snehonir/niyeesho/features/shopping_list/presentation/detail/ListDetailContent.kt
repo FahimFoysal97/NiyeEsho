@@ -39,6 +39,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.snehonir.niyeesho.core.designsystem.theme.AppStrings
 import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoDarkBg
 import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoDarkSurface
 import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoGoldSecondary
@@ -85,13 +86,13 @@ fun ListDetailContent(
             ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Back",
+                    contentDescription = AppStrings.ACTION_BACK,
                     tint = Color.White,
                     modifier = Modifier.size(20.dp),
                 )
             }
             Text(
-                text = uiState.list?.title ?: "Shopping list",
+                text = uiState.list?.title ?: AppStrings.TITLE_SHOPPING_LIST,
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
                 color = Color.White,
@@ -112,7 +113,7 @@ fun ListDetailContent(
             ) {
                 Icon(
                     imageVector = Icons.Default.Settings,
-                    contentDescription = "Settings",
+                    contentDescription = AppStrings.TITLE_SETTINGS,
                     tint = NiyeEshoGreenPrimary,
                     modifier = Modifier.size(20.dp),
                 )
@@ -249,7 +250,7 @@ fun ListDetailContent(
                     .align(Alignment.BottomEnd)
                     .padding(Spacing.lg),
             ) {
-                Icon(imageVector = Icons.Default.Add, contentDescription = "Add Item")
+                Icon(imageVector = Icons.Default.Add, contentDescription = AppStrings.ACTION_ADD_ITEM)
             }
         }
     }

@@ -21,8 +21,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
 import com.snehonir.niyeesho.core.designsystem.theme.AppShapes
+import com.snehonir.niyeesho.core.designsystem.theme.AppStrings
 import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoDarkBg
 import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoDarkSurface
 import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoGreenDarkMuted
@@ -43,7 +43,7 @@ fun ContactSettingsDialog(
         containerColor = NiyeEshoDarkSurface,
         title = {
             Text(
-                text = "Contact Details",
+                text = AppStrings.TITLE_CONTACT_DETAILS,
                 style = MaterialTheme.typography.titleMedium,
                 color = Color.White,
             )
@@ -85,7 +85,7 @@ fun ContactSettingsDialog(
                                 color = NiyeEshoGreenDarkMuted,
                             )
                             Text(
-                                text = "Connected",
+                                text = AppStrings.LABEL_CONNECTED,
                                 style = MaterialTheme.typography.bodySmall,
                                 color = NiyeEshoGreenPrimary,
                             )
@@ -107,7 +107,7 @@ fun ContactSettingsDialog(
                     }
                 } else {
                     Text(
-                        text = "Contact details unavailable.",
+                        text = AppStrings.LABEL_CONTACT_UNAVAILABLE,
                         style = MaterialTheme.typography.bodyMedium,
                         color = NiyeEshoGreenDarkMuted,
                     )
@@ -118,7 +118,7 @@ fun ContactSettingsDialog(
             TextButton(
                 onClick = onDismiss,
                 colors = ButtonDefaults.textButtonColors(contentColor = NiyeEshoGreenPrimary),
-            ) { Text("Close") }
+            ) { Text(AppStrings.ACTION_CLOSE) }
         },
     )
 }

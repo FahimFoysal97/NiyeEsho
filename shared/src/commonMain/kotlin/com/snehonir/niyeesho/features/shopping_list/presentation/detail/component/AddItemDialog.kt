@@ -15,6 +15,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import com.snehonir.niyeesho.core.designsystem.component.AppTextField
+import com.snehonir.niyeesho.core.designsystem.theme.AppStrings
 import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoDarkSurface
 import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoGreenDarkMuted
 import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoGreenPrimary
@@ -36,7 +37,7 @@ fun AddItemDialog(
         containerColor = NiyeEshoDarkSurface,
         title = {
             Text(
-                text = "Add new item",
+                text = AppStrings.ACTION_ADD_ITEM,
                 style = MaterialTheme.typography.titleMedium,
                 color = Color.White,
             )
@@ -46,12 +47,12 @@ fun AddItemDialog(
                 AppTextField(
                     value = itemName,
                     onValueChange = { itemName = it },
-                    label = UiText.Plain("Item name (e.g. Milk)"),
+                    label = UiText.Plain(AppStrings.HINT_ITEM_NAME),
                 )
                 AppTextField(
                     value = itemQty,
                     onValueChange = { itemQty = it },
-                    label = UiText.Plain("Quantity (optional, e.g. 2 ltr)"),
+                    label = UiText.Plain(AppStrings.HINT_QUANTITY),
                 )
             }
         },
@@ -60,13 +61,13 @@ fun AddItemDialog(
                 onClick = { if (itemName.isNotBlank()) onConfirm(itemName.trim(), itemQty.ifBlank { null }) },
                 enabled = itemName.isNotBlank(),
                 colors = ButtonDefaults.textButtonColors(contentColor = NiyeEshoGreenPrimary),
-            ) { Text("Add") }
+            ) { Text(AppStrings.ACTION_ADD) }
         },
         dismissButton = {
             TextButton(
                 onClick = onDismiss,
                 colors = ButtonDefaults.textButtonColors(contentColor = NiyeEshoGreenDarkMuted),
-            ) { Text("Cancel") }
+            ) { Text(AppStrings.ACTION_CANCEL) }
         },
     )
 }

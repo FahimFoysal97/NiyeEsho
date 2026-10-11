@@ -1,11 +1,12 @@
 package com.snehonir.niyeesho.core.designsystem.component
 
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import com.snehonir.niyeesho.core.designsystem.theme.AppStrings
 import com.snehonir.niyeesho.core.utils.UiText
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -31,7 +32,7 @@ fun AppTopBar(
                 IconButton(onClick = onBack) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Back",
+                        contentDescription = AppStrings.ACTION_BACK,
                         tint = contentColor,
                     )
                 }

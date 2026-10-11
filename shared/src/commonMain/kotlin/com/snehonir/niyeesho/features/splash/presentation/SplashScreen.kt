@@ -26,7 +26,6 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -50,6 +49,7 @@ import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoSageGreen
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.snehonir.niyeesho.core.designsystem.theme.AppShapes
 import com.snehonir.niyeesho.core.designsystem.theme.AppStrings
 import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoDarkBg
 import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoGreenDarkMuted
@@ -232,16 +232,16 @@ fun SplashScreen(
                     }
                     .shadow(
                         elevation = 28.dp,
-                        shape = RoundedCornerShape(30.dp),
+                        shape = AppShapes.hero,
                         spotColor = NiyeEshoGreenPrimary.copy(alpha = 0.5f),
                         ambientColor = NiyeEshoGreenPrimary.copy(alpha = 0.5f)
                     )
-                    .clip(RoundedCornerShape(30.dp))
+                    .clip(AppShapes.hero)
                     .size(132.dp)
             ) {
                 Image(
                     painter = painterResource(Res.drawable.niye_esho_icon),
-                    contentDescription = "Niye Esho",
+                    contentDescription = AppStrings.APP_NAME,
                     modifier = Modifier.fillMaxSize()
                 )
             }

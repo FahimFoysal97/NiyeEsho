@@ -6,12 +6,12 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
+import com.snehonir.niyeesho.core.designsystem.theme.AppShapes
 import com.snehonir.niyeesho.core.designsystem.theme.Spacing
 
 @Composable
@@ -28,7 +28,7 @@ fun BrandPageHeader(
                 brush = Brush.horizontalGradient(
                     colors = listOf(MaterialTheme.colorScheme.primary, MaterialTheme.colorScheme.primaryContainer),
                 ),
-                shape = RoundedCornerShape(Spacing.lg),
+                shape = AppShapes.cardLarge,
             )
             .padding(Spacing.lg),
         horizontalArrangement = Arrangement.SpaceBetween,

@@ -19,6 +19,7 @@ import kotlin.math.abs
 @Composable
 actual fun QrCodeDisplay(
     value: String,
+    sizeDp: Int,
     modifier: Modifier,
 ) {
     Surface(

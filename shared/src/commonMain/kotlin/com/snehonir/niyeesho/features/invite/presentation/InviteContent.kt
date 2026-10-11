@@ -220,6 +220,7 @@ fun InviteContent(
                             ) {
                                 QrCodeDisplay(
                                     value = uiState.inviteLink,
+                                    sizeDp = 300,
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .clip(RoundedCornerShape(12.dp)),

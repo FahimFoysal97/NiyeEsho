@@ -84,9 +84,9 @@ fun generateQrCodeBitmap(
 @Composable
 actual fun QrCodeDisplay(
     value: String,
+    sizeDp: Int,
     modifier: Modifier,
 ) {
-    val sizeDp = 200
     val density = LocalDensity.current
     val sizePx = remember(sizeDp) { with(density) { sizeDp.dp.roundToPx() } }
     val qrBitmap = remember(value, sizePx) {

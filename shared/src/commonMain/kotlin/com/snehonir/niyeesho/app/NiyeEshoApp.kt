@@ -43,7 +43,7 @@ fun NiyeEshoApp(
         val signedIn = isSignedIn().getOrDefault(false)
         logD("NiyeEshoApp", "Auth check result signedIn = $signedIn")
         // Allow user to see the animated splash screen
-        delay(1600L.milliseconds)
+        delay(3000L.milliseconds)
         startDestination = if (signedIn) NavRoute.ShoppingLists.route else NavRoute.SignIn.route
         logD("NiyeEshoApp", "Determined startDestination = $startDestination")
     }

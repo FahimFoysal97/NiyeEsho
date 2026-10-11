@@ -68,6 +68,9 @@ class MessagingRepositoryImpl(
                     val handleResult = handler.handle(fcmMsg)
                     handleResult.onSuccess {
                         logD("SystemNotifier", "Successfully handled pending handshake from ${fcmMsg.senderName}")
+                        if (fcmMsg.type == FcmMessageType.CONTACT_ACCEPTED || fcmMsg.type == FcmMessageType.CONTACT_DECLINED) {
+                            deleteHandshakeRequest(myUid, fcmMsg.senderId)
+                        }
                     }.onFailure { err ->
                         logE("SystemNotifier", "Failed to handle pending handshake from ${fcmMsg.senderName}: ${err.message}", err)
                     }

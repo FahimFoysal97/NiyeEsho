@@ -11,6 +11,10 @@ import com.snehonir.niyeesho.features.contacts.domain.repository.ContactsReposit
 import com.snehonir.niyeesho.features.contacts.domain.usecase.RefreshContactTokenUseCase
 import com.snehonir.niyeesho.features.contacts.domain.usecase.RemoveContactUseCase
 import com.snehonir.niyeesho.features.contacts.domain.usecase.SearchContactsUseCase
+import com.snehonir.niyeesho.features.messaging.domain.entity.ContactHandshakeAction
+import com.snehonir.niyeesho.features.messaging.domain.entity.FcmMessage
+import com.snehonir.niyeesho.features.messaging.domain.entity.FcmMessageData
+import com.snehonir.niyeesho.features.messaging.domain.entity.FcmMessageType
 import com.snehonir.niyeesho.features.messaging.domain.entity.InviteData
 import com.snehonir.niyeesho.features.messaging.domain.repository.MessagingRepository
 import com.snehonir.niyeesho.features.messaging.domain.usecase.GenerateInviteLinkUseCase
@@ -26,7 +30,6 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
-import kotlin.time.Duration.Companion.seconds
 
 class ContactsViewModel(
     private val contactsRepository: ContactsRepository,
@@ -124,11 +127,22 @@ class ContactsViewModel(
             val myUid = user?.uid ?: "user_me"
 
             try {
-                // Delete request node from Realtime Database
+                // 1. Delete incoming request node from Realtime Database
                 messagingRepository.deleteHandshakeRequest(myUid, contact.uid)
 
-                // Update local contact status to ACTIVE
+                // 2. Update local contact status to ACTIVE
                 contactsRepository.updateStatus(contact.uid, ContactStatus.ACTIVE).onFailure { fail(it) }
+
+                // 3. Dispatch CONTACT_ACCEPTED handshake response to User A's RTDB node so User A updates to ACTIVE
+                val message = FcmMessage(
+                    type = FcmMessageType.CONTACT_ACCEPTED,
+                    senderId = myUid,
+                    senderName = user?.displayName ?: "User",
+                    listId = null,
+                    timestamp = Clock.System.now(),
+                    data = FcmMessageData.ContactHandshake(action = ContactHandshakeAction.ACCEPT),
+                )
+                messagingRepository.send(contact.uid, contact.cachedFcmToken, message)
             } finally {
                 _uiState.update { it.copy(processingUids = it.processingUids - contact.uid) }
             }
@@ -144,11 +158,22 @@ class ContactsViewModel(
             val myUid = user?.uid ?: "user_me"
 
             try {
-                // Delete request node from Realtime Database
+                // 1. Delete incoming request node from Realtime Database
                 messagingRepository.deleteHandshakeRequest(myUid, contact.uid)
 
-                // Remove contact from local storage on decline
+                // 2. Remove contact from local storage on decline
                 contactsRepository.removeContact(contact.uid).onFailure { fail(it) }
+
+                // 3. Dispatch CONTACT_DECLINED handshake response to User A's RTDB node so User A removes User B
+                val message = FcmMessage(
+                    type = FcmMessageType.CONTACT_DECLINED,
+                    senderId = myUid,
+                    senderName = user?.displayName ?: "User",
+                    listId = null,
+                    timestamp = Clock.System.now(),
+                    data = FcmMessageData.ContactHandshake(action = ContactHandshakeAction.DECLINE),
+                )
+                messagingRepository.send(contact.uid, contact.cachedFcmToken, message)
             } finally {
                 _uiState.update { it.copy(processingUids = it.processingUids - contact.uid) }
             }

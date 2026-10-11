@@ -35,6 +35,8 @@ object AppStrings {
     const val ACTION_SIGN_OUT = "Sign out"
     const val ACTION_CHOOSE_PHOTOS = "Choose from photos"
     const val ACTION_TRY_AGAIN = "Try Again"
+    const val ACTION_START_CAMERA_SCANNER = "Start Camera Scanner"
+    const val ACTION_CLOSE_CAMERA = "Close Camera"
 
     const val TAB_MY_CODE = "My code"
     const val TAB_SCAN = "Scan"
@@ -105,6 +107,8 @@ object AppStrings {
     const val LABEL_CONNECTED = "Connected"
     const val LABEL_CONTACT_UNAVAILABLE = "Contact details unavailable."
     const val LABEL_LIST_TITLE = "List Title"
+    const val LABEL_CAMERA_OFF_TITLE = "Camera Scanner Off"
+    const val LABEL_CAMERA_OFF_SUBTITLE = "Tap below when you're ready to scan a QR code"
 
     const val DESC_SYNC = "Sync"
     const val DESC_REFRESH = "Refresh"

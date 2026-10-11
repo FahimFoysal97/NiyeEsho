@@ -79,6 +79,7 @@ import androidx.compose.ui.unit.sp
 import com.snehonir.niyeesho.core.designsystem.component.AppBottomBar
 import com.snehonir.niyeesho.core.designsystem.component.AppNavTab
 import com.snehonir.niyeesho.core.designsystem.component.AvatarImage
+import com.snehonir.niyeesho.core.designsystem.theme.AppShapes
 import com.snehonir.niyeesho.core.designsystem.theme.AppStrings
 import com.snehonir.niyeesho.core.designsystem.theme.InviteGradientBottom
 import com.snehonir.niyeesho.core.designsystem.theme.InviteGradientTop
@@ -90,6 +91,7 @@ import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoDarkSurfaceInner
 import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoDarkSurfaceVariant
 import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoEmeraldAccent
 import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoGreenDarkMuted
+import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoGreenMuted
 import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoGreenPrimary
 import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoIndigoTertiary
 import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoMutedGreenText
@@ -104,6 +106,7 @@ import niyeesho.shared.generated.resources.Res
 import niyeesho.shared.generated.resources.content_copy
 import niyeesho.shared.generated.resources.content_paste
 import niyeesho.shared.generated.resources.download
+import niyeesho.shared.generated.resources.scan
 import org.jetbrains.compose.resources.painterResource
 
 @Composable
@@ -373,53 +376,142 @@ fun InviteContent(
                 ) {
                     when (uiState.scannerStep) {
                         ScannerStep.SCAN -> {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .weight(1f)
-                                    .clip(RoundedCornerShape(22.dp))
-                                    .background(
-                                        Brush.linearGradient(
-                                            listOf(InviteGradientTop, InviteGradientBottom)
-                                        )
-                                    ),
-                                contentAlignment = Alignment.Center,
-                            ) {
-                                CameraQrScannerView(
-                                    onQrCodeScanned = { scannedLink ->
-                                        if (scannedLink.isNotBlank()) {
-                                            onAction(InviteUiAction.PastedLinkClicked(scannedLink))
-                                        }
-                                    },
-                                    modifier = Modifier.fillMaxSize(),
-                                )
+                            if (uiState.isCameraActive) {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .weight(1f)
+                                        .clip(RoundedCornerShape(22.dp))
+                                        .background(
+                                            Brush.linearGradient(
+                                                listOf(InviteGradientTop, InviteGradientBottom)
+                                            )
+                                        ),
+                                    contentAlignment = Alignment.Center,
+                                ) {
+                                    CameraQrScannerView(
+                                        isScanningEnabled = true,
+                                        onQrCodeScanned = { scannedLink ->
+                                            if (scannedLink.isNotBlank()) {
+                                                onAction(InviteUiAction.PastedLinkClicked(scannedLink))
+                                                onAction(InviteUiAction.ConnectInviteClicked)
+                                            }
+                                        },
+                                        modifier = Modifier.fillMaxSize(),
+                                    )
 
-                                QrScannerOverlay(
-                                    modifier = Modifier.size(240.dp),
-                                )
-                                // Pill badge inside camera view
-                                Surface(
-                                    onClick = {
-                                        qrImageHelper.pickAndDecodeQrImage { decodedLink ->
-                                            if (!decodedLink.isNullOrBlank()) {
-                                                onAction(InviteUiAction.PastedLinkClicked(decodedLink))
+                                    QrScannerOverlay(
+                                        modifier = Modifier.size(240.dp),
+                                    )
+
+                                    // Stop Camera button
+                                    Button(
+                                        onClick = { onAction(InviteUiAction.StopCameraClicked) },
+                                        shape = AppShapes.button,
+                                        colors = ButtonDefaults.buttonColors(
+                                            containerColor = NiyeEshoDarkBg.copy(alpha = 0.85f),
+                                            contentColor = Color.White,
+                                        ),
+                                        modifier = Modifier
+                                            .align(Alignment.TopEnd)
+                                            .padding(Spacing.sm),
+                                    ) {
+                                        Text(AppStrings.ACTION_CLOSE_CAMERA, style = MaterialTheme.typography.labelSmall)
+                                    }
+
+                                    // Choose from photos badge inside camera view
+                                    Surface(
+                                        onClick = {
+                                            qrImageHelper.pickAndDecodeQrImage { decodedLink ->
+                                                if (!decodedLink.isNullOrBlank()) {
+                                                    onAction(InviteUiAction.PastedLinkClicked(decodedLink))
+                                                    onAction(InviteUiAction.ConnectInviteClicked)
+                                                }
+                                            }
+                                        },
+                                        shape = RoundedCornerShape(20.dp),
+                                        color = NiyeEshoDarkBg.copy(alpha = 0.85f),
+                                        border = BorderStroke(1.dp, NiyeEshoBorderSubtle),
+                                        modifier = Modifier
+                                            .align(Alignment.BottomCenter)
+                                            .padding(bottom = 16.dp),
+                                    ) {
+                                        Text(
+                                            text = AppStrings.ACTION_CHOOSE_PHOTOS,
+                                            style = MaterialTheme.typography.labelMedium,
+                                            fontWeight = FontWeight.Bold,
+                                            color = NiyeEshoMutedGreenText,
+                                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 7.dp),
+                                        )
+                                    }
+                                }
+                            } else {
+                                // Camera Scanner Off Card with Start Button
+                                Card(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .weight(1f),
+                                    shape = AppShapes.cardLarge,
+                                    colors = CardDefaults.cardColors(containerColor = NiyeEshoDarkSurface),
+                                ) {
+                                    Column(
+                                        modifier = Modifier
+                                            .fillMaxSize()
+                                            .padding(Spacing.lg),
+                                        horizontalAlignment = Alignment.CenterHorizontally,
+                                        verticalArrangement = Arrangement.Center,
+                                    ) {
+                                        Surface(
+                                            shape = CircleShape,
+                                            color = NiyeEshoDarkBg,
+                                            modifier = Modifier.size(72.dp),
+                                        ) {
+                                            Box(contentAlignment = Alignment.Center) {
+                                                Icon(
+                                                    painter = painterResource(Res.drawable.scan),
+                                                    contentDescription = null,
+                                                    tint = NiyeEshoGreenPrimary,
+                                                    modifier = Modifier.size(36.dp),
+                                                )
                                             }
                                         }
-                                    },
-                                    shape = RoundedCornerShape(20.dp),
-                                    color = NiyeEshoDarkBg.copy(alpha = 0.85f),
-                                    border = BorderStroke(1.dp, NiyeEshoBorderSubtle),
-                                    modifier = Modifier
-                                        .align(Alignment.BottomCenter)
-                                        .padding(bottom = 16.dp),
-                                ) {
-                                    Text(
-                                        text = AppStrings.ACTION_CHOOSE_PHOTOS,
-                                        style = MaterialTheme.typography.labelMedium,
-                                        fontWeight = FontWeight.Bold,
-                                        color = NiyeEshoMutedGreenText,
-                                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 7.dp),
-                                    )
+
+                                        Spacer(Modifier.height(Spacing.md))
+
+                                        Text(
+                                            text = AppStrings.LABEL_CAMERA_OFF_TITLE,
+                                            style = MaterialTheme.typography.titleMedium,
+                                            fontWeight = FontWeight.Bold,
+                                            color = Color.White,
+                                        )
+
+                                        Spacer(Modifier.height(Spacing.xs))
+
+                                        Text(
+                                            text = AppStrings.LABEL_CAMERA_OFF_SUBTITLE,
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = NiyeEshoGreenMuted,
+                                            textAlign = TextAlign.Center,
+                                        )
+
+                                        Spacer(Modifier.height(Spacing.lg))
+
+                                        Button(
+                                            onClick = { onAction(InviteUiAction.StartCameraClicked) },
+                                            shape = AppShapes.button,
+                                            colors = ButtonDefaults.buttonColors(
+                                                containerColor = NiyeEshoGreenPrimary,
+                                                contentColor = Color.White,
+                                            ),
+                                            contentPadding = PaddingValues(horizontal = Spacing.lg, vertical = Spacing.sm),
+                                        ) {
+                                            Text(
+                                                text = AppStrings.ACTION_START_CAMERA_SCANNER,
+                                                style = MaterialTheme.typography.labelLarge,
+                                                fontWeight = FontWeight.Bold,
+                                            )
+                                        }
+                                    }
                                 }
                             }
 

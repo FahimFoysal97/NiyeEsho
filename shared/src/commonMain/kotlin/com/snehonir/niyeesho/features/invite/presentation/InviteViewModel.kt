@@ -86,10 +86,18 @@ class InviteViewModel(
 
     fun onAction(action: InviteUiAction) {
         when (action) {
-            is InviteUiAction.SubTabSelected -> _uiState.update { it.copy(selectedSubTab = action.index, scannerStep = ScannerStep.SCAN, errorMessage = null) }
-            InviteUiAction.SwitchToScan -> _uiState.update { it.copy(scannerStep = ScannerStep.SCAN, pastedLink = "", errorMessage = null) }
-            is InviteUiAction.PastedLinkClicked -> _uiState.update { it.copy(pastedLink = action.link) }
-            InviteUiAction.ConnectInviteClicked -> handleConnectInvite()
+            is InviteUiAction.SubTabSelected -> _uiState.update { it.copy(selectedSubTab = action.index, isCameraActive = false, scannerStep = ScannerStep.SCAN, errorMessage = null) }
+            InviteUiAction.SwitchToScan -> _uiState.update { it.copy(scannerStep = ScannerStep.SCAN, isCameraActive = false, pastedLink = "", errorMessage = null) }
+            InviteUiAction.StartCameraClicked -> _uiState.update { it.copy(isCameraActive = true, scannerStep = ScannerStep.SCAN, errorMessage = null) }
+            InviteUiAction.StopCameraClicked -> _uiState.update { it.copy(isCameraActive = false) }
+            InviteUiAction.TryAgainClicked -> _uiState.update { it.copy(isCameraActive = false, scannerStep = ScannerStep.SCAN, pastedLink = "", errorMessage = null) }
+            is InviteUiAction.PastedLinkClicked -> {
+                _uiState.update { it.copy(pastedLink = action.link, isCameraActive = false) }
+            }
+            InviteUiAction.ConnectInviteClicked -> {
+                _uiState.update { it.copy(isCameraActive = false) }
+                handleConnectInvite()
+            }
             InviteUiAction.SaveQrImage -> viewModelScope.launch { _uiEvent.send(InviteUiEvent.ShowToast("QR code saved")) }
             InviteUiAction.ShareQrImage -> viewModelScope.launch { _uiEvent.send(InviteUiEvent.ShareLink(_uiState.value.inviteLink)) }
             InviteUiAction.CopyLink -> viewModelScope.launch { _uiEvent.send(InviteUiEvent.ShowToast("Link copied")) }
@@ -107,12 +115,11 @@ class InviteViewModel(
                 logD("InviteVM", "handleConnectInvite() -> failed to parse invite link: $link")
                 _uiState.update {
                     it.copy(
+                        isCameraActive = false,
                         scannerStep = ScannerStep.FAILED,
                         errorMessage = "Invalid or unrecognized invite link.",
                     )
                 }
-                kotlinx.coroutines.delay(4.seconds)
-                _uiState.update { it.copy(scannerStep = ScannerStep.SCAN, errorMessage = null) }
                 return@launch
             }
 
@@ -157,7 +164,7 @@ class InviteViewModel(
                 logD("InviteVM", "Failed to save PENDING_OUTGOING contact: ${it.message}")
             }
 
-            // Send FCM CONTACT_REQUEST message to User A (recipientUid = invite.uid, recipientToken = invite.token)
+            // Send FCM CONTACT_REQUEST message to User A
             logD("InviteVM", "Dispatching CONTACT_REQUEST via FCM to recipientUid: ${invite.uid}, recipientToken: ${invite.token.take(15)}... from senderUid: ${myInviteData.uid}")
             sendContactRequest(recipientUid = invite.uid, recipientToken = invite.token, senderData = myInviteData).onSuccess {
                 logD("InviteVM", "sendContactRequest() -> FCM dispatch returned SUCCESS for recipientUid: ${invite.uid}")
@@ -167,6 +174,7 @@ class InviteViewModel(
 
             _uiState.update {
                 it.copy(
+                    isCameraActive = false,
                     scannerStep = ScannerStep.CONNECTED,
                     connectedFriendName = friendName,
                     connectedFriendAvatarUrl = friendAvatar,

@@ -6,5 +6,6 @@ import androidx.compose.ui.Modifier
 @Composable
 expect fun CameraQrScannerView(
     onQrCodeScanned: (String) -> Unit,
+    isScanningEnabled: Boolean = true,
     modifier: Modifier = Modifier,
 )

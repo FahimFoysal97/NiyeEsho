@@ -12,6 +12,7 @@ import androidx.compose.ui.graphics.Color
 @Composable
 actual fun CameraQrScannerView(
     onQrCodeScanned: (String) -> Unit,
+    isScanningEnabled: Boolean,
     modifier: Modifier,
 ) {
     Box(

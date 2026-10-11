@@ -3,6 +3,9 @@ package com.snehonir.niyeesho.features.invite.presentation
 sealed interface InviteUiAction {
     data class SubTabSelected(val index: Int) : InviteUiAction
     data object SwitchToScan : InviteUiAction
+    data object StartCameraClicked : InviteUiAction
+    data object StopCameraClicked : InviteUiAction
+    data object TryAgainClicked : InviteUiAction
     data class PastedLinkClicked(val link: String) : InviteUiAction
     data object ConnectInviteClicked : InviteUiAction
     data object SaveQrImage : InviteUiAction

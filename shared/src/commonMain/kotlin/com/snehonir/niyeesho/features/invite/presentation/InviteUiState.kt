@@ -7,6 +7,7 @@ data class InviteUiState(
     val displayInviteCode: String = "maria-4f7K",
     val selectedSubTab: Int = 0, // 0 = My code, 1 = Scan
     val scannerStep: ScannerStep = ScannerStep.SCAN,
+    val isCameraActive: Boolean = false,
     val pastedLink: String = "",
     val myName: String = "User",
     val myAvatarUrl: String? = null,

@@ -55,6 +55,7 @@ import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoGreenPrimary
 @Composable
 actual fun CameraQrScannerView(
     onQrCodeScanned: (String) -> Unit,
+    isScanningEnabled: Boolean,
     modifier: Modifier,
 ) {
     val context = LocalContext.current
@@ -101,7 +102,7 @@ actual fun CameraQrScannerView(
         }
     }
 
-    if (hasCameraPermission) {
+    if (hasCameraPermission && isScanningEnabled) {
         val cameraProviderFuture = remember(context) { ProcessCameraProvider.getInstance(context) }
 
         AndroidView(
@@ -123,7 +124,7 @@ actual fun CameraQrScannerView(
                         .build()
 
                     imageAnalysis.setAnalyzer(executor) { imageProxy ->
-                        if (!isScanned) {
+                        if (!isScanned && isScanningEnabled) {
                             val qrText = scanQrFromImageProxy(imageProxy)
                             if (!qrText.isNullOrBlank()) {
                                 isScanned = true
@@ -169,57 +170,59 @@ actual fun CameraQrScannerView(
                 modifier = Modifier.padding(24.dp),
             ) {
                 Text(
-                    text = "Camera permission required to scan QR code",
+                    text = if (!hasCameraPermission) "Camera permission required to scan QR code" else "Camera Scanner Paused",
                     color = Color(0xFF7F9D8E),
                     style = MaterialTheme.typography.bodyMedium,
                     textAlign = TextAlign.Center,
                 )
 
-                Button(
-                    onClick = {
-                        val isGranted = ContextCompat.checkSelfPermission(
-                            context,
-                            Manifest.permission.CAMERA
-                        ) == PackageManager.PERMISSION_GRANTED
+                if (!hasCameraPermission) {
+                    Button(
+                        onClick = {
+                            val isGranted = ContextCompat.checkSelfPermission(
+                                context,
+                                Manifest.permission.CAMERA
+                            ) == PackageManager.PERMISSION_GRANTED
 
-                        if (isGranted) {
-                            hasCameraPermission = true
-                        } else {
-                            val showRationale = activity?.let {
-                                ActivityCompat.shouldShowRequestPermissionRationale(it, Manifest.permission.CAMERA)
-                            } ?: true
-
-                            if (showRationale) {
-                                permissionLauncher.launch(Manifest.permission.CAMERA)
+                            if (isGranted) {
+                                hasCameraPermission = true
                             } else {
-                                try {
-                                    val intent = Intent(
-                                        Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
-                                        Uri.fromParts("package", context.packageName, null)
-                                    ).apply {
-                                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                                    }
-                                    context.startActivity(intent)
-                                } catch (e: Exception) {
+                                val showRationale = activity?.let {
+                                    ActivityCompat.shouldShowRequestPermissionRationale(it, Manifest.permission.CAMERA)
+                                } ?: true
+
+                                if (showRationale) {
                                     permissionLauncher.launch(Manifest.permission.CAMERA)
+                                } else {
+                                    try {
+                                        val intent = Intent(
+                                            Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                                            Uri.fromParts("package", context.packageName, null)
+                                        ).apply {
+                                            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                                        }
+                                        context.startActivity(intent)
+                                    } catch (e: Exception) {
+                                        permissionLauncher.launch(Manifest.permission.CAMERA)
+                                    }
                                 }
                             }
-                        }
-                    },
-                    shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = NiyeEshoGreenPrimary,
-                        contentColor = Color.White,
-                    ),
-                ) {
-                    val isPermanentlyDenied = activity != null &&
-                        !ActivityCompat.shouldShowRequestPermissionRationale(activity, Manifest.permission.CAMERA)
+                        },
+                        shape = RoundedCornerShape(12.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = NiyeEshoGreenPrimary,
+                            contentColor = Color.White,
+                        ),
+                    ) {
+                        val isPermanentlyDenied = activity != null &&
+                            !ActivityCompat.shouldShowRequestPermissionRationale(activity, Manifest.permission.CAMERA)
 
-                    Text(
-                        text = if (isPermanentlyDenied) "Open App Settings" else "Allow Camera",
-                        style = MaterialTheme.typography.labelLarge,
-                        fontWeight = FontWeight.Bold,
-                    )
+                        Text(
+                            text = if (isPermanentlyDenied) "Open App Settings" else "Allow Camera",
+                            style = MaterialTheme.typography.labelLarge,
+                            fontWeight = FontWeight.Bold,
+                        )
+                    }
                 }
             }
         }

@@ -10,6 +10,7 @@ interface MessagingRepository {
     suspend fun send(recipientUid: String, recipientToken: String, message: FcmMessage): Result<Unit>
     suspend fun handleIncoming(message: FcmMessage): Result<Unit>
     suspend fun fetchPendingHandshakes(myUid: String): Result<Unit>
+    suspend fun deleteHandshakeRequest(myUid: String, senderUid: String): Result<Unit>
     suspend fun retryPending(): Result<Int>
     suspend fun generateInviteLink(data: InviteData): Result<String>
     suspend fun sendContactRequest(recipientUid: String, recipientToken: String, senderData: InviteData): Result<Unit>

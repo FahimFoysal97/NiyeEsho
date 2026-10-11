@@ -27,4 +27,10 @@ class FakeMessagingRemoteDataSource : MessagingRemoteDataSource {
         val list = pendingHandshakes[myUid] ?: emptyList()
         return Result.success(list.toList())
     }
+
+    override suspend fun deleteHandshakeRequest(myUid: String, senderUid: String): Result<Unit> {
+        delay(30)
+        pendingHandshakes[myUid]?.removeAll { it.senderId == senderUid }
+        return Result.success(Unit)
+    }
 }

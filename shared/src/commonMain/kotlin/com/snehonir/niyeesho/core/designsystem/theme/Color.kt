@@ -99,3 +99,16 @@ val NiyeEshoSoftRed = Color(0xFFFF8083)
 val NiyeEshoGradientTop = NiyeEshoDarkBg
 val NiyeEshoGradientBottom = Color(0xFF08120D)
 val NiyeEshoAccentSoft = NiyeEshoGreenLight
+
+// Action Button Dark Surface Tokens (Accept: Green, Reject: Gold/Amber, Block: Crimson)
+val ActionAcceptSurface = Color(0xFF112A1E)
+val ActionAcceptBorder = Color(0xFF1E6B4E)
+val ActionAcceptIcon = Color(0xFF34D399)
+
+val ActionDeclineSurface = Color(0xFF2E200E)
+val ActionDeclineBorder = Color(0xFF78450F)
+val ActionDeclineIcon = Color(0xFFF59E0B)
+
+val ActionBlockSurface = Color(0xFF331416)
+val ActionBlockBorder = Color(0xFF7F1D1D)
+val ActionBlockIcon = Color(0xFFEF4444)

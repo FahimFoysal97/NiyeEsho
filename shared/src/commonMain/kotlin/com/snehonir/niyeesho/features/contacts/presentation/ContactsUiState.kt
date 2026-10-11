@@ -23,6 +23,7 @@ data class ContactsUiState(
     val error: String? = null,
     val inviteLink: String? = null,
     val isInviteBottomSheetVisible: Boolean = false,
+    val processingUids: Set<String> = emptySet(),
 ) {
     companion object {
         fun preview() = ContactsUiState(

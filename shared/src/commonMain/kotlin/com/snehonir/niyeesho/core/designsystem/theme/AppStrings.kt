@@ -109,6 +109,7 @@ object AppStrings {
     const val LABEL_LIST_TITLE = "List Title"
     const val LABEL_CAMERA_OFF_TITLE = "Camera Scanner Off"
     const val LABEL_CAMERA_OFF_SUBTITLE = "Tap below when you're ready to scan a QR code"
+    const val LABEL_CONNECTING = "Connecting..."
 
     const val DESC_SYNC = "Sync"
     const val DESC_REFRESH = "Refresh"

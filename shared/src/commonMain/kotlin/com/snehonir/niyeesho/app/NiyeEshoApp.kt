@@ -15,17 +15,18 @@ import com.snehonir.niyeesho.core.navigation.NavGraphDestinations
 import com.snehonir.niyeesho.core.navigation.NavRoute
 import com.snehonir.niyeesho.core.navigation.NiyeEshoNavGraph
 import com.snehonir.niyeesho.core.utils.logD
+import com.snehonir.niyeesho.features.auth.domain.usecase.GetCurrentUserUseCase
 import com.snehonir.niyeesho.features.auth.domain.usecase.IsSignedInUseCase
 import com.snehonir.niyeesho.features.auth.presentation.profile.ProfileScreen
 import com.snehonir.niyeesho.features.auth.presentation.signin.SignInScreen
 import com.snehonir.niyeesho.features.contacts.presentation.ContactsScreen
-import com.snehonir.niyeesho.features.invite.presentation.InviteScreen
 import com.snehonir.niyeesho.features.dashboard.presentation.DashboardScreen
+import com.snehonir.niyeesho.features.invite.presentation.InviteScreen
+import com.snehonir.niyeesho.features.messaging.domain.repository.MessagingRepository
 import com.snehonir.niyeesho.features.shopping_list.presentation.detail.ListDetailScreen
-import org.koin.compose.koinInject
-
 import com.snehonir.niyeesho.features.splash.presentation.SplashScreen
 import kotlinx.coroutines.delay
+import org.koin.compose.koinInject
 import kotlin.time.Duration.Companion.milliseconds
 
 @Composable
@@ -36,6 +37,8 @@ fun NiyeEshoApp(
     logD("NiyeEshoApp", "NiyeEshoApp composable starting")
     val navController = rememberNavController()
     val isSignedIn = koinInject<IsSignedInUseCase>()
+    val getCurrentUser = koinInject<GetCurrentUserUseCase>()
+    val messagingRepository = koinInject<MessagingRepository>()
     var startDestination by remember { mutableStateOf<String?>(null) }
 
     LaunchedEffect(Unit) {
@@ -46,6 +49,16 @@ fun NiyeEshoApp(
         delay(3000L.milliseconds)
         startDestination = if (signedIn) NavRoute.ShoppingLists.route else NavRoute.SignIn.route
         logD("NiyeEshoApp", "Determined startDestination = $startDestination")
+    }
+
+    // Single handshake check on app startup
+    LaunchedEffect(startDestination) {
+        if (startDestination != null && startDestination != NavRoute.SignIn.route) {
+            val user = getCurrentUser().getOrNull()
+            val myUid = user?.uid ?: "user_me"
+            logD("NiyeEshoApp", "Initial handshake check for $myUid")
+            messagingRepository.fetchPendingHandshakes(myUid)
+        }
     }
 
     NiyeEshoTheme {

@@ -2,6 +2,7 @@ package com.snehonir.niyeesho.features.messaging.data.repository
 
 import com.snehonir.niyeesho.core.utils.Constants
 import com.snehonir.niyeesho.core.utils.logD
+import com.snehonir.niyeesho.core.utils.logE
 import com.snehonir.niyeesho.features.messaging.data.handler.FcmMessageHandler
 import com.snehonir.niyeesho.features.messaging.data.local.MessagingLocalDataSource
 import com.snehonir.niyeesho.features.messaging.data.mapper.toDomain
@@ -56,17 +57,32 @@ class MessagingRepositoryImpl(
     }
 
     override suspend fun fetchPendingHandshakes(myUid: String): Result<Unit> = runCatching {
-        logD("MessagingRepo", "fetchPendingHandshakes() -> checking for pending handshakes for $myUid")
-        remote.fetchHandshakeRequests(myUid).onSuccess { list ->
-            logD("MessagingRepo", "fetchPendingHandshakes() -> found ${list.size} pending handshake payloads")
+        logD("SystemNotifier", "fetchPendingHandshakes() -> checking for pending handshakes for $myUid")
+        val result = remote.fetchHandshakeRequests(myUid)
+        result.onSuccess { list ->
+            logD("SystemNotifier", "fetchPendingHandshakes() -> found ${list.size} pending handshake payloads for $myUid")
             list.forEach { dto ->
-                dto.toDomain()?.let { fcmMsg ->
-                    logD("MessagingRepo", "Processing pending handshake type: ${fcmMsg.type} from ${fcmMsg.senderName}")
-                    handler.handle(fcmMsg)
+                try {
+                    val fcmMsg = dto.toDomain()
+                    logD("SystemNotifier", "Processing pending handshake type: ${fcmMsg.type} from ${fcmMsg.senderName}")
+                    val handleResult = handler.handle(fcmMsg)
+                    handleResult.onSuccess {
+                        logD("SystemNotifier", "Successfully handled pending handshake from ${fcmMsg.senderName}")
+                    }.onFailure { err ->
+                        logE("SystemNotifier", "Failed to handle pending handshake from ${fcmMsg.senderName}: ${err.message}", err)
+                    }
+                } catch (e: Throwable) {
+                    logE("SystemNotifier", "Error processing DTO: ${e.message}", e)
                 }
             }
+        }.onFailure { err ->
+            logE("SystemNotifier", "fetchHandshakeRequests failed: ${err.message}", err)
         }
+        Unit
     }
+
+    override suspend fun deleteHandshakeRequest(myUid: String, senderUid: String): Result<Unit> =
+        remote.deleteHandshakeRequest(myUid, senderUid)
 
     override suspend fun retryPending(): Result<Int> {
         var retried = 0

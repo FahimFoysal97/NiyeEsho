@@ -8,4 +8,9 @@ object NetworkConstants {
     val fcmBaseUrl: String = BuildKonfig.FCM_BASE_URL
     val fcmProjectId: String = BuildKonfig.FCM_PROJECT_ID
     val rtdbBaseUrl: String = "https://${BuildKonfig.FCM_PROJECT_ID}-default-rtdb.asia-southeast1.firebasedatabase.app"
+    val rtdbFallbackUrls: List<String> = listOf(
+        "https://${BuildKonfig.FCM_PROJECT_ID}-default-rtdb.asia-southeast1.firebasedatabase.app",
+        "https://${BuildKonfig.FCM_PROJECT_ID}-default-rtdb.firebaseio.com",
+        "https://${BuildKonfig.FCM_PROJECT_ID}.firebaseio.com",
+    )
 }

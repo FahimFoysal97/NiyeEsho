@@ -86,13 +86,13 @@ class InviteViewModel(
 
     fun onAction(action: InviteUiAction) {
         when (action) {
-            is InviteUiAction.SubTabSelected -> _uiState.update { it.copy(selectedSubTab = action.index, isCameraActive = false, scannerStep = ScannerStep.SCAN, errorMessage = null) }
-            InviteUiAction.SwitchToScan -> _uiState.update { it.copy(scannerStep = ScannerStep.SCAN, isCameraActive = false, pastedLink = "", errorMessage = null) }
-            InviteUiAction.StartCameraClicked -> _uiState.update { it.copy(isCameraActive = true, scannerStep = ScannerStep.SCAN, errorMessage = null) }
+            is InviteUiAction.SubTabSelected -> _uiState.update { it.copy(selectedSubTab = action.index, isCameraActive = false, isConnecting = false, scannerStep = ScannerStep.SCAN, errorMessage = null) }
+            InviteUiAction.SwitchToScan -> _uiState.update { it.copy(scannerStep = ScannerStep.SCAN, isCameraActive = false, isConnecting = false, pastedLink = "", errorMessage = null) }
+            InviteUiAction.StartCameraClicked -> _uiState.update { it.copy(isCameraActive = true, isConnecting = false, scannerStep = ScannerStep.SCAN, errorMessage = null) }
             InviteUiAction.StopCameraClicked -> _uiState.update { it.copy(isCameraActive = false) }
-            InviteUiAction.TryAgainClicked -> _uiState.update { it.copy(isCameraActive = false, scannerStep = ScannerStep.SCAN, pastedLink = "", errorMessage = null) }
+            InviteUiAction.TryAgainClicked -> _uiState.update { it.copy(isCameraActive = false, isConnecting = false, scannerStep = ScannerStep.SCAN, pastedLink = "", errorMessage = null) }
             is InviteUiAction.PastedLinkClicked -> {
-                _uiState.update { it.copy(pastedLink = action.link, isCameraActive = false) }
+                _uiState.update { it.copy(pastedLink = action.link, isCameraActive = false, isConnecting = false) }
             }
             InviteUiAction.ConnectInviteClicked -> {
                 _uiState.update { it.copy(isCameraActive = false) }
@@ -108,13 +108,16 @@ class InviteViewModel(
     private fun handleConnectInvite() {
         viewModelScope.launch {
             val link = _uiState.value.pastedLink.trim()
-            if (link.isBlank()) return@launch
+            if (link.isBlank() || _uiState.value.isConnecting) return@launch
+
+            _uiState.update { it.copy(isConnecting = true) }
 
             val invite = DeepLinkHandler.parse(link)
             if (invite == null) {
                 logD("InviteVM", "handleConnectInvite() -> failed to parse invite link: $link")
                 _uiState.update {
                     it.copy(
+                        isConnecting = false,
                         isCameraActive = false,
                         scannerStep = ScannerStep.FAILED,
                         errorMessage = "Invalid or unrecognized invite link.",
@@ -174,6 +177,7 @@ class InviteViewModel(
 
             _uiState.update {
                 it.copy(
+                    isConnecting = false,
                     isCameraActive = false,
                     scannerStep = ScannerStep.CONNECTED,
                     connectedFriendName = friendName,

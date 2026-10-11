@@ -11,12 +11,8 @@ import com.snehonir.niyeesho.features.contacts.domain.repository.ContactsReposit
 import com.snehonir.niyeesho.features.contacts.domain.usecase.RefreshContactTokenUseCase
 import com.snehonir.niyeesho.features.contacts.domain.usecase.RemoveContactUseCase
 import com.snehonir.niyeesho.features.contacts.domain.usecase.SearchContactsUseCase
-import com.snehonir.niyeesho.features.messaging.domain.entity.ContactHandshakeAction
-import com.snehonir.niyeesho.features.messaging.domain.entity.FcmMessage
-import com.snehonir.niyeesho.features.messaging.domain.entity.FcmMessageData
-import com.snehonir.niyeesho.features.messaging.domain.entity.FcmMessageType
-import com.snehonir.niyeesho.features.messaging.domain.repository.MessagingRepository
 import com.snehonir.niyeesho.features.messaging.domain.entity.InviteData
+import com.snehonir.niyeesho.features.messaging.domain.repository.MessagingRepository
 import com.snehonir.niyeesho.features.messaging.domain.usecase.GenerateInviteLinkUseCase
 import com.snehonir.niyeesho.features.messaging.domain.usecase.SendFcmMessageUseCase
 import com.snehonir.niyeesho.features.shopping_list.domain.entity.ListMember
@@ -30,6 +26,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
+import kotlin.time.Duration.Companion.seconds
 
 class ContactsViewModel(
     private val contactsRepository: ContactsRepository,
@@ -73,7 +70,7 @@ class ContactsViewModel(
                 }
             }
         }
-        // Fetch network handshakes from Realtime Sync Node
+        // Initial handshake check on screen load
         viewModelScope.launch {
             val user = getCurrentUser().getOrNull()
             val myUid = user?.uid ?: "user_me"
@@ -85,7 +82,14 @@ class ContactsViewModel(
     fun onAction(action: ContactsUiAction) {
         when (action) {
             is ContactsUiAction.QueryChanged -> queryChanged(action.query)
-            is ContactsUiAction.TabSelected -> _uiState.update { it.copy(selectedTab = action.tab) }
+            is ContactsUiAction.TabSelected -> {
+                _uiState.update { it.copy(selectedTab = action.tab) }
+                viewModelScope.launch {
+                    val user = getCurrentUser().getOrNull()
+                    val myUid = user?.uid ?: "user_me"
+                    messagingRepository.fetchPendingHandshakes(myUid)
+                }
+            }
             is ContactsUiAction.ContactSelected -> {
                 _uiState.update {
                     it.copy(
@@ -113,41 +117,29 @@ class ContactsViewModel(
 
     private fun acceptRequest(contact: Contact) {
         viewModelScope.launch {
-            logD("ContactsVM", "acceptRequest() -> User A accepting request from ${contact.displayName} (uid: ${contact.uid}, token: ${contact.cachedFcmToken.take(15)}...)")
-            // Update User A's local status to ACTIVE
-            contactsRepository.updateStatus(contact.uid, ContactStatus.ACTIVE).onSuccess {
-                // Send CONTACT_ACCEPTED message to User B
-                val user = getCurrentUser().getOrNull()
-                val message = FcmMessage(
-                    type = FcmMessageType.CONTACT_ACCEPTED,
-                    senderId = user?.uid ?: "user_me",
-                    senderName = user?.displayName ?: "User",
-                    listId = null,
-                    timestamp = Clock.System.now(),
-                    data = FcmMessageData.ContactHandshake(action = ContactHandshakeAction.ACCEPT),
-                )
-                sendFcmMessage(contact.uid, contact.cachedFcmToken, message)
-            }.onFailure { fail(it) }
+            logD("ContactsVM", "acceptRequest() -> accepting request from ${contact.displayName} (uid: ${contact.uid})")
+            val user = getCurrentUser().getOrNull()
+            val myUid = user?.uid ?: "user_me"
+
+            // Delete request node from Realtime Database
+            messagingRepository.deleteHandshakeRequest(myUid, contact.uid)
+
+            // Update local contact status to ACTIVE
+            contactsRepository.updateStatus(contact.uid, ContactStatus.ACTIVE).onFailure { fail(it) }
         }
     }
 
     private fun declineRequest(contact: Contact) {
         viewModelScope.launch {
-            logD("ContactsVM", "declineRequest() -> User A declining request from ${contact.displayName} (uid: ${contact.uid})")
-            // Update User A's local status to DECLINED
-            contactsRepository.updateStatus(contact.uid, ContactStatus.DECLINED).onSuccess {
-                // Send CONTACT_DECLINED message to User B
-                val user = getCurrentUser().getOrNull()
-                val message = FcmMessage(
-                    type = FcmMessageType.CONTACT_DECLINED,
-                    senderId = user?.uid ?: "user_me",
-                    senderName = user?.displayName ?: "User",
-                    listId = null,
-                    timestamp = Clock.System.now(),
-                    data = FcmMessageData.ContactHandshake(action = ContactHandshakeAction.DECLINE),
-                )
-                sendFcmMessage(contact.uid, contact.cachedFcmToken, message)
-            }.onFailure { fail(it) }
+            logD("ContactsVM", "declineRequest() -> declining request from ${contact.displayName} (uid: ${contact.uid})")
+            val user = getCurrentUser().getOrNull()
+            val myUid = user?.uid ?: "user_me"
+
+            // Delete request node from Realtime Database
+            messagingRepository.deleteHandshakeRequest(myUid, contact.uid)
+
+            // Remove contact from local storage on decline
+            contactsRepository.removeContact(contact.uid).onFailure { fail(it) }
         }
     }
 

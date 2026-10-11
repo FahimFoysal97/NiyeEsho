@@ -4,6 +4,8 @@ import android.app.Application
 import com.google.firebase.messaging.FirebaseMessaging
 import com.snehonir.niyeesho.app.di.initializeNiyeEsho
 import com.snehonir.niyeesho.core.database.DatabaseDriverFactory
+import com.snehonir.niyeesho.core.network.FcmTokenProvider
+import com.snehonir.niyeesho.core.notifier.SystemNotifier
 import com.snehonir.niyeesho.core.utils.TokenManagerImpl
 import com.snehonir.niyeesho.core.utils.logD
 import com.snehonir.niyeesho.di.androidModule
@@ -12,6 +14,8 @@ class NiyeEshoApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         logD("NiyeEshoApplication", "onCreate() started")
+        SystemNotifier.init(this)
+        FcmTokenProvider.init(this)
         initializeNiyeEsho(
             databaseDriverFactory = DatabaseDriverFactory(this),
             extraModules = listOf(androidModule(this)),

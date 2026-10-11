@@ -43,6 +43,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
@@ -394,7 +395,6 @@ fun InviteContent(
                                         onQrCodeScanned = { scannedLink ->
                                             if (scannedLink.isNotBlank()) {
                                                 onAction(InviteUiAction.PastedLinkClicked(scannedLink))
-                                                onAction(InviteUiAction.ConnectInviteClicked)
                                             }
                                         },
                                         modifier = Modifier.fillMaxSize(),
@@ -425,7 +425,6 @@ fun InviteContent(
                                             qrImageHelper.pickAndDecodeQrImage { decodedLink ->
                                                 if (!decodedLink.isNullOrBlank()) {
                                                     onAction(InviteUiAction.PastedLinkClicked(decodedLink))
-                                                    onAction(InviteUiAction.ConnectInviteClicked)
                                                 }
                                             }
                                         },
@@ -594,16 +593,41 @@ fun InviteContent(
                             }
 
                             Button(
-                                onClick = { if (isValidLink) onAction(InviteUiAction.ConnectInviteClicked) },
+                                onClick = { if (isValidLink && !uiState.isConnecting) onAction(InviteUiAction.ConnectInviteClicked) },
+                                enabled = isValidLink && !uiState.isConnecting,
                                 modifier = Modifier.fillMaxWidth(),
                                 shape = RoundedCornerShape(13.dp),
                                 colors = ButtonDefaults.buttonColors(
                                     containerColor = if (isValidLink) NiyeEshoGreenPrimary else NiyeEshoDarkSurface,
                                     contentColor = if (isValidLink) Color.White else NiyeEshoGreenDarkMuted,
+                                    disabledContainerColor = if (uiState.isConnecting) NiyeEshoGreenPrimary.copy(alpha = 0.7f) else NiyeEshoDarkSurface,
+                                    disabledContentColor = Color.White,
                                 ),
                                 contentPadding = PaddingValues(12.dp),
                             ) {
-                                Text(AppStrings.ACTION_CONNECT, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
+                                if (uiState.isConnecting) {
+                                    Row(
+                                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                        verticalAlignment = Alignment.CenterVertically,
+                                    ) {
+                                        CircularProgressIndicator(
+                                            modifier = Modifier.size(18.dp),
+                                            color = Color.White,
+                                            strokeWidth = 2.dp,
+                                        )
+                                        Text(
+                                            text = AppStrings.LABEL_CONNECTING,
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            fontWeight = FontWeight.Bold,
+                                        )
+                                    }
+                                } else {
+                                    Text(
+                                        text = AppStrings.ACTION_CONNECT,
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        fontWeight = FontWeight.Bold,
+                                    )
+                                }
                             }
                         }
 

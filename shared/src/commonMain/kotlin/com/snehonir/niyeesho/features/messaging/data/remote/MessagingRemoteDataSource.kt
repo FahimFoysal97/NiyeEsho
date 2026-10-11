@@ -6,4 +6,5 @@ interface MessagingRemoteDataSource {
     suspend fun send(recipientToken: String, payload: FcmPayloadDto): Result<Unit>
     suspend fun postHandshakeRequest(recipientUid: String, payload: FcmPayloadDto): Result<Unit>
     suspend fun fetchHandshakeRequests(myUid: String): Result<List<FcmPayloadDto>>
+    suspend fun deleteHandshakeRequest(myUid: String, senderUid: String): Result<Unit>
 }

@@ -246,6 +246,7 @@ fun ContactsContent(
                                     onAccept = { onAction(ContactsUiAction.AcceptContactRequest(contact)) },
                                     onDecline = { onAction(ContactsUiAction.DeclineContactRequest(contact)) },
                                     onBlock = { onAction(ContactsUiAction.BlockContact(contact)) },
+                                    isProcessing = uiState.processingUids.contains(contact.uid),
                                 )
                             }
                         }

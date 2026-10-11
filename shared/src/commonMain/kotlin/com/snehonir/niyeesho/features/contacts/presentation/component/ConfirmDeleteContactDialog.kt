@@ -9,6 +9,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import com.snehonir.niyeesho.core.designsystem.theme.AppStrings
 import com.snehonir.niyeesho.core.designsystem.theme.ErrorDark
 import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoDarkSurface
 import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoGreenDarkMuted
@@ -26,7 +27,7 @@ fun ConfirmDeleteContactDialog(
         shape = MaterialTheme.shapes.large,
         title = {
             Text(
-                text = "Delete Contact",
+                text = AppStrings.TITLE_DELETE_CONTACT,
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 color = Color.White,
@@ -49,7 +50,7 @@ fun ConfirmDeleteContactDialog(
                 shape = MaterialTheme.shapes.small,
             ) {
                 Text(
-                    text = "Delete",
+                    text = AppStrings.ACTION_DELETE,
                     style = MaterialTheme.typography.labelMedium,
                     fontWeight = FontWeight.Bold,
                 )
@@ -64,7 +65,7 @@ fun ConfirmDeleteContactDialog(
                 ),
             ) {
                 Text(
-                    text = "Cancel",
+                    text = AppStrings.ACTION_CANCEL,
                     style = MaterialTheme.typography.labelMedium,
                     fontWeight = FontWeight.SemiBold,
                 )

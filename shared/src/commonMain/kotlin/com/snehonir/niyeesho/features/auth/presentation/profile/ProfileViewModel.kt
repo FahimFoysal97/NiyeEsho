@@ -3,6 +3,7 @@ package com.snehonir.niyeesho.features.auth.presentation.profile
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.russhwolf.settings.Settings
+import com.snehonir.niyeesho.core.designsystem.theme.AppStrings
 import com.snehonir.niyeesho.core.utils.TokenManager
 import com.snehonir.niyeesho.features.auth.domain.usecase.GetCurrentUserUseCase
 import com.snehonir.niyeesho.features.auth.domain.usecase.SignOutUseCase
@@ -26,6 +27,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
+
+private const val PREF_LAST_SYNCED_AT = "last_synced_at"
 
 class ProfileViewModel(
     private val getCurrentUser: GetCurrentUserUseCase,
@@ -75,7 +78,7 @@ class ProfileViewModel(
     private fun load() {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, error = null) }
-            val storedSyncEpoch = settings.getLong("last_synced_at", 0L)
+            val storedSyncEpoch = settings.getLong(PREF_LAST_SYNCED_AT, 0L)
             val lastSyncedInstant = if (storedSyncEpoch > 0L) Instant.fromEpochMilliseconds(storedSyncEpoch) else null
             getCurrentUser()
                 .onSuccess { user ->
@@ -91,7 +94,7 @@ class ProfileViewModel(
             runCatching {
                 val token = tokenManager.getToken()
                 if (token.isNullOrBlank()) {
-                    error("Google access token not found. Please sign in with Google to sync.")
+                    error(AppStrings.ERROR_TOKEN_NOT_FOUND)
                 }
                 // 1. Upload unuploaded local data to cloud first
                 val localLists = shoppingListLocal.watchAll().first()
@@ -131,7 +134,7 @@ class ProfileViewModel(
 
                 // 3. Set real completion timestamp
                 val completionTime = Clock.System.now()
-                settings.putLong("last_synced_at", completionTime.toEpochMilliseconds())
+                settings.putLong(PREF_LAST_SYNCED_AT, completionTime.toEpochMilliseconds())
                 completionTime
             }.onSuccess { realServerTime ->
                 _uiState.update { it.copy(isSyncing = false, isSyncedSuccessfully = true, lastSyncedAt = realServerTime, error = null) }

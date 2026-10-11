@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -27,7 +26,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -37,9 +35,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.snehonir.niyeesho.core.designsystem.component.AppBottomBar
-import com.snehonir.niyeesho.core.designsystem.component.AvatarImage
 import com.snehonir.niyeesho.core.designsystem.component.AppNavTab
+import com.snehonir.niyeesho.core.designsystem.component.AvatarImage
 import com.snehonir.niyeesho.core.designsystem.component.ErrorView
+import com.snehonir.niyeesho.core.designsystem.theme.AppShapes
+import com.snehonir.niyeesho.core.designsystem.theme.AppStrings
 import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoDarkBg
 import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoDarkSurface
 import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoGoldSecondary
@@ -94,12 +94,12 @@ fun DashboardContent(
                     ) {
                         Column(verticalArrangement = Arrangement.spacedBy(Spacing.xs / 2)) {
                             Text(
-                                text = "Good morning",
+                                text = AppStrings.GREETING_MORNING,
                                 style = MaterialTheme.typography.bodySmall,
                                 color = NiyeEshoGreenMuted,
                             )
                             Text(
-                                text = uiState.userName.ifBlank { "Sneho" },
+                                text = uiState.userName.ifBlank { AppStrings.LABEL_DEFAULT_USER },
                                 style = MaterialTheme.typography.titleLarge,
                                 fontWeight = FontWeight.Bold,
                                 color = Color.White,
@@ -109,12 +109,12 @@ fun DashboardContent(
                             onClick = { onAction(DashboardUiAction.AddGroupClicked) },
                             modifier = Modifier
                                 .size(40.dp)
-                                .clip(RoundedCornerShape(12.dp))
+                                .clip(AppShapes.button)
                                 .background(NiyeEshoGreenPrimary),
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Add,
-                                contentDescription = "Create Group",
+                                contentDescription = AppStrings.ACTION_CREATE_GROUP,
                                 tint = Color.White,
                                 modifier = Modifier.size(22.dp),
                             )
@@ -128,14 +128,14 @@ fun DashboardContent(
                         val displayMembers = if (mostActive.members.isNotEmpty()) {
                             mostActive.members
                         } else {
-                            listOf(ListMember(uiState.currentUserUid ?: "user_demo", uiState.userName.ifBlank { "User" }, uiState.userAvatarUrl))
+                            listOf(ListMember(uiState.currentUserUid ?: "user_demo", uiState.userName.ifBlank { AppStrings.LABEL_DEFAULT_USER }, uiState.userAvatarUrl))
                         }
 
                         Card(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .clickable { onNavigateToDetail(mostActive.id) },
-                            shape = RoundedCornerShape(14.dp),
+                            shape = AppShapes.card,
                             colors = CardDefaults.cardColors(containerColor = NiyeEshoDarkSurface),
                             elevation = CardDefaults.cardElevation(defaultElevation = Spacing.xs),
                         ) {
@@ -159,7 +159,7 @@ fun DashboardContent(
                                         verticalAlignment = Alignment.CenterVertically,
                                     ) {
                                         Text(
-                                            text = "LAST ACTIVE LIST",
+                                            text = AppStrings.TITLE_LAST_ACTIVE_LIST,
                                             style = MaterialTheme.typography.labelSmall,
                                             fontWeight = FontWeight.Bold,
                                             color = NiyeEshoGreenPrimary,
@@ -167,7 +167,7 @@ fun DashboardContent(
                                         if (mostActive.isDone) {
                                             Icon(
                                                 imageVector = Icons.Default.CheckCircle,
-                                                contentDescription = "Completed",
+                                                contentDescription = AppStrings.LABEL_COMPLETED,
                                                 tint = NiyeEshoGreenPrimary,
                                                 modifier = Modifier.size(Spacing.md),
                                             )
@@ -255,7 +255,7 @@ fun DashboardContent(
                             contentAlignment = Alignment.Center,
                         ) {
                             Text(
-                                text = "No shopping lists yet. Tap '+' to create one!",
+                                text = AppStrings.LABEL_EMPTY_SHOPPING_LISTS,
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = NiyeEshoGreenMuted,
                             )
@@ -314,14 +314,14 @@ private fun DashboardListRowCard(
     modifier: Modifier = Modifier,
 ) {
     val displayMembers = list.members.ifEmpty {
-        listOf(ListMember("user_demo", userName.ifBlank { "User" }, userAvatarUrl))
+        listOf(ListMember("user_demo", userName.ifBlank { AppStrings.LABEL_DEFAULT_USER }, userAvatarUrl))
     }
 
     Card(
         modifier = modifier
             .fillMaxWidth()
             .clickable(onClick = onClick),
-        shape = RoundedCornerShape(14.dp),
+        shape = AppShapes.card,
         colors = CardDefaults.cardColors(containerColor = NiyeEshoDarkSurface),
         elevation = CardDefaults.cardElevation(defaultElevation = Spacing.xs),
     ) {
@@ -370,7 +370,7 @@ private fun DashboardListRowCard(
                     if (list.isDone) {
                         Icon(
                             imageVector = Icons.Default.CheckCircle,
-                            contentDescription = "Completed",
+                            contentDescription = AppStrings.LABEL_COMPLETED,
                             tint = NiyeEshoGreenPrimary,
                             modifier = Modifier.size(Spacing.md),
                         )

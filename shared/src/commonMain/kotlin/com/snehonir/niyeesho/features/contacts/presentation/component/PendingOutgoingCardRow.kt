@@ -16,6 +16,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.snehonir.niyeesho.core.designsystem.component.AvatarImage
+import com.snehonir.niyeesho.core.designsystem.theme.AppStrings
 import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoDarkSurface
 import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoGoldSecondary
 import com.snehonir.niyeesho.core.designsystem.theme.Spacing
@@ -57,7 +58,7 @@ fun PendingOutgoingCardRow(
                         color = Color.White,
                     )
                     Text(
-                        text = "Awaiting approval...",
+                        text = AppStrings.LABEL_AWAITING_APPROVAL,
                         style = MaterialTheme.typography.bodySmall,
                         color = NiyeEshoGoldSecondary,
                     )

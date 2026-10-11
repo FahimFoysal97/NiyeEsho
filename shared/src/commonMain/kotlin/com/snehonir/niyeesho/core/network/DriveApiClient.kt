@@ -17,8 +17,8 @@ class DriveApiClient(
     private val baseUrl: String = NetworkConstants.driveBaseUrl,
 ) {
     suspend fun getFileContent(fileId: String, accessToken: String): Result<String> = runCatching {
-        client.get("$baseUrl/files/$fileId") {
-            parameter("alt", "media")
+        client.get(ApiRoutes.file(baseUrl, fileId)) {
+            parameter(ApiRoutes.Params.ALT, ApiRoutes.Params.ALT_MEDIA)
             bearerAuth(accessToken)
         }.bodyAsText()
     }
@@ -28,11 +28,11 @@ class DriveApiClient(
         metadataJson: String,
         contentJson: String,
     ): Result<String> = runCatching {
-        client.post("${baseUrl}files") {
+        client.post(ApiRoutes.files(baseUrl)) {
             bearerAuth(accessToken)
             contentType(ContentType.Application.Json)
             setBody(contentJson)
-            header("X-NiyeEsho-Metadata", metadataJson)
+            header(ApiRoutes.Headers.METADATA, metadataJson)
         }.bodyAsText()
     }
 
@@ -41,7 +41,7 @@ class DriveApiClient(
         accessToken: String,
         contentJson: String,
     ): Result<String> = runCatching {
-        client.patch("${baseUrl}files/$fileId") {
+        client.patch(ApiRoutes.file(baseUrl, fileId)) {
             bearerAuth(accessToken)
             contentType(ContentType.Application.Json)
             setBody(contentJson)
@@ -49,12 +49,12 @@ class DriveApiClient(
     }
 
     suspend fun deleteFile(fileId: String, accessToken: String): Result<Unit> = runCatching {
-        client.delete("${baseUrl}files/$fileId") {
+        client.delete(ApiRoutes.file(baseUrl, fileId)) {
             bearerAuth(accessToken)
         }
     }
 
     private fun io.ktor.client.request.HttpRequestBuilder.bearerAuth(token: String) {
-        header("Authorization", "Bearer $token")
+        header(ApiRoutes.Headers.AUTHORIZATION, "${ApiRoutes.Headers.BEARER_PREFIX}$token")
     }
 }

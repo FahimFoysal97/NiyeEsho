@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
@@ -42,6 +41,7 @@ import com.snehonir.niyeesho.core.designsystem.component.AppNavTab
 import com.snehonir.niyeesho.core.designsystem.component.AvatarImage
 import com.snehonir.niyeesho.core.designsystem.component.ErrorView
 import com.snehonir.niyeesho.core.designsystem.theme.AppShapes
+import com.snehonir.niyeesho.core.designsystem.theme.AppStrings
 import com.snehonir.niyeesho.core.designsystem.theme.ErrorDark
 import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoDarkBg
 import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoDarkSurface
@@ -93,13 +93,13 @@ fun ContactsContent(
             ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Back",
+                    contentDescription = AppStrings.ACTION_BACK,
                     tint = Color.White,
                     modifier = Modifier.size(20.dp),
                 )
             }
             Text(
-                text = "Contacts",
+                text = AppStrings.TITLE_CONTACTS,
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
                 color = Color.White,
@@ -124,11 +124,11 @@ fun ContactsContent(
                         value = uiState.query,
                         onValueChange = { onAction(ContactsUiAction.QueryChanged(it)) },
                         modifier = Modifier.fillMaxWidth(),
-                        placeholder = { Text("Search contacts...", style = MaterialTheme.typography.bodyMedium, color = NiyeEshoGreenDarkMuted) },
+                        placeholder = { Text(AppStrings.HINT_SEARCH_CONTACTS, style = MaterialTheme.typography.bodyMedium, color = NiyeEshoGreenDarkMuted) },
                         leadingIcon = {
                             Icon(
                                 imageVector = Icons.Default.Search,
-                                contentDescription = "Search",
+                                contentDescription = AppStrings.ACTION_SEARCH,
                                 tint = NiyeEshoGreenDarkMuted,
                                 modifier = Modifier.size(20.dp),
                             )
@@ -298,7 +298,7 @@ private fun ContactCardRow(
 ) {
     Card(
         modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
+        shape = AppShapes.card,
         colors = CardDefaults.cardColors(containerColor = NiyeEshoDarkSurface),
         elevation = CardDefaults.cardElevation(defaultElevation = Spacing.xs),
     ) {

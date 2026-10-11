@@ -61,21 +61,6 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import com.snehonir.niyeesho.core.designsystem.theme.InviteGradientBottom
-import com.snehonir.niyeesho.core.designsystem.theme.InviteGradientTop
-import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoBorderSubtle
-import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoBrightRed
-import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoDarkBg
-import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoDarkSurface
-import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoDarkSurfaceInner
-import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoDarkSurfaceVariant
-import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoEmeraldAccent
-import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoGreenDarkMuted
-import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoGreenPrimary
-import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoMutedGreenText
-import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoSoftRed
-import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoTextMuted
-import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoTextSubtle
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
@@ -93,11 +78,23 @@ import androidx.compose.ui.unit.sp
 import com.snehonir.niyeesho.core.designsystem.component.AppBottomBar
 import com.snehonir.niyeesho.core.designsystem.component.AppNavTab
 import com.snehonir.niyeesho.core.designsystem.component.AvatarImage
+import com.snehonir.niyeesho.core.designsystem.theme.AppStrings
+import com.snehonir.niyeesho.core.designsystem.theme.InviteGradientBottom
+import com.snehonir.niyeesho.core.designsystem.theme.InviteGradientTop
+import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoBorderSubtle
+import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoBrightRed
 import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoDarkBg
 import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoDarkSurface
 import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoDarkSurfaceInner
+import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoDarkSurfaceVariant
+import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoEmeraldAccent
+import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoGreenDarkMuted
 import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoGreenPrimary
 import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoIndigoTertiary
+import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoMutedGreenText
+import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoSoftRed
+import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoTextMuted
+import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoTextSubtle
 import com.snehonir.niyeesho.core.designsystem.theme.Spacing
 import com.snehonir.niyeesho.features.contacts.presentation.component.QrCodeDisplay
 import com.snehonir.niyeesho.features.contacts.presentation.component.rememberQrImageHelper
@@ -250,7 +247,7 @@ fun InviteContent(
                                     ) {
                                         Icon(painterResource(Res.drawable.download), contentDescription = "Save", tint = NiyeEshoEmeraldAccent, modifier = Modifier.size(15.dp))
                                         Spacer(modifier = Modifier.width(6.dp))
-                                        Text("Save", style = MaterialTheme.typography.labelMedium, color = NiyeEshoMutedGreenText, fontWeight = FontWeight.Bold)
+                                        Text(AppStrings.ACTION_SAVE, style = MaterialTheme.typography.labelMedium, color = NiyeEshoMutedGreenText, fontWeight = FontWeight.Bold)
                                     }
                                 }
 
@@ -269,7 +266,7 @@ fun InviteContent(
                                     ) {
                                         Icon(Icons.Default.Share, contentDescription = "Share", tint = NiyeEshoEmeraldAccent, modifier = Modifier.size(15.dp))
                                         Spacer(modifier = Modifier.width(6.dp))
-                                        Text("Share", style = MaterialTheme.typography.labelMedium, color = NiyeEshoMutedGreenText, fontWeight = FontWeight.Bold)
+                                        Text(AppStrings.ACTION_SHARE, style = MaterialTheme.typography.labelMedium, color = NiyeEshoMutedGreenText, fontWeight = FontWeight.Bold)
                                     }
                                 }
                             }
@@ -337,7 +334,7 @@ fun InviteContent(
                                     ) {
                                         Icon(painterResource(Res.drawable.content_copy), contentDescription = "Copy", tint = NiyeEshoEmeraldAccent, modifier = Modifier.size(15.dp))
                                         Spacer(modifier = Modifier.width(6.dp))
-                                        Text("Copy", style = MaterialTheme.typography.labelMedium, color = NiyeEshoMutedGreenText, fontWeight = FontWeight.Bold)
+                                        Text(AppStrings.ACTION_COPY, style = MaterialTheme.typography.labelMedium, color = NiyeEshoMutedGreenText, fontWeight = FontWeight.Bold)
                                     }
                                 }
 
@@ -356,7 +353,7 @@ fun InviteContent(
                                     ) {
                                         Icon(Icons.Default.Share, contentDescription = "Share", tint = NiyeEshoEmeraldAccent, modifier = Modifier.size(15.dp))
                                         Spacer(modifier = Modifier.width(6.dp))
-                                        Text("Share", style = MaterialTheme.typography.labelMedium, color = NiyeEshoMutedGreenText, fontWeight = FontWeight.Bold)
+                                        Text(AppStrings.ACTION_SHARE, style = MaterialTheme.typography.labelMedium, color = NiyeEshoMutedGreenText, fontWeight = FontWeight.Bold)
                                     }
                                 }
                             }
@@ -440,7 +437,7 @@ fun InviteContent(
                                 horizontalArrangement = Arrangement.spacedBy(10.dp),
                             ) {
                                 HorizontalDivider(modifier = Modifier.weight(1f), color = NiyeEshoDarkSurface)
-                                Text("or paste invite link", style = MaterialTheme.typography.labelSmall, color = NiyeEshoTextMuted)
+                                Text(AppStrings.HINT_PASTE_INVITE_LINK, style = MaterialTheme.typography.labelSmall, color = NiyeEshoTextMuted)
                                 HorizontalDivider(modifier = Modifier.weight(1f), color = NiyeEshoDarkSurface)
                             }
 
@@ -512,7 +509,7 @@ fun InviteContent(
                                 ),
                                 contentPadding = PaddingValues(12.dp),
                             ) {
-                                Text("Connect", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
+                                Text(AppStrings.ACTION_CONNECT, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
                             }
                         }
 

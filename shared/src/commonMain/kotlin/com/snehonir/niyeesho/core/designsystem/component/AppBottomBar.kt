@@ -8,21 +8,17 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.List
-import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import com.snehonir.niyeesho.core.designsystem.theme.AppStrings
 import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoDarkBg
 import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoDarkSurface
 import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoGreenDarkMuted
@@ -31,7 +27,6 @@ import com.snehonir.niyeesho.core.designsystem.theme.Spacing
 import niyeesho.shared.generated.resources.Res
 import niyeesho.shared.generated.resources.contacts
 import niyeesho.shared.generated.resources.lists
-import niyeesho.shared.generated.resources.person_add
 import niyeesho.shared.generated.resources.profile
 import niyeesho.shared.generated.resources.scan
 import org.jetbrains.compose.resources.painterResource
@@ -60,25 +55,25 @@ fun AppBottomBar(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             NavItem(
-                label = "Lists",
+                label = AppStrings.TITLE_LISTS,
                 icon = painterResource(Res.drawable.lists),
                 isSelected = currentTab == AppNavTab.LISTS,
                 onClick = { onTabSelected(AppNavTab.LISTS) },
             )
             NavItem(
-                label = "Contacts",
+                label = AppStrings.TITLE_CONTACTS,
                 icon = painterResource(Res.drawable.contacts),
                 isSelected = currentTab == AppNavTab.CONTACTS,
                 onClick = { onTabSelected(AppNavTab.CONTACTS) },
             )
             NavItem(
-                label = "Invite",
+                label = AppStrings.TITLE_INVITE,
                 icon = painterResource(Res.drawable.scan),
                 isSelected = currentTab == AppNavTab.INVITE,
                 onClick = { onTabSelected(AppNavTab.INVITE) },
             )
             NavItem(
-                label = "Profile",
+                label = AppStrings.TITLE_PROFILE,
                 icon = painterResource(Res.drawable.profile),
                 isSelected = currentTab == AppNavTab.PROFILE,
                 onClick = { onTabSelected(AppNavTab.PROFILE) },
@@ -113,7 +108,7 @@ private fun NavItem(
         )
         Text(
             text = label,
-            fontSize = 10.sp,
+            style = MaterialTheme.typography.labelSmall,
             fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal,
             color = if (isSelected) activeColor else inactiveColor,
         )

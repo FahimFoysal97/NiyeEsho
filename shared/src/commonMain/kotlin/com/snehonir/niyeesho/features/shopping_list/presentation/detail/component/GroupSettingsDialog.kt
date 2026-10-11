@@ -16,6 +16,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import com.snehonir.niyeesho.core.designsystem.theme.AppShapes
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
@@ -84,7 +85,7 @@ fun GroupSettingsDialog(
     if (showDeleteConfirm) {
         AlertDialog(
             onDismissRequest = { showDeleteConfirm = false },
-            shape = RoundedCornerShape(24.dp),
+            shape = AppShapes.dialog,
             containerColor = NiyeEshoDarkSurface,
             title = { Text("Delete Shopping List?", color = Color.White, style = MaterialTheme.typography.titleMedium) },
             text = { Text("Are you sure you want to delete this list? This action cannot be undone.", color = NiyeEshoGreenMuted) },
@@ -94,7 +95,7 @@ fun GroupSettingsDialog(
                         showDeleteConfirm = false
                         onDeleteList()
                     },
-                    shape = RoundedCornerShape(12.dp),
+                    shape = AppShapes.button,
                     colors = ButtonDefaults.buttonColors(containerColor = ErrorDark, contentColor = Color.White),
                 ) { Text("Delete", fontWeight = FontWeight.Bold) }
             },
@@ -110,7 +111,7 @@ fun GroupSettingsDialog(
     AlertDialog(
         onDismissRequest = onDismiss,
         modifier = modifier,
-        shape = RoundedCornerShape(24.dp),
+        shape = AppShapes.dialog,
         containerColor = NiyeEshoDarkSurface,
         title = {
             Text(
@@ -146,7 +147,7 @@ fun GroupSettingsDialog(
                                 onValueChange = { titleInput = it },
                                 modifier = Modifier.weight(1f),
                                 singleLine = true,
-                                shape = RoundedCornerShape(12.dp),
+                                shape = AppShapes.button,
                                 colors = OutlinedTextFieldDefaults.colors(
                                     unfocusedContainerColor = NiyeEshoDarkBg,
                                     focusedContainerColor = NiyeEshoDarkBg,
@@ -161,7 +162,7 @@ fun GroupSettingsDialog(
                                 enabled = titleInput.isNotBlank() && titleInput != listTitle,
                                 modifier = Modifier
                                     .size(44.dp)
-                                    .clip(RoundedCornerShape(12.dp))
+                                    .clip(AppShapes.button)
                                     .background(if (titleInput.isNotBlank() && titleInput != listTitle) NiyeEshoGreenPrimary else NiyeEshoDarkBg),
                             ) {
                                 Icon(
@@ -193,7 +194,7 @@ fun GroupSettingsDialog(
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .background(NiyeEshoDarkBg.copy(alpha = 0.5f), RoundedCornerShape(12.dp))
+                            .background(NiyeEshoDarkBg.copy(alpha = 0.5f), AppShapes.button)
                             .padding(horizontal = Spacing.md, vertical = Spacing.sm),
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceBetween,
@@ -279,7 +280,7 @@ fun GroupSettingsDialog(
                                         selectedContactUids + contact.uid
                                     }
                                 }
-                                .background(NiyeEshoDarkBg.copy(alpha = 0.5f), RoundedCornerShape(12.dp))
+                                .background(NiyeEshoDarkBg.copy(alpha = 0.5f), AppShapes.button)
                                 .padding(horizontal = Spacing.md, vertical = Spacing.sm),
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.SpaceBetween,
@@ -340,7 +341,7 @@ fun GroupSettingsDialog(
                         }
                     },
                     enabled = selectedContactUids.isNotEmpty(),
-                    shape = RoundedCornerShape(12.dp),
+                    shape = AppShapes.button,
                     colors = ButtonDefaults.buttonColors(
                         containerColor = NiyeEshoGreenPrimary,
                         contentColor = Color.White,

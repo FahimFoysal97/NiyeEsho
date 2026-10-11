@@ -1,5 +1,6 @@
 package com.snehonir.niyeesho.features.shopping_list.data.repository
 
+import com.snehonir.niyeesho.core.designsystem.theme.AppStrings
 import com.snehonir.niyeesho.core.utils.TokenManager
 import com.snehonir.niyeesho.core.utils.logD
 import com.snehonir.niyeesho.features.auth.data.local.AuthLocalDataSource
@@ -30,7 +31,7 @@ class ShoppingListRepositoryImpl(
 
     override suspend fun getShoppingList(id: String): Result<ShoppingList> =
         local.get(id)?.let { Result.success(it) }
-            ?: Result.failure(NoSuchElementException("Shopping list not found."))
+            ?: Result.failure(NoSuchElementException(AppStrings.ERROR_LIST_NOT_FOUND))
 
     override suspend fun createShoppingList(
         title: String,
@@ -40,7 +41,7 @@ class ShoppingListRepositoryImpl(
     ): Result<ShoppingList> = runCatching {
         val now = Clock.System.now()
         val currentUser = authLocal.getUser()
-        val ownerName = currentUser?.displayName ?: "Sneho Nir"
+        val ownerName = currentUser?.displayName ?: AppStrings.LABEL_DEFAULT_OWNER
         val ownerAvatar = currentUser?.avatarUrl
         val ownerMember = ListMember(ownerId, ownerName, ownerAvatar)
         val allMembers = (listOf(ownerMember) + members).distinctBy { it.uid }
@@ -118,7 +119,6 @@ class ShoppingListRepositoryImpl(
                 return
             }
             logD("ShoppingListRepo", "syncListToRemote() -> backing up list '${list.title}' (${list.id}) to Google Drive")
-            val items = listItemLocal.watchForList(list.id).first()
             val driveList = DriveShoppingList(
                 id = list.id,
                 title = list.title,
@@ -128,27 +128,12 @@ class ShoppingListRepositoryImpl(
                 createdAt = list.createdAt,
                 updatedAt = list.updatedAt,
                 lastSyncedAt = list.lastSyncedAt,
-                items = items.map { item ->
-                    com.snehonir.niyeesho.features.drive.domain.entity.DriveListItem(
-                        id = item.id,
-                        name = item.name,
-                        quantity = item.quantity,
-                        unit = item.unit,
-                        isChecked = item.isChecked,
-                        addedBy = item.addedBy,
-                        addedByName = item.addedByName,
-                        checkedBy = item.checkedBy,
-                        position = item.position,
-                        createdAt = item.createdAt,
-                        updatedAt = item.updatedAt,
-                    )
-                },
+                items = emptyList(),
                 isArchived = list.isArchived,
             )
-            driveRepository.saveList(token, driveList)
-            logD("ShoppingListRepo", "syncListToRemote() -> Google Drive backup success for list '${list.title}'")
+            driveRepository.saveList(token, driveList).getOrThrow()
         }.onFailure {
-            logD("ShoppingListRepo", "syncListToRemote() -> Google Drive backup failed: ${it.message}")
+            logD("ShoppingListRepo", "syncListToRemote() -> failed: ${it.message}")
         }
     }
 }

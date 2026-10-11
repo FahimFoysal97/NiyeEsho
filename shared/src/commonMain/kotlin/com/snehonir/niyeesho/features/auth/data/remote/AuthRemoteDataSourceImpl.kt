@@ -1,5 +1,6 @@
 package com.snehonir.niyeesho.features.auth.data.remote
 
+import com.snehonir.niyeesho.core.designsystem.theme.AppStrings
 import com.snehonir.niyeesho.features.auth.domain.entity.User
 import dev.gitlive.firebase.auth.FirebaseAuth
 import dev.gitlive.firebase.auth.GoogleAuthProvider
@@ -18,7 +19,7 @@ class AuthRemoteDataSourceImpl(
     override suspend fun signInWithGoogle(idToken: String): Result<User> = runCatching {
         firebaseAuth.signInWithCredential(
             GoogleAuthProvider.credential(idToken, null),
-        ).user?.toDomain() ?: error("Firebase returned no authenticated user.")
+        ).user?.toDomain() ?: error(AppStrings.ERROR_FIREBASE_NO_USER)
     }
 
     override suspend fun signOut(): Result<Unit> = runCatching {

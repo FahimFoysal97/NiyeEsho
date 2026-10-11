@@ -17,6 +17,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import com.snehonir.niyeesho.core.designsystem.theme.AppShapes
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
@@ -79,7 +80,7 @@ fun ListDetailContent(
                 onClick = onBack,
                 modifier = Modifier
                     .size(40.dp)
-                    .clip(RoundedCornerShape(12.dp))
+                    .clip(AppShapes.button)
                     .background(NiyeEshoDarkSurface),
             ) {
                 Icon(
@@ -106,7 +107,7 @@ fun ListDetailContent(
                 },
                 modifier = Modifier
                     .size(40.dp)
-                    .clip(RoundedCornerShape(12.dp))
+                    .clip(AppShapes.button)
                     .background(NiyeEshoDarkSurface),
             ) {
                 Icon(
@@ -147,7 +148,7 @@ fun ListDetailContent(
                             members.forEachIndexed { idx, member ->
                                 val chipColor = NiyeEshoGreenPrimary
                                 Surface(
-                                    shape = RoundedCornerShape(16.dp),
+                                    shape = AppShapes.surfaceMedium,
                                     color = chipColor.copy(alpha = 0.2f),
                                     border = BorderStroke(1.dp, chipColor.copy(alpha = 0.5f)),
                                 ) {
@@ -164,7 +165,7 @@ fun ListDetailContent(
 
                         // Synced Tag
                         Surface(
-                            shape = RoundedCornerShape(20.dp),
+                            shape = AppShapes.surfaceLarge,
                             color = NiyeEshoDarkSurface,
                         ) {
                             Text(

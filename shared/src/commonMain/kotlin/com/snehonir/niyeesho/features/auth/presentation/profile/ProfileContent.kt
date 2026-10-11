@@ -48,6 +48,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import com.snehonir.niyeesho.core.designsystem.theme.AppShapes
 import com.snehonir.niyeesho.core.designsystem.theme.ErrorDark
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -141,7 +142,7 @@ fun ProfileContent(
                         item {
                             Card(
                                 modifier = Modifier.fillMaxWidth(),
-                                shape = RoundedCornerShape(16.dp),
+                                shape = AppShapes.surfaceMedium,
                                 colors = CardDefaults.cardColors(containerColor = NiyeEshoDarkSurface),
                                 elevation = CardDefaults.cardElevation(defaultElevation = Spacing.xs),
                             ) {
@@ -216,7 +217,7 @@ fun ProfileContent(
                         item {
                             Card(
                                 modifier = Modifier.fillMaxWidth(),
-                                shape = RoundedCornerShape(14.dp),
+                                shape = AppShapes.card,
                                 colors = CardDefaults.cardColors(containerColor = NiyeEshoDarkSurface),
                                 elevation = CardDefaults.cardElevation(defaultElevation = Spacing.xs),
                             ) {
@@ -314,7 +315,7 @@ fun ProfileContent(
                         item {
                             Card(
                                 modifier = Modifier.fillMaxWidth(),
-                                shape = RoundedCornerShape(14.dp),
+                                shape = AppShapes.card,
                                 colors = CardDefaults.cardColors(containerColor = NiyeEshoDarkSurface),
                                 elevation = CardDefaults.cardElevation(defaultElevation = Spacing.xs),
                             ) {
@@ -463,7 +464,7 @@ private fun StatBox(
 ) {
     Surface(
         modifier = modifier,
-        shape = RoundedCornerShape(10.dp),
+        shape = AppShapes.chip,
         color = NiyeEshoDarkBg,
     ) {
         Column(

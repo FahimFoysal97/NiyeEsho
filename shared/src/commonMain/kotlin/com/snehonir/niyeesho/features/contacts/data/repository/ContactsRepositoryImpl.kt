@@ -1,5 +1,6 @@
 package com.snehonir.niyeesho.features.contacts.data.repository
 
+import com.snehonir.niyeesho.core.designsystem.theme.AppStrings
 import com.snehonir.niyeesho.features.contacts.data.local.ContactsLocalDataSource
 import com.snehonir.niyeesho.features.contacts.data.mapper.toContact
 import com.snehonir.niyeesho.features.contacts.data.mapper.toDriveContact
@@ -54,7 +55,7 @@ class ContactsRepositoryImpl(
 
     override suspend fun refreshContactToken(uid: String): Result<Contact> = runCatching {
         val contact = local.getById(uid)
-            ?: error("Contact not found.")
+            ?: error(AppStrings.ERROR_CONTACT_NOT_FOUND)
         val profile = driveRepository.getProfileFromDriveUrl(contact.profileDriveUrl).getOrThrow()
         val refreshed = contact.copy(
             displayName = profile.displayName,

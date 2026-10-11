@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.AlertDialog
@@ -23,6 +22,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.snehonir.niyeesho.core.designsystem.theme.AppShapes
 import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoDarkBg
 import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoDarkSurface
 import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoGreenDarkMuted
@@ -60,7 +60,7 @@ fun ContactSettingsDialog(
                         horizontalArrangement = Arrangement.spacedBy(Spacing.md),
                     ) {
                         Surface(
-                            shape = RoundedCornerShape(12.dp),
+                            shape = AppShapes.button,
                             color = NiyeEshoGreenPrimary,
                             modifier = Modifier.size(Spacing.xxl),
                         ) {
@@ -97,7 +97,7 @@ fun ContactSettingsDialog(
                     Button(
                         onClick = onCreateGroupClicked,
                         modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(12.dp),
+                        shape = AppShapes.button,
                         colors = ButtonDefaults.buttonColors(
                             containerColor = NiyeEshoGreenPrimary,
                             contentColor = Color.White,

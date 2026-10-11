@@ -2,6 +2,7 @@ package com.snehonir.niyeesho.features.auth.presentation.signin
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.snehonir.niyeesho.core.designsystem.theme.AppStrings
 import com.snehonir.niyeesho.core.utils.logD
 import com.snehonir.niyeesho.features.auth.domain.usecase.SignInWithGoogleUseCase
 import kotlinx.coroutines.channels.Channel
@@ -30,7 +31,7 @@ class SignInViewModel(
         when (action) {
             is SignInUiAction.GoogleSignInClicked -> signIn(action.idToken)
             is SignInUiAction.GoogleSignInFailed -> {
-                val message = action.throwable.message ?: "Unable to sign in with Google."
+                val message = action.throwable.message ?: AppStrings.ERROR_SIGN_IN_GOOGLE
                 logD("SignInViewModel", "GoogleSignInFailed error message: $message")
                 _uiState.update { it.copy(isLoading = false, error = com.snehonir.niyeesho.core.utils.UiText.Plain(message)) }
                 viewModelScope.launch { _uiEvent.send(SignInUiEvent.ShowError(message)) }
@@ -52,7 +53,7 @@ class SignInViewModel(
                     _uiEvent.send(SignInUiEvent.NavigateToShoppingLists)
                 }
                 .onFailure { throwable ->
-                    val message = throwable.message ?: "Unable to sign in."
+                    val message = throwable.message ?: AppStrings.ERROR_SIGN_IN
                     logD("SignInViewModel", "signInWithGoogle failed with error: $message")
                     _uiState.update { it.copy(error = com.snehonir.niyeesho.core.utils.UiText.Plain(message)) }
                     _uiEvent.send(SignInUiEvent.ShowError(message))

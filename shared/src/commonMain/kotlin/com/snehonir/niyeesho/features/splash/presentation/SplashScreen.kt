@@ -50,6 +50,7 @@ import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoSageGreen
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.snehonir.niyeesho.core.designsystem.theme.AppStrings
 import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoDarkBg
 import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoGreenDarkMuted
 import niyeesho.shared.generated.resources.Res
@@ -266,7 +267,7 @@ fun SplashScreen(
 
             // Tagline ("Shared lists, made easy")
             Text(
-                text = "Shared lists, made easy",
+                text = AppStrings.TAGLINE_SPLASH,
                 style = TextStyle(
                     fontSize = 14.sp,
                     color = NiyeEshoSageGreen
@@ -292,7 +293,7 @@ fun SplashScreen(
 
             // Version Label
             Text(
-                text = "Niye Esho",
+                text = AppStrings.APP_NAME,
                 style = TextStyle(
                     fontSize = 11.sp,
                     color = NiyeEshoGreenDarkMuted,

@@ -26,6 +26,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.snehonir.niyeesho.core.designsystem.component.AvatarImage
+import com.snehonir.niyeesho.core.designsystem.theme.AppStrings
 import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoBrightRed
 import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoDarkSurface
 import com.snehonir.niyeesho.core.designsystem.theme.NiyeEshoGreenMuted
@@ -74,7 +75,7 @@ fun PendingRequestCardRow(
                         color = Color.White,
                     )
                     Text(
-                        text = "Wants to connect",
+                        text = AppStrings.LABEL_WANTS_TO_CONNECT,
                         style = MaterialTheme.typography.bodySmall,
                         color = NiyeEshoGreenMuted,
                     )
@@ -88,7 +89,7 @@ fun PendingRequestCardRow(
                     colors = ButtonDefaults.buttonColors(containerColor = NiyeEshoGreenPrimary),
                     contentPadding = PaddingValues(horizontal = Spacing.sm, vertical = Spacing.xs),
                 ) {
-                    Text("Accept", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
+                    Text(AppStrings.ACTION_ACCEPT, style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
                 }
 
                 TextButton(
@@ -96,7 +97,7 @@ fun PendingRequestCardRow(
                     shape = MaterialTheme.shapes.small,
                     contentPadding = PaddingValues(horizontal = Spacing.xs, vertical = Spacing.xs),
                 ) {
-                    Text("Decline", style = MaterialTheme.typography.labelSmall, color = NiyeEshoMutedGreenText)
+                    Text(AppStrings.ACTION_DECLINE, style = MaterialTheme.typography.labelSmall, color = NiyeEshoMutedGreenText)
                 }
 
                 IconButton(onClick = onBlock, modifier = Modifier.size(32.dp)) {

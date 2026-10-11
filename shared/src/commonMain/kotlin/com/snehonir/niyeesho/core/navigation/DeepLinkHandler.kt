@@ -20,9 +20,6 @@ data class InviteDeepLink(
 )
 
 object DeepLinkHandler {
-    private const val Scheme = "niyeesho://"
-    private const val InvitePath = "invite"
-
     fun parse(uri: String): InviteDeepLink? {
         val query = when {
             uri.contains("?") -> uri.substringAfter("?")
@@ -42,8 +39,8 @@ object DeepLinkHandler {
             .toMap()
 
         val now = Clock.System.now().toEpochMilliseconds()
-        val expiresAt = values["expiresAt"]?.toLongOrNull()
-        val ts = values["ts"]?.toLongOrNull()
+        val expiresAt = values[DeepLinkConfig.Params.EXPIRES_AT]?.toLongOrNull()
+        val ts = values[DeepLinkConfig.Params.TS]?.toLongOrNull()
 
         // Enforce expiration window check
         if (expiresAt != null && now > expiresAt) {
@@ -55,11 +52,11 @@ object DeepLinkHandler {
             return null
         }
 
-        val uid = values["uid"] ?: return null
-        val name = values["name"] ?: return null
-        val email = values["email"]
-        val token = values["token"] ?: return null
-        val driveUrl = values["driveUrl"] ?: ""
+        val uid = values[DeepLinkConfig.Params.UID] ?: return null
+        val name = values[DeepLinkConfig.Params.NAME] ?: return null
+        val email = values[DeepLinkConfig.Params.EMAIL]
+        val token = values[DeepLinkConfig.Params.TOKEN] ?: return null
+        val driveUrl = values[DeepLinkConfig.Params.DRIVE_URL] ?: ""
 
         return InviteDeepLink(
             uid = uid,
@@ -67,22 +64,22 @@ object DeepLinkHandler {
             email = email,
             token = token,
             driveUrl = driveUrl,
-            avatar = values["avatar"],
-            listId = values["listId"],
-            listTitle = values["listTitle"],
+            avatar = values[DeepLinkConfig.Params.AVATAR],
+            listId = values[DeepLinkConfig.Params.LIST_ID],
+            listTitle = values[DeepLinkConfig.Params.LIST_TITLE],
             expiresAt = expiresAt ?: (ts?.let { it + 60_000L }),
         )
     }
 
     fun toRoute(link: InviteDeepLink): String = buildString {
         append(NavRoute.InviteAccept.path)
-        append("?uid=").append(link.uid)
-        append("&name=").append(link.name)
-        link.email?.let { append("&email=").append(it) }
-        append("&token=").append(link.token)
-        append("&driveUrl=").append(link.driveUrl)
-        link.avatar?.let { append("&avatar=").append(it) }
-        link.listId?.let { append("&listId=").append(it) }
-        link.listTitle?.let { append("&listTitle=").append(it) }
+        append("?${DeepLinkConfig.Params.UID}=").append(link.uid)
+        append("&${DeepLinkConfig.Params.NAME}=").append(link.name)
+        link.email?.let { append("&${DeepLinkConfig.Params.EMAIL}=").append(it) }
+        append("&${DeepLinkConfig.Params.TOKEN}=").append(link.token)
+        append("&${DeepLinkConfig.Params.DRIVE_URL}=").append(link.driveUrl)
+        link.avatar?.let { append("&${DeepLinkConfig.Params.AVATAR}=").append(it) }
+        link.listId?.let { append("&${DeepLinkConfig.Params.LIST_ID}=").append(it) }
+        link.listTitle?.let { append("&${DeepLinkConfig.Params.LIST_TITLE}=").append(it) }
     }
 }

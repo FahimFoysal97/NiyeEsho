@@ -4,11 +4,18 @@ import com.snehonir.niyeesho.features.contacts.domain.entity.Contact
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 
+enum class ContactsTab(val label: String) {
+    CONTACTS("Contacts"),
+    REQUESTS("Requests"),
+    PENDING("Pending"),
+}
+
 data class ContactsUiState(
     val contacts: ImmutableList<Contact> = persistentListOf(),
     val pendingIncomingContacts: ImmutableList<Contact> = persistentListOf(),
     val pendingOutgoingContacts: ImmutableList<Contact> = persistentListOf(),
     val query: String = "",
+    val selectedTab: ContactsTab = ContactsTab.CONTACTS,
     val isLoading: Boolean = true,
     val isRefreshing: Boolean = false,
     val isCreateGroupDialogVisible: Boolean = false,

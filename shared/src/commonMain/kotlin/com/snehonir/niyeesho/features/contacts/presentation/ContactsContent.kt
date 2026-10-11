@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
@@ -24,6 +25,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -144,34 +146,38 @@ fun ContactsContent(
                     )
                 }
 
-                uiState.error?.let { err ->
-                    item { ErrorView(UiText.Plain(err), modifier = Modifier.fillMaxWidth()) }
-                }
-
-                // Pending Incoming Requests Section (User A view)
-                if (uiState.pendingIncomingContacts.isNotEmpty()) {
-                    item {
-                        Column(
-                            verticalArrangement = Arrangement.spacedBy(8.dp),
-                            modifier = Modifier.fillMaxWidth(),
-                        ) {
-                            Text(
-                                text = "PENDING REQUESTS (${uiState.pendingIncomingContacts.size})",
-                                style = MaterialTheme.typography.labelSmall,
-                                fontWeight = FontWeight.Bold,
-                                color = NiyeEshoGreenPrimary,
-                            )
-
-                            Column(
-                                modifier = Modifier.fillMaxWidth(),
-                                verticalArrangement = Arrangement.spacedBy(8.dp),
+                // 3 Tabs: Contacts | Requests | Pending
+                item {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(NiyeEshoDarkSurface, RoundedCornerShape(13.dp))
+                            .padding(3.dp),
+                        horizontalArrangement = Arrangement.spacedBy(3.dp),
+                    ) {
+                        ContactsTab.entries.forEach { tab ->
+                            val isSelected = uiState.selectedTab == tab
+                            val label = when (tab) {
+                                ContactsTab.CONTACTS -> "Contacts (${uiState.contacts.size})"
+                                ContactsTab.REQUESTS -> "Requests (${uiState.pendingIncomingContacts.size})"
+                                ContactsTab.PENDING -> "Pending (${uiState.pendingOutgoingContacts.size})"
+                            }
+                            Surface(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .clip(RoundedCornerShape(10.dp))
+                                    .clickable { onAction(ContactsUiAction.TabSelected(tab)) },
+                                color = if (isSelected) NiyeEshoGreenPrimary else Color.Transparent,
                             ) {
-                                uiState.pendingIncomingContacts.forEach { contact ->
-                                    PendingRequestCardRow(
-                                        contact = contact,
-                                        onAccept = { onAction(ContactsUiAction.AcceptContactRequest(contact)) },
-                                        onDecline = { onAction(ContactsUiAction.DeclineContactRequest(contact)) },
-                                        onBlock = { onAction(ContactsUiAction.BlockContact(contact)) },
+                                Box(
+                                    modifier = Modifier.padding(vertical = 9.dp),
+                                    contentAlignment = Alignment.Center,
+                                ) {
+                                    Text(
+                                        text = label,
+                                        style = MaterialTheme.typography.labelSmall,
+                                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.SemiBold,
+                                        color = if (isSelected) Color.White else NiyeEshoGreenDarkMuted,
                                     )
                                 }
                             }
@@ -179,69 +185,93 @@ fun ContactsContent(
                     }
                 }
 
-                // Pending Outgoing Requests Section (User B view)
-                if (uiState.pendingOutgoingContacts.isNotEmpty()) {
-                    item {
-                        Column(
-                            verticalArrangement = Arrangement.spacedBy(8.dp),
-                            modifier = Modifier.fillMaxWidth(),
-                        ) {
-                            Text(
-                                text = "AWAITING APPROVAL (${uiState.pendingOutgoingContacts.size})",
-                                style = MaterialTheme.typography.labelSmall,
-                                fontWeight = FontWeight.Bold,
-                                color = NiyeEshoGoldSecondary,
-                            )
+                uiState.error?.let { err ->
+                    item { ErrorView(UiText.Plain(err), modifier = Modifier.fillMaxWidth()) }
+                }
 
-                            Column(
-                                modifier = Modifier.fillMaxWidth(),
-                                verticalArrangement = Arrangement.spacedBy(8.dp),
-                            ) {
-                                uiState.pendingOutgoingContacts.forEach { contact ->
-                                    PendingOutgoingCardRow(contact = contact)
+                when (uiState.selectedTab) {
+                    ContactsTab.CONTACTS -> {
+                        // Tab 0: Active Contacts
+                        if (uiState.contacts.isEmpty()) {
+                            item {
+                                Card(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    shape = AppShapes.card,
+                                    colors = CardDefaults.cardColors(containerColor = NiyeEshoDarkSurface),
+                                ) {
+                                    Text(
+                                        text = "No active contacts yet. Share your invite link to connect!",
+                                        modifier = Modifier.padding(Spacing.lg),
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        color = NiyeEshoGreenMuted,
+                                    )
                                 }
+                            }
+                        } else {
+                            itemsIndexed(uiState.contacts, key = { _, item -> item.uid }) { index, contact ->
+                                val avatarBg = avatarColors[index % avatarColors.size]
+                                val subtitleText = contact.email
+
+                                ContactCardRow(
+                                    contact = contact,
+                                    avatarBg = avatarBg,
+                                    subtitleText = subtitleText,
+                                    onClick = { onAction(ContactsUiAction.ContactSelected(contact)) },
+                                    onDelete = { contactPendingDelete = contact },
+                                )
                             }
                         }
                     }
-                }
-
-                // Active Contacts Section Header
-                item {
-                    Text(
-                        text = "ON NIYE ESHO",
-                        style = MaterialTheme.typography.labelSmall,
-                        fontWeight = FontWeight.Bold,
-                        color = NiyeEshoGreenDarkMuted,
-                    )
-                }
-
-                if (uiState.contacts.isEmpty()) {
-                    item {
-                        Card(
-                            modifier = Modifier.fillMaxWidth(),
-                            shape = AppShapes.card,
-                            colors = CardDefaults.cardColors(containerColor = NiyeEshoDarkSurface),
-                        ) {
-                            Text(
-                                text = "No active contacts yet. Share your invite link to connect!",
-                                modifier = Modifier.padding(Spacing.lg),
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = NiyeEshoGreenMuted,
-                            )
+                    ContactsTab.REQUESTS -> {
+                        // Tab 1: Incoming Requests
+                        if (uiState.pendingIncomingContacts.isEmpty()) {
+                            item {
+                                Card(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    shape = AppShapes.card,
+                                    colors = CardDefaults.cardColors(containerColor = NiyeEshoDarkSurface),
+                                ) {
+                                    Text(
+                                        text = "No incoming contact requests.",
+                                        modifier = Modifier.padding(Spacing.lg),
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        color = NiyeEshoGreenMuted,
+                                    )
+                                }
+                            }
+                        } else {
+                            itemsIndexed(uiState.pendingIncomingContacts, key = { _, item -> "pending_inc_${item.uid}" }) { _, contact ->
+                                PendingRequestCardRow(
+                                    contact = contact,
+                                    onAccept = { onAction(ContactsUiAction.AcceptContactRequest(contact)) },
+                                    onDecline = { onAction(ContactsUiAction.DeclineContactRequest(contact)) },
+                                    onBlock = { onAction(ContactsUiAction.BlockContact(contact)) },
+                                )
+                            }
                         }
                     }
-                } else {
-                    itemsIndexed(uiState.contacts, key = { _, item -> item.uid }) { index, contact ->
-                        val avatarBg = avatarColors[index % avatarColors.size]
-                        val subtitleText = contact.email
-
-                        ContactCardRow(
-                            contact = contact,
-                            avatarBg = avatarBg,
-                            subtitleText = subtitleText,
-                            onClick = { onAction(ContactsUiAction.ContactSelected(contact)) },
-                            onDelete = { contactPendingDelete = contact },
-                        )
+                    ContactsTab.PENDING -> {
+                        // Tab 2: Outgoing Pending Requests
+                        if (uiState.pendingOutgoingContacts.isEmpty()) {
+                            item {
+                                Card(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    shape = AppShapes.card,
+                                    colors = CardDefaults.cardColors(containerColor = NiyeEshoDarkSurface),
+                                ) {
+                                    Text(
+                                        text = "No pending outgoing requests awaiting approval.",
+                                        modifier = Modifier.padding(Spacing.lg),
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        color = NiyeEshoGreenMuted,
+                                    )
+                                }
+                            }
+                        } else {
+                            itemsIndexed(uiState.pendingOutgoingContacts, key = { _, item -> "pending_out_${item.uid}" }) { _, contact ->
+                                PendingOutgoingCardRow(contact = contact)
+                            }
+                        }
                     }
                 }
             }

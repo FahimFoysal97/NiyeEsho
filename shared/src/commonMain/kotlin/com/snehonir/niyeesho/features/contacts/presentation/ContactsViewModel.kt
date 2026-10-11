@@ -85,6 +85,7 @@ class ContactsViewModel(
     fun onAction(action: ContactsUiAction) {
         when (action) {
             is ContactsUiAction.QueryChanged -> queryChanged(action.query)
+            is ContactsUiAction.TabSelected -> _uiState.update { it.copy(selectedTab = action.tab) }
             is ContactsUiAction.ContactSelected -> {
                 _uiState.update {
                     it.copy(

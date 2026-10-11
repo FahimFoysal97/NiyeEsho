@@ -5,6 +5,7 @@ import com.snehonir.niyeesho.features.shopping_list.domain.entity.ListMember
 
 sealed interface ContactsUiAction {
     data class QueryChanged(val query: String) : ContactsUiAction
+    data class TabSelected(val tab: ContactsTab) : ContactsUiAction
     data class ContactSelected(val contact: Contact) : ContactsUiAction
     data object CreateGroupClicked : ContactsUiAction
     data class InviteContactClicked(val contact: Contact) : ContactsUiAction

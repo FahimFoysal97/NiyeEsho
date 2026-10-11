@@ -51,7 +51,7 @@ fun NiyeEshoApp(
         logD("NiyeEshoApp", "Determined startDestination = $startDestination")
     }
 
-    // Single handshake check on app startup
+    // Single handshake check on app launch
     LaunchedEffect(startDestination) {
         if (startDestination != null && startDestination != NavRoute.SignIn.route) {
             val user = getCurrentUser().getOrNull()

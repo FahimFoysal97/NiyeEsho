@@ -24,7 +24,7 @@ import org.koin.dsl.module
 
 val messagingModule = module {
     singleOf(::MessagingLocalDataSourceImpl).bind<MessagingLocalDataSource>()
-    single<MessagingRemoteDataSource> { MessagingRemoteDataSourceImpl(get(), get()) }
+    single<MessagingRemoteDataSource> { MessagingRemoteDataSourceImpl(get(), get(), get()) }
     singleOf(::ContactMessageHandler)
     singleOf(::ListMessageHandler)
     singleOf(::ItemMessageHandler)

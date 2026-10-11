@@ -50,4 +50,6 @@ class AuthRepositoryImpl(
 
     override suspend fun isSignedIn(): Result<Boolean> =
         getCurrentUser().map { it != null }
+
+    override suspend fun getIdToken(): Result<String?> = remote.getIdToken()
 }

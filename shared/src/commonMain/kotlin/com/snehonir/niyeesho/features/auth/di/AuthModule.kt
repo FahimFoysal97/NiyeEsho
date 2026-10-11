@@ -1,11 +1,9 @@
 package com.snehonir.niyeesho.features.auth.di
 
-import com.snehonir.niyeesho.BuildKonfig
 import com.snehonir.niyeesho.features.auth.data.local.AuthLocalDataSource
 import com.snehonir.niyeesho.features.auth.data.local.AuthLocalDataSourceImpl
 import com.snehonir.niyeesho.features.auth.data.remote.AuthRemoteDataSource
 import com.snehonir.niyeesho.features.auth.data.remote.AuthRemoteDataSourceImpl
-import com.snehonir.niyeesho.features.auth.data.remote.FakeAuthRemoteDataSource
 import com.snehonir.niyeesho.features.auth.data.repository.AuthRepositoryImpl
 import com.snehonir.niyeesho.features.auth.domain.repository.AuthRepository
 import com.snehonir.niyeesho.features.auth.domain.usecase.GetCurrentUserUseCase

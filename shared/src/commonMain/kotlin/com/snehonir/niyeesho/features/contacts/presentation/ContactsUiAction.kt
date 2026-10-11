@@ -16,6 +16,7 @@ sealed interface ContactsUiAction {
     data class DeclineContactRequest(val contact: Contact) : ContactsUiAction
     data class BlockContact(val contact: Contact) : ContactsUiAction
     data class RefreshToken(val uid: String) : ContactsUiAction
+    data object PullToRefresh : ContactsUiAction
     data object InviteClicked : ContactsUiAction
     data object ScanQrClicked : ContactsUiAction
     data object DismissInvite : ContactsUiAction

@@ -110,11 +110,24 @@ class ContactsViewModel(
             is ContactsUiAction.DeclineContactRequest -> declineRequest(action.contact)
             is ContactsUiAction.BlockContact -> block(action.contact)
             is ContactsUiAction.RefreshToken -> refresh(action.uid)
+            ContactsUiAction.PullToRefresh -> pullToRefresh()
             ContactsUiAction.InviteClicked -> generateInvite()
             ContactsUiAction.ScanQrClicked -> Unit
             ContactsUiAction.DismissInvite -> _uiState.update { it.copy(isInviteBottomSheetVisible = false) }
             ContactsUiAction.DismissScanner -> Unit
             ContactsUiAction.ErrorDismissed -> _uiState.update { it.copy(error = null) }
+        }
+    }
+
+    private fun pullToRefresh() {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isRefreshing = true) }
+            runCatching {
+                val user = getCurrentUser().getOrNull()
+                val myUid = user?.uid ?: "user_me"
+                messagingRepository.fetchPendingHandshakes(myUid)
+            }
+            _uiState.update { it.copy(isRefreshing = false) }
         }
     }
 

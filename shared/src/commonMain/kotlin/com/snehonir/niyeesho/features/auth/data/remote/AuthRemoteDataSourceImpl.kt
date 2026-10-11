@@ -30,6 +30,10 @@ class AuthRemoteDataSourceImpl(
         firebaseAuth.currentUser?.toDomain()
     }
 
+    override suspend fun getIdToken(): Result<String?> = runCatching {
+        firebaseAuth.currentUser?.getIdToken(false)
+    }
+
     private fun dev.gitlive.firebase.auth.FirebaseUser.toDomain(): User {
         val now = Clock.System.now()
         return User(

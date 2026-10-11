@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.Flow
 /** Sends, receives, and queues peer-to-peer FCM data messages. */
 interface MessagingRepository {
     fun observeIncomingMessages(): Flow<FcmMessage>
+    fun observeHandshakeRequests(myUid: String): Flow<Unit>
     suspend fun send(recipientUid: String, recipientToken: String, message: FcmMessage): Result<Unit>
     suspend fun handleIncoming(message: FcmMessage): Result<Unit>
     suspend fun fetchPendingHandshakes(myUid: String): Result<Unit>

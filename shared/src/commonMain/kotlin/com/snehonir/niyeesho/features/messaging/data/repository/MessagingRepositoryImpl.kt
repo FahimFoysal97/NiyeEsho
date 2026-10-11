@@ -15,6 +15,7 @@ import com.snehonir.niyeesho.features.messaging.domain.entity.FcmMessageType
 import com.snehonir.niyeesho.features.messaging.domain.entity.InviteData
 import com.snehonir.niyeesho.features.messaging.domain.repository.MessagingRepository
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import kotlinx.datetime.Clock
 
 class MessagingRepositoryImpl(
@@ -23,6 +24,18 @@ class MessagingRepositoryImpl(
     private val handler: FcmMessageHandler,
 ) : MessagingRepository {
     override fun observeIncomingMessages(): Flow<FcmMessage> = local.observeIncoming()
+
+    override fun observeHandshakeRequests(myUid: String): Flow<Unit> = flow {
+        logD("SystemNotifier", "observeHandshakeRequests() -> starting SSE event stream collector for $myUid")
+        remote.watchHandshakeRequests(myUid).collect { list ->
+            logD("SystemNotifier", "observeHandshakeRequests() -> SSE event delivered ${list.size} handshake payloads for $myUid")
+            list.forEach { dto ->
+                val fcmMsg = dto.toDomain()
+                handler.handle(fcmMsg)
+            }
+            emit(Unit)
+        }
+    }
 
     override suspend fun send(recipientUid: String, recipientToken: String, message: FcmMessage): Result<Unit> {
         val targetToken = recipientToken.ifBlank { recipientUid }

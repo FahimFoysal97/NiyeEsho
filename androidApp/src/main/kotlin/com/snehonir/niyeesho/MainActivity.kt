@@ -13,8 +13,18 @@ import androidx.core.content.ContextCompat
 import com.snehonir.niyeesho.app.NiyeEshoApp
 import com.snehonir.niyeesho.core.notifier.SystemNotifier
 import com.snehonir.niyeesho.core.utils.logD
+import com.snehonir.niyeesho.features.auth.domain.usecase.GetCurrentUserUseCase
+import com.snehonir.niyeesho.features.messaging.domain.repository.MessagingRepository
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
-class MainActivity : ComponentActivity() {
+class MainActivity : ComponentActivity(), KoinComponent {
+    private val messagingRepository: MessagingRepository by inject()
+    private val getCurrentUser: GetCurrentUserUseCase by inject()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
@@ -49,5 +59,19 @@ class MainActivity : ComponentActivity() {
             )
         }
         logD("MainActivity", "MainActivity.onCreate() completed")
+    }
+
+    override fun onResume() {
+        super.onResume()
+        logD("MainActivity", "onResume() -> fetching pending handshakes")
+        CoroutineScope(Dispatchers.Default).launch {
+            runCatching {
+                val user = getCurrentUser().getOrNull()
+                val myUid = user?.uid ?: "user_me"
+                messagingRepository.fetchPendingHandshakes(myUid)
+            }.onFailure {
+                logD("MainActivity", "onResume() handshake sync failed: ${it.message}")
+            }
+        }
     }
 }

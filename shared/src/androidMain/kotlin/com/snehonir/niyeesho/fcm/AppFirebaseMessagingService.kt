@@ -48,27 +48,26 @@ class AppFirebaseMessagingService : FirebaseMessagingService(), KoinComponent {
                     timestamp = data["timestamp"].orEmpty(),
                     data = data["data"].orEmpty(),
                 )
-                payload.toDomain()?.let { fcmMessage ->
-                    logD("AppFirebaseMessagingService", "Handling incoming FCM message type: ${fcmMessage.type} from ${fcmMessage.senderName}")
+                val fcmMessage = payload.toDomain()
+                logD("AppFirebaseMessagingService", "Handling incoming FCM message type: ${fcmMessage.type} from ${fcmMessage.senderName}")
 
-                    when (fcmMessage.type) {
-                        FcmMessageType.CONTACT_REQUEST -> {
-                            postSystemNotification(
-                                title = "New Connection Request",
-                                messageText = "${fcmMessage.senderName} wants to connect with you on Niye Esho.",
-                            )
-                        }
-                        FcmMessageType.CONTACT_ACCEPTED -> {
-                            postSystemNotification(
-                                title = "Connection Accepted!",
-                                messageText = "${fcmMessage.senderName} accepted your connection request.",
-                            )
-                        }
-                        else -> Unit
+                when (fcmMessage.type) {
+                    FcmMessageType.CONTACT_REQUEST -> {
+                        postSystemNotification(
+                            title = "New Connection Request 🤝",
+                            messageText = "${fcmMessage.senderName} wants to connect with you on Niye Esho.",
+                        )
                     }
-
-                    scope.launch { handleIncomingMessage(fcmMessage) }
+                    FcmMessageType.CONTACT_ACCEPTED -> {
+                        postSystemNotification(
+                            title = "Connection Accepted! 🎉",
+                            messageText = "${fcmMessage.senderName} accepted your connection request.",
+                        )
+                    }
+                    else -> Unit
                 }
+
+                scope.launch { handleIncomingMessage(fcmMessage) }
             }.onFailure {
                 logD("AppFirebaseMessagingService", "Failed to decode or handle FCM payload: ${it.message}")
             }
@@ -87,6 +86,8 @@ class AppFirebaseMessagingService : FirebaseMessagingService(), KoinComponent {
                     NotificationManager.IMPORTANCE_HIGH,
                 ).apply {
                     description = "Notifications for incoming contact requests and connection approvals"
+                    enableVibration(true)
+                    enableLights(true)
                 }
                 notificationManager.createNotificationChannel(channel)
             }
@@ -104,6 +105,8 @@ class AppFirebaseMessagingService : FirebaseMessagingService(), KoinComponent {
                 .setContentTitle(title)
                 .setContentText(messageText)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setDefaults(NotificationCompat.DEFAULT_ALL)
+                .setCategory(NotificationCompat.CATEGORY_MESSAGE)
                 .setAutoCancel(true)
                 .setContentIntent(pendingIntent)
                 .build()

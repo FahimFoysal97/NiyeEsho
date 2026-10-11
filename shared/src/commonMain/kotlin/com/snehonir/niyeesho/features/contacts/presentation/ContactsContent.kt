@@ -17,9 +17,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -83,30 +85,37 @@ fun ContactsContent(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = Spacing.lg, vertical = Spacing.md),
-            horizontalArrangement = Arrangement.spacedBy(Spacing.md),
+            horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            IconButton(
-                onClick = onBack,
-                modifier = Modifier
-                    .size(40.dp)
-                    .clip(AppShapes.button)
-                    .background(NiyeEshoDarkSurface),
-            ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = AppStrings.ACTION_BACK,
-                    tint = Color.White,
-                    modifier = Modifier.size(20.dp),
-                )
-            }
             Text(
                 text = AppStrings.TITLE_CONTACTS,
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
                 color = Color.White,
-                modifier = Modifier.weight(1f),
             )
+            IconButton(
+                onClick = { onAction(ContactsUiAction.PullToRefresh) },
+                modifier = Modifier
+                    .size(40.dp)
+                    .clip(AppShapes.button)
+                    .background(NiyeEshoDarkSurface),
+            ) {
+                if (uiState.isRefreshing) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(20.dp),
+                        color = NiyeEshoGreenPrimary,
+                        strokeWidth = 2.dp,
+                    )
+                } else {
+                    Icon(
+                        imageVector = Icons.Default.Refresh,
+                        contentDescription = AppStrings.DESC_REFRESH,
+                        tint = NiyeEshoGreenPrimary,
+                        modifier = Modifier.size(20.dp),
+                    )
+                }
+            }
         }
 
         Box(modifier = Modifier.weight(1f)) {

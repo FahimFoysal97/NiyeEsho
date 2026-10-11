@@ -16,6 +16,8 @@ import io.ktor.client.request.setBody
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import kotlinx.datetime.Clock
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
@@ -162,5 +164,9 @@ class MessagingRemoteDataSourceImpl(
         Unit
     }.onFailure {
         logD("MessagingRemote(Network)", "deleteHandshakeRequest() -> failed: ${it.message}")
+    }
+
+    override fun watchHandshakeRequests(myUid: String): Flow<List<FcmPayloadDto>> = flow {
+        fetchHandshakeRequests(myUid).onSuccess { emit(it) }
     }
 }

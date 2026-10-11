@@ -2,6 +2,8 @@ package com.snehonir.niyeesho.features.messaging.data.remote
 
 import com.snehonir.niyeesho.features.messaging.data.remote.dto.FcmPayloadDto
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 
 class FakeMessagingRemoteDataSource : MessagingRemoteDataSource {
     private val pendingHandshakes = mutableMapOf<String, MutableList<FcmPayloadDto>>()
@@ -32,5 +34,9 @@ class FakeMessagingRemoteDataSource : MessagingRemoteDataSource {
         delay(30)
         pendingHandshakes[myUid]?.removeAll { it.senderId == senderUid }
         return Result.success(Unit)
+    }
+
+    override fun watchHandshakeRequests(myUid: String): Flow<List<FcmPayloadDto>> = flow {
+        emit(pendingHandshakes[myUid] ?: emptyList())
     }
 }

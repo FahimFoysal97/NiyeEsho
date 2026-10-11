@@ -117,35 +117,58 @@ class ContactsViewModel(
 
     private fun acceptRequest(contact: Contact) {
         viewModelScope.launch {
+            if (_uiState.value.processingUids.contains(contact.uid)) return@launch
             logD("ContactsVM", "acceptRequest() -> accepting request from ${contact.displayName} (uid: ${contact.uid})")
+            _uiState.update { it.copy(processingUids = it.processingUids + contact.uid) }
             val user = getCurrentUser().getOrNull()
             val myUid = user?.uid ?: "user_me"
 
-            // Delete request node from Realtime Database
-            messagingRepository.deleteHandshakeRequest(myUid, contact.uid)
+            try {
+                // Delete request node from Realtime Database
+                messagingRepository.deleteHandshakeRequest(myUid, contact.uid)
 
-            // Update local contact status to ACTIVE
-            contactsRepository.updateStatus(contact.uid, ContactStatus.ACTIVE).onFailure { fail(it) }
+                // Update local contact status to ACTIVE
+                contactsRepository.updateStatus(contact.uid, ContactStatus.ACTIVE).onFailure { fail(it) }
+            } finally {
+                _uiState.update { it.copy(processingUids = it.processingUids - contact.uid) }
+            }
         }
     }
 
     private fun declineRequest(contact: Contact) {
         viewModelScope.launch {
+            if (_uiState.value.processingUids.contains(contact.uid)) return@launch
             logD("ContactsVM", "declineRequest() -> declining request from ${contact.displayName} (uid: ${contact.uid})")
+            _uiState.update { it.copy(processingUids = it.processingUids + contact.uid) }
             val user = getCurrentUser().getOrNull()
             val myUid = user?.uid ?: "user_me"
 
-            // Delete request node from Realtime Database
-            messagingRepository.deleteHandshakeRequest(myUid, contact.uid)
+            try {
+                // Delete request node from Realtime Database
+                messagingRepository.deleteHandshakeRequest(myUid, contact.uid)
 
-            // Remove contact from local storage on decline
-            contactsRepository.removeContact(contact.uid).onFailure { fail(it) }
+                // Remove contact from local storage on decline
+                contactsRepository.removeContact(contact.uid).onFailure { fail(it) }
+            } finally {
+                _uiState.update { it.copy(processingUids = it.processingUids - contact.uid) }
+            }
         }
     }
 
     private fun block(contact: Contact) {
         viewModelScope.launch {
-            contactsRepository.removeContact(contact.uid).onFailure { fail(it) }
+            if (_uiState.value.processingUids.contains(contact.uid)) return@launch
+            logD("ContactsVM", "block() -> blocking contact ${contact.displayName} (uid: ${contact.uid})")
+            _uiState.update { it.copy(processingUids = it.processingUids + contact.uid) }
+            val user = getCurrentUser().getOrNull()
+            val myUid = user?.uid ?: "user_me"
+
+            try {
+                messagingRepository.deleteHandshakeRequest(myUid, contact.uid)
+                contactsRepository.removeContact(contact.uid).onFailure { fail(it) }
+            } finally {
+                _uiState.update { it.copy(processingUids = it.processingUids - contact.uid) }
+            }
         }
     }
 

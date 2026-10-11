@@ -90,6 +90,9 @@ object AppStrings {
     const val MSG_LINK_INVALID = "That doesn't look like a Niye Esho invite link"
 
     const val GREETING_MORNING = "Good morning"
+    const val GREETING_AFTERNOON = "Good afternoon"
+    const val GREETING_EVENING = "Good evening"
+
     const val LABEL_DEFAULT_USER = "Sneho"
     const val LABEL_DEFAULT_OWNER = "Sneho Nir"
     const val LABEL_LOADING = "Loading..."

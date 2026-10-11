@@ -28,12 +28,16 @@ import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import kotlinx.datetime.Clock
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import com.snehonir.niyeesho.core.designsystem.component.AppBottomBar
 import com.snehonir.niyeesho.core.designsystem.component.AppNavTab
 import com.snehonir.niyeesho.core.designsystem.component.AvatarImage
@@ -93,8 +97,18 @@ fun DashboardContent(
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Column(verticalArrangement = Arrangement.spacedBy(Spacing.xs / 2)) {
+                            val currentHour = remember {
+                                runCatching {
+                                    Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).hour
+                                }.getOrDefault(9)
+                            }
+                            val greetingText = when (currentHour) {
+                                in 5..11 -> AppStrings.GREETING_MORNING
+                                in 12..16 -> AppStrings.GREETING_AFTERNOON
+                                else -> AppStrings.GREETING_EVENING
+                            }
                             Text(
-                                text = AppStrings.GREETING_MORNING,
+                                text = greetingText,
                                 style = MaterialTheme.typography.bodySmall,
                                 color = NiyeEshoGreenMuted,
                             )

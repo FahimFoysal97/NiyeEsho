@@ -19,6 +19,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -213,14 +214,14 @@ fun InviteContent(
                                     .padding(bottom = 10.dp),
                             )
 
-                            Box(
+                            BoxWithConstraints(
                                 modifier = Modifier
                                     .fillMaxWidth(),
                                 contentAlignment = Alignment.CenterStart,
                             ) {
                                 QrCodeDisplay(
                                     value = uiState.inviteLink,
-                                    sizeDp = 300,
+                                    sizeDp = maxWidth.value.toInt(),
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .clip(RoundedCornerShape(12.dp)),
